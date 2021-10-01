@@ -38,7 +38,10 @@ public class Model {
 	}
 	
 	private void loadModel(Asset asset) {
-		AIScene scene = ModelImporter.importScene(asset, aiProcess_Triangulate);
+		AIScene scene = ModelImporter.importScene(asset,
+				aiProcess_Triangulate |
+				aiProcess_GenNormals
+		);
 		if (scene == null ||
 				(scene.mFlags() & AI_SCENE_FLAGS_INCOMPLETE) != 0 || 
 				scene.mRootNode() == null) {
@@ -84,24 +87,24 @@ public class Model {
 		//Vertex buffer
 		for (int i = 0, pos = 0; i < numVertices; i++) {
 			AIVector3D vertex = vertices.get(i);
-			AIVector3D normal = normals.get(i);
+			AIVector3D normal = null;
+			if (normals != null) normal = normals.get(i);
 			//Vertex positions
 			vertexBuffer[pos++] = vertex.x();
 			vertexBuffer[pos++] = vertex.y();
 			vertexBuffer[pos++] = vertex.z();
 			//Texture coordinates
-			if (texCoords == null) {
-				vertexBuffer[pos++] = 0.0f;
-				vertexBuffer[pos++] = 0.0f;
-			} else {
+			if (texCoords != null) {
 				AIVector3D texCoord = texCoords.get(i);
 				vertexBuffer[pos++] = texCoord.x();
 				vertexBuffer[pos++] = texCoord.y();
 			}
 			//Vertex normals
-			vertexBuffer[pos++] = normal.x();
-			vertexBuffer[pos++] = normal.y();
-			vertexBuffer[pos++] = normal.z();
+			if (normal != null) {
+				vertexBuffer[pos++] = normal.x();
+				vertexBuffer[pos++] = normal.y();
+				vertexBuffer[pos++] = normal.z();
+			}
 		}
 		//Index buffer
 		for (int i = 0, pos = 0; i < numFaces; i++) {

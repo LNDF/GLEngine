@@ -15,7 +15,7 @@ public class Main {
 	public static void main(String[] args) {
 		Window win = Window.createWindow("AAA", 800, 600, true);
 		Scene scene = new Scene();
-		Model model = new Model(new Asset("resource:/model2/model.obj"));
+		Model model = new Model(new Asset("resource:/model/model.obj"));
 		GameObject camObj = new GameObject();
 		FPCamera cam = new FPCamera((float) Math.PI / 2.0f, 100.0f);
 		Spotlight light = new Spotlight(new Vector3f(1,1,1), 1.0f, 0.35f, 0.44f, (float) Math.toRadians(25), (float) Math.toRadians(35));
