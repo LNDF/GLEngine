@@ -85,25 +85,27 @@ public class Model {
 		AIVector3D.Buffer texCoords = aiMesh.mTextureCoords(0);
 		Texture2DRoles textures = new Texture2DRoles();
 		//Vertex buffer
-		for (int i = 0, pos = 0; i < numVertices; i++) {
-			AIVector3D vertex = vertices.get(i);
-			AIVector3D normal = null;
-			if (normals != null) normal = normals.get(i);
-			//Vertex positions
-			vertexBuffer[pos++] = vertex.x();
-			vertexBuffer[pos++] = vertex.y();
-			vertexBuffer[pos++] = vertex.z();
-			//Texture coordinates
-			if (texCoords != null) {
-				AIVector3D texCoord = texCoords.get(i);
-				vertexBuffer[pos++] = texCoord.x();
-				vertexBuffer[pos++] = texCoord.y();
+		if (vertices != null) { //positions
+			for (int i = 0; i < numVertices; i++) {
+				AIVector3D vertex = vertices.get(i);
+				vertexBuffer[(vertexElements * i) + 0] = vertex.x();
+				vertexBuffer[(vertexElements * i) + 1] = vertex.y();
+				vertexBuffer[(vertexElements * i) + 2] = vertex.z();
 			}
-			//Vertex normals
-			if (normal != null) {
-				vertexBuffer[pos++] = normal.x();
-				vertexBuffer[pos++] = normal.y();
-				vertexBuffer[pos++] = normal.z();
+		}
+		if (texCoords != null) { //texture coordinates
+			for (int i = 0; i < numVertices; i++) {
+				AIVector3D texCoord = texCoords.get(i);
+				vertexBuffer[(vertexElements * i) + 3] = texCoord.x();
+				vertexBuffer[(vertexElements * i) + 4] = texCoord.y();
+			}
+		}
+		if (normals != null) { //normals
+			for (int i = 0; i < numVertices; i++) {
+				AIVector3D normal = normals.get(i);
+				vertexBuffer[(vertexElements * i) + 5] = normal.x();
+				vertexBuffer[(vertexElements * i) + 6] = normal.y();
+				vertexBuffer[(vertexElements * i) + 7] = normal.z();
 			}
 		}
 		//Index buffer
