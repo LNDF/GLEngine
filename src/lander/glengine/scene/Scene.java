@@ -1,6 +1,10 @@
 package lander.glengine.scene;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import lander.glengine.engine.SceneManager;
 import lander.glengine.scene.components.lighting.DirectionalLight;
@@ -9,9 +13,8 @@ import lander.glengine.scene.components.lighting.Spotlight;
 
 public class Scene {
 	
-	private HashSet<GameObject> gameObjects = new HashSet<GameObject>();
-	private HashSet<GameObject> objectsToAdd = new HashSet<GameObject>();
-	private HashSet<GameObject> objectsToRemove = new HashSet<GameObject>();
+	private KeySetView<GameObject, Boolean> gameObjects = ConcurrentHashMap.newKeySet();
+	private KeySetView<GameObject, Boolean> gameObjectsToDestroy = ConcurrentHashMap.newKeySet();
 	
 	private float ambientLight;
 	
@@ -44,8 +47,9 @@ public class Scene {
 	}
 	
 	private void _addObject(GameObject object) {
-		this.objectsToAdd.add(object);
-		this.objectsToRemove.remove(object);
+		this.clearComponentCaches();
+		this.gameObjects.add(object);
+		this.gameObjectsToDestroy.remove(object);
 		object.setScene(this);
 		for (GameObject child : object.getChildren()) {
 			this._addObject(child);
@@ -58,17 +62,18 @@ public class Scene {
 	}
 	
 	private void _removeObject(GameObject object) {
+		this.clearComponentCaches();
 		if (this.gameObjects.contains(object)) {
-			this.objectsToRemove.add(object);
+			this.gameObjects.remove(object);
+			this.gameObjectsToDestroy.add(object);
 		}
-		this.objectsToAdd.remove(object);
 		for (GameObject child : object.getChildren()) {
 			this._removeObject(child);
 		}
 	}
 	
-	public HashSet<GameObject> getGameObjects() {
-		return this.gameObjects;
+	public Set<GameObject> getGameObjects() {
+		return Collections.unmodifiableSet(this.gameObjects);
 	}
 	
 	public HashSet<RenderComponent> getRenderComponents() {
@@ -127,32 +132,17 @@ public class Scene {
 		return this.spotlightCache;
 	}
 	
-	public void addAndRemoveObjects() {
-		if (this.objectsToAdd.size() > 0 || this.objectsToRemove.size() > 0) {
-			this.clearComponentCaches();
-			this.gameObjects.addAll(this.objectsToAdd);
-			this.gameObjects.removeAll(this.objectsToRemove);
-			//TODO: WTF!!!
-			//for (GameObject obj : this.objectsToAdd) {
-			//	obj.addAndRemoveComponents();
-			//}
-			for (GameObject obj : this.objectsToRemove) {
-				obj.setScene(null);
-			}
-			this.objectsToAdd.clear();
-			this.objectsToRemove.clear();
-		}
-	}
-	
 	public void update() {
 		for (GameObject obj : this.gameObjects) {
 			for (Component comp : obj.getComponents()) {
 				comp.update();
 			}
+			obj.destroyComponents();
 			obj.getTransform().checkCache();
-			obj.addAndRemoveComponents();
 		}
-		this.addAndRemoveObjects();
+		for (GameObject obj : this.gameObjectsToDestroy) {
+			obj.setScene(null);
+		}
 	}
 	
 	public void destroy() {

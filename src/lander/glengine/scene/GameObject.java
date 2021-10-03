@@ -2,16 +2,15 @@ package lander.glengine.scene;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 public class GameObject {
 	
-	private HashMap<Class<? extends Component>, Component> components = new HashMap<Class<? extends Component>, Component>();
-	private HashMap<Class<? extends Component>, Component> componentsToAdd = new HashMap<Class<? extends Component>, Component>();
-	private HashMap<Class<? extends Component>, Component> componentsToRemove = new HashMap<Class<? extends Component>, Component>();
+	private ConcurrentHashMap<Class<? extends Component>, Component> components = new ConcurrentHashMap<Class<? extends Component>, Component>();
+	private KeySetView<Component, Boolean> componentsToDestroy = ConcurrentHashMap.newKeySet();
 	
 	private Scene scene = null;
 	
@@ -31,8 +30,8 @@ public class GameObject {
 	public void addComponent(Component component) {
 		if (component.getGameObject() != null) return;
 		Class<? extends Component> c = component.getClass();
-		this.componentsToAdd.put(c, component);
-		this.componentsToRemove.remove(c);
+		this.components.put(c, component);
+		this.componentsToDestroy.remove(component);
 		component.setGameObject(this);
 		component.start();
 	}
@@ -47,27 +46,18 @@ public class GameObject {
 	
 	public void removeCompopnent(Class<? extends Component> c) {
 		if (this.components.containsKey(c)) {
-			this.componentsToRemove.put(c, this.components.get(c));
+			Component comp = this.components.get(c);
+			this.componentsToDestroy.add(comp);
+			this.components.remove(c);
 		}
-		this.componentsToAdd.remove(c);
 	}
 	
-	public void addAndRemoveComponents() {
-		if (this.getScene() != null && (this.componentsToAdd.size() > 0 || this.componentsToRemove.size() > 0)) {
-			this.getScene().clearComponentCaches();
-			this.components.putAll(this.componentsToAdd);
-			for (Map.Entry<Class<? extends Component>, Component> entry : this.componentsToRemove.entrySet()) {
-				Class<? extends Component> cc = entry.getKey();
-				Component c = entry.getValue();
-				if (c != null) {
-					c.destroy();
-					c.setGameObject(null);
-				}
-				this.components.remove(cc);
-			}
-			this.componentsToAdd.clear();
-			this.componentsToRemove.clear();
+	public void destroyComponents() {
+		for (Component c : this.componentsToDestroy) {
+			c.destroy();
+			c.setGameObject(null);
 		}
+		this.componentsToDestroy.clear();
 	}
 	
 	public void destroy() {
@@ -79,8 +69,8 @@ public class GameObject {
 			obj.setParent(null);
 		}
 		this.children.clear();
-		this.componentsToRemove.putAll(this.components);
-		this.componentsToAdd.clear();
+		this.componentsToDestroy.clear();
+		this.components.clear();
 	}
 	
 	public GameObject getParent() {
