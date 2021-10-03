@@ -156,11 +156,16 @@ public class FPCamera extends Camera{
 			pos.add(0, -step, 0);
 		}
 		if (Input.getKey(this.camUpKey)) {
-			
 			t.rotateArround(t.getRight(), rotAngle);
+			if (t.getDown().y > 0) {
+				t.lookAt(new Vector3f(0, 1, 0), t.getUp());
+			}
 		}
 		if (Input.getKey(this.camDownKey)) {
 			t.rotateArround(t.getRight(), -rotAngle);
+			if (t.getDown().y > 0) {
+				t.lookAt(new Vector3f(0, -1, 0), t.getUp());
+			}
 		}
 		if (Input.getKey(this.camLeftKey)) {
 			t.rotateArround(UP, rotAngle);
