@@ -55,6 +55,7 @@ public class Transform {
 	}
 	
 	public Matrix4f getTransformation() {
+		this.checkCache();
 		if (this.transformation != null) return new Matrix4f(this.transformation);
 		Matrix4f b = new Matrix4f(this.customTransformBefore);
 		Matrix4f a = new Matrix4f(this.customTransformAfter);
