@@ -134,19 +134,20 @@ public class FPCamera extends Camera{
 		GameObject obj = this.getGameObject();
 		Transform t = obj.getTransform();
 		Vector3f pos = t.getPosition();
+		Vector3f go = new Vector3f();
 		float rotAngle = (float) (rotationSpeed * DeltaTime.get());
 		float step = (float) (speed * DeltaTime.get());
 		if (Input.getKey(this.fordwardKey)) {
-			pos.add(t.getFront().mul(step));
+			go.add(t.getFront().mul(step));
 		}
 		if (Input.getKey(this.backwardsKey)) {
-			pos.add(t.getBack().mul(step));
+			go.add(t.getBack().mul(step));
 		}
 		if (Input.getKey(this.leftKey)) {
-			pos.add(t.getLeft().mul(step));
+			go.add(t.getLeft().mul(step));
 		}
 		if (Input.getKey(this.rightKey)) {
-			pos.add(t.getRight().mul(step));
+			go.add(t.getRight().mul(step));
 		}
 		if (Input.getKey(this.upKey)) {
 			pos.add(0, step, 0);
@@ -167,6 +168,16 @@ public class FPCamera extends Camera{
 		if (Input.getKey(this.camRightKey)) {
 			t.rotateArround(UP, -rotAngle);
 		}
+		float lenCorrect = go.length();
+		float y = go.y;
+		go.y = 0;
+		float len = go.length();
+		if (len != 0) {
+			go.mul(lenCorrect / len);
+		} else {
+			t.getDown().mul(y, go);
+		}
+		pos.add(go);
 	}
 	
 }
