@@ -172,6 +172,64 @@ public class Transform {
 		this.rotation.set(new Quaternionf().rotateAxis(angle, axis).mul(this.rotation).normalize());
 	}
 	
+	public void lookAt(Vector3f front, Vector3f up) {
+		float fx = -front.x, fy = -front.y, fz = -front.z;
+		float ux = -up.x, uy = -up.y, uz = -up.z;
+		
+		//normalize dir
+		float fl = (float) Math.sqrt(fx * fx + fy * fy + fz * fz);
+		fx /= fl;
+		fy /= fl;
+		fz /= fl;
+		
+		//right
+		float rx = fy * uz - fz * uy;
+		float ry = fz * ux - fx * uz;
+		float rz = fx * uy - fy * ux;
+		
+		//normalize left
+		float rl = (float) Math.sqrt(rx * rx + ry * ry + rz * rz);
+		rx /= rl;
+		ry /= rl;
+		rz /= rl;
+		
+		//normalized up
+		ux = fy * rz - fz * ry;
+		uy = fz * rx - fx * rz;
+		uz = fx * ry - fy * rx;
+		
+		//Calculate as matrix: row 0 = right, row 1 = up, row 2 = front
+		float x, y, z, w, s;
+		float trace = rx + uy + fz;
+		if (trace > 0) {
+			s = (float) (2.0f * Math.sqrt(trace + 1.0));
+			w = 0.25f * s;
+			x = (uz - fy) / s;
+			y = (fx - rz) / s;
+			z = (ry - ux) / s;
+		} else if (rx > uy && rx > fz) {
+			s = (float) (2.0 * Math.sqrt(1.0 + rx - uy - fz));
+			w = (uz - fy) / s;
+			x = 0.25f * s;
+			y = (ux + ry) / s;
+			z = (fx + rz) / s;
+		} else if (uy > fz) {
+			s = (float) (2.0 * Math.sqrt(1.0 + uy - rx - fz));
+			w = (fx - rz) / s;
+			x = (ux + ry) / s;
+			y = 0.25f * s;
+			z = (fy + uz) / s;
+		} else {
+			s = (float) (2.0 * Math.sqrt(1.0 + fz - rx - uy));
+			w = (ry - ux) / s;
+			x = (fx + rz) / s;
+			y = (fy + uz) / s;
+			z = 0.25f * s;
+		}
+		float l = (float) Math.sqrt(x * x + y * y + z * z + w * w);
+		this.rotation.set(x / l, y / l, z / l, w / l);
+	}
+	
 	public void rotateEuler(Vector3f angles) {
 		this.rotation.rotationXYZ(angles.x, angles.y, angles.z);
 	}
