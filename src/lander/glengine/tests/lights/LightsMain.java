@@ -31,7 +31,7 @@ public class LightsMain {
 			@Override
 			public void update() {
 				GameObject obj = this.getGameObject();
-				obj.rotateX((float) DeltaTime.get());
+				obj.getTransform().getRotation().rotateAxis((float) DeltaTime.get(), 1, 0, 0);
 			}
 		};
 		GameObject camObj = new GameObject();
@@ -44,15 +44,12 @@ public class LightsMain {
 					Cube box = new Cube(material);
 					GameObject boxObj = new GameObject();
 					boxObj.addComponent(box);
-					boxObj.setPosition(i * 3, k * 4, j * 3);
-					boxObj.rotateX((float) Math.toRadians(i * 10));
-					boxObj.rotateZ((float) Math.toRadians(j * k));
-					boxObj.rotateY((float) Math.toRadians(k * i));
+					boxObj.getTransform().setPosition(new Vector3f(i * 3, k * 4, j * 3));
+					boxObj.getTransform().rotateEuler(new Vector3f((float) Math.toRadians(i * 10), (float) Math.toRadians(j * k), (float) Math.toRadians(k * i)));
 					scene.addObject(boxObj);
 				}
 			}
 		}
-		camObj.setFront(new Vector3f(0, 0, -1));
 		camObj.addComponent(cam);
 		camObj.addComponent(pl);
 		pl1CObj.addChild(pl1Obj);
@@ -66,7 +63,7 @@ public class LightsMain {
 			@Override
 			public void update() {
 				GameObject obj = this.getGameObject();
-				obj.rotateY((float) DeltaTime.get());
+				obj.getTransform().getRotation().rotateAxis((float) DeltaTime.get(), 1, 0, 0);
 			}
 
 			@Override
@@ -75,13 +72,12 @@ public class LightsMain {
 			}
 			
 		});
-		pl1CObj.setPosition(10, 10, 10);
+		pl1CObj.getTransform().setPosition(new Vector3f(10, 10, 10));
 		pl1Obj.addComponent(pl1);
-		pl1Obj.setPosition(3, 3, 3);
+		pl1Obj.getTransform().setPosition(new Vector3f(3, 3, 3));
 		pl2Obj.addComponent(pl2);
-		pl2Obj.rotateX((float) Math.PI / 6);
-		pl2Obj.rotateY((float) Math.PI / 3);
-		camObj.setPosition(0, 0, 1);
+		pl2Obj.getTransform().rotateEuler(new Vector3f((float) Math.PI / 6, (float) Math.PI / 3, 0));
+		camObj.getTransform().setPosition(new Vector3f(0, 0, 1));
 		scene.subscribeToUpdates();
 		scene.addObject(pl1Obj);
 		scene.addObject(pl2Obj);

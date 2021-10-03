@@ -149,6 +149,7 @@ public class Scene {
 			for (Component comp : obj.getComponents()) {
 				comp.update();
 			}
+			obj.getTransform().checkCache();
 			obj.addAndRemoveComponents();
 		}
 		this.addAndRemoveObjects();

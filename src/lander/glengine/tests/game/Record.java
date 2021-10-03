@@ -21,23 +21,24 @@ public class Record extends GameObject {
 			Record.material = new TextureMaterial(Record.texture, 8, 1, 0, 0);
 		}
 		GameState.record = this;
-		this.setScale(4, 1, 1);
-		this.setRotationX((float) (Math.PI / 2));
+		this.getTransform().setScale(new Vector3f(4, 1, 1));
+		this.getTransform().rotateEuler(new Vector3f((float) (Math.PI / 2), 0, 0));
 		Record.instances++;
 		Plane plane = new Plane(Record.material);
 		this.addComponent(plane);
 		this.addComponent(new Component() {
-
+			
+			Vector3f pos = getTransform().getPosition();
+			
 			@Override
 			public void start() {
-				setPosition(0, 0.06f, -45f);
+				pos.set(new Vector3f(0, 0.06f, -45f));
 			}
 
 			@Override
 			public void update() {
-				Vector3f pos = getPosition();
+				Vector3f pos = getTransform().getPosition();
 				pos.z += DeltaTime.get() * 20f;
-				setPosition(pos);
 				if (pos.z > 50f) {
 					this.getGameObject().destroy();
 				}

@@ -1,7 +1,7 @@
 package lander.glengine.scene.components;
 
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import lander.glengine.engine.Window;
@@ -10,6 +10,7 @@ import lander.glengine.scene.Component;
 import lander.glengine.scene.GameObject;
 import lander.glengine.scene.RenderComponent;
 import lander.glengine.scene.Scene;
+import lander.glengine.scene.Transform;
 
 public class Camera extends Component implements Drawable {
 	
@@ -34,11 +35,11 @@ public class Camera extends Component implements Drawable {
 	public Matrix4f makeViewProjection(Window window) {
 		GameObject obj = this.getGameObject();
 		if (obj == null) return null;
-		Matrix4f modelMatrix = obj.getModelMatrix();
+		Transform t = obj.getTransform();
 		Matrix4f vp = new Matrix4f();
-		Vector3f point = modelMatrix.getTranslation(new Vector3f());
-		Vector3f scale = modelMatrix.getScale(new Vector3f());
-		AxisAngle4f rot = modelMatrix.getRotation(new AxisAngle4f());
+		Quaternionf rot = t.getWorldRotation().conjugate();
+		Vector3f pos = t.getWorldPosition().mul(-1);
+		Vector3f scale = t.getWorldScale();
 		if (this.is3D) { 
 			vp.perspective(FOV, (float) window.getWidth() / (float) window.getHeight(), 0.01f, this.drawDistance);
 		} else {
@@ -50,10 +51,8 @@ public class Camera extends Component implements Drawable {
 				vp.setOrtho(-1.0f, 1.0f, -ratio, ratio, -1.0f, 1.0f);
 			}
 		}
-		vp.scale(scale)
-		  .rotate(new AxisAngle4f(-rot.angle, rot.x, rot.y, rot.z))
-		  .translate(-point.x, -point.y, -point.z);
-		this.lastPOVPos = point;
+		vp.scale(scale).rotate(rot).translate(pos);
+		this.lastPOVPos = pos;
 		return vp;
 	}
 	

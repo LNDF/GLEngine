@@ -21,7 +21,6 @@ public class Main {
 		DirectionalLight light = new DirectionalLight(new Vector3f(.5f,.5f,.5f));
 		camObj.addComponent(cam);
 		camObj.addComponent(light);
-		camObj.setFront(new Vector3f(0, 0, -1));
 		camObj.addComponent(light);
 		GameObject persona = model.createGameObject();
 		scene.addObject(persona);
