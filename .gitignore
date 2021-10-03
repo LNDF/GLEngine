@@ -17,3 +17,6 @@ buildNumber.properties
 # models
 resources/model/*
 resources/model2/*
+
+
+puntos.bin
