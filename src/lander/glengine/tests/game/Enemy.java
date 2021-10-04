@@ -19,14 +19,14 @@ public class Enemy extends Component {
 	@Override
 	public void start() {
 		GameObject go = this.getGameObject();
-		go.setPosition(this.derecha ? 0.7f : -0.7f, -1.2f, -70f);
+		go.getTransform().setPosition(new Vector3f(this.derecha ? 0.7f : -0.7f, -1.2f, -70f));
 		GameState.enemigos.add(go);
 	}
 
 	@Override
 	public void update() {
 		GameObject go = this.getGameObject();
-		Vector3f pos = go.getPosition();
+		Vector3f pos = go.getTransform().getPosition();
 		if (pos.z > -50f && !this.spawned) {
 			this.spawned = true;
 			GameState.spawned++;
@@ -42,7 +42,6 @@ public class Enemy extends Component {
 			go.destroy();
 			return;
 		}
-		go.setPosition(pos);
 		Player player = GameState.player;
 		if (pos.z >= -2.5f && pos.z <= -1.5f) {
 			if (this.derecha == player.derecha) {

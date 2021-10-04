@@ -15,7 +15,7 @@ public class Player extends Component {
 	
 	@Override
 	public void start() {
-		this.getGameObject().setPosition(-0.7f, 0.6f, -2f);
+		this.getGameObject().getTransform().setPosition(new Vector3f(-0.7f, 0.6f, -2f));;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class Player extends Component {
 		if (Input.getKey(GLFW.GLFW_KEY_LEFT)) {
 			this.derecha = false;
 		}
-		Vector3f pos = this.getGameObject().getPosition();
+		Vector3f pos = this.getGameObject().getTransform().getPosition();
 		if (pos.x > -0.7f && !this.derecha) {
 			pos.add(-30f * (float) DeltaTime.get(), 0, 0);
 		} else if (pos.x < 0.7f && this.derecha) {
@@ -41,7 +41,6 @@ public class Player extends Component {
 		}
 		if (pos.x > 0.7) pos.x = 0.7f;
 		if (pos.x < -0.7) pos.x = -0.7f;
-		this.getGameObject().setPosition(pos);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package lander.glengine.tests.game;
 
+import org.joml.Vector3f;
+
 import lander.glengine.asset.Asset;
 import lander.glengine.engine.Window;
 import lander.glengine.gl.texture.Texture2D;
@@ -37,23 +39,22 @@ public class Level extends Scene {
 		Actor player = new Actor(false);
 		this.addObject(player);
 		this.addObject(ground);
-		ground.setRotationX((float) -(Math.PI / 2));
+		ground.getTransform().rotateEuler(new Vector3f((float) -(Math.PI / 2), 0, 0));
 		//add grass
 		ground.addChild(grassObj);
-		grassObj.setScale(100, 100, 1);
-		//this.addObject(grassObj);
+		grassObj.getTransform().setScale(new Vector3f(100, 100, 1));
 		//add road
 		ground.addChild(roadObj);
-		roadObj.setPosition(0, 0, 0.05f);
-		roadObj.setScale(4, 99, 1);
+		roadObj.getTransform().setPosition(new Vector3f(0, 0, 0.05f));
+		roadObj.getTransform().setScale(new Vector3f(4, 99, 1));
 		//this.addObject(roadObj);
 		//add road edges
 		ground.addChild(roadEdge1Obj);
-		roadEdge1Obj.setPosition(-2, 0, 0.01f);
-		roadEdge1Obj.setScale(0.2f, 94, 0.2f);
+		roadEdge1Obj.getTransform().setPosition(new Vector3f(-2, 0, 0.01f));
+		roadEdge1Obj.getTransform().setScale(new Vector3f(0.2f, 94, 0.2f));
 		ground.addChild(roadEdge2Obj);
-		roadEdge2Obj.setPosition(2, 0, 0.01f);
-		roadEdge2Obj.setScale(0.2f, 94, 0.2f);
+		roadEdge2Obj.getTransform().setPosition(new Vector3f(2, 0, 0.01f));
+		roadEdge2Obj.getTransform().setScale(new Vector3f(0.2f, 94, 0.2f));
 		//this.addObject(roadEdge1Obj);
 		//this.addObject(roadEdge2Obj);
 		//add grass plane
@@ -69,10 +70,10 @@ public class Level extends Scene {
 		roadEdge2Obj.addComponent(edgeRoad2Cube);
 		//Cam setup
 		this.cam = new FPCamera((float) (Math.PI / 4), 100.0f);
-		this.cam.setPitch((float) -(Math.PI / 12));
 		this.addObject(camObject);
 		camObject.addComponent(this.cam);
-		camObject.setPosition(0, 2, 3);
+		camObject.getTransform().getRotation().rotateAxis((float) (Math.PI) / -12, 1, 0, 0);
+		camObject.getTransform().setPosition(new Vector3f(0, 2, 3));
 	}
 	
 	public Camera getCamera() {

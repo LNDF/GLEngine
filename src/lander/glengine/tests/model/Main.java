@@ -8,7 +8,7 @@ import lander.glengine.model.Model;
 import lander.glengine.scene.GameObject;
 import lander.glengine.scene.Scene;
 import lander.glengine.scene.components.FPCamera;
-import lander.glengine.scene.components.lighting.Spotlight;
+import lander.glengine.scene.components.lighting.DirectionalLight;
 
 public class Main {
 	
@@ -18,10 +18,9 @@ public class Main {
 		Model model = new Model(new Asset("resource:/model/model.obj"));
 		GameObject camObj = new GameObject();
 		FPCamera cam = new FPCamera((float) Math.PI / 2.0f, 100.0f);
-		Spotlight light = new Spotlight(new Vector3f(1,1,1), 1.0f, 0.35f, 0.44f, (float) Math.toRadians(25), (float) Math.toRadians(35));
+		DirectionalLight light = new DirectionalLight(new Vector3f(.5f,.5f,.5f));
 		camObj.addComponent(cam);
 		camObj.addComponent(light);
-		camObj.setFront(new Vector3f(0, 0, -1));
 		camObj.addComponent(light);
 		GameObject persona = model.createGameObject();
 		scene.addObject(persona);

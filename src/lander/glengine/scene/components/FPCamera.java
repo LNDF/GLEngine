@@ -2,18 +2,17 @@ package lander.glengine.scene.components;
 
 import java.awt.event.KeyEvent;
 
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import lander.glengine.engine.DeltaTime;
 import lander.glengine.engine.Input;
 import lander.glengine.scene.GameObject;
+import lander.glengine.scene.Transform;
 
 public class FPCamera extends Camera{
 	
-	private float pitch = 0.0f;
-	private float yaw = 0.0f;
+	private static final Vector3f UP = new Vector3f(0, 1, 0);
 	
 	private float speed = 1f;
 	private float rotationSpeed = 1f;
@@ -33,18 +32,6 @@ public class FPCamera extends Camera{
 		super(FOV, drawDistance);
 	}
 
-	public float getPitch() {
-		return pitch;
-	}
-
-	public void setPitch(float pitch) {
-		this.pitch = pitch;
-	}
-
-	public float getYaw() {
-		return yaw;
-	}
-
 	public float getSpeed() {
 		return speed;
 	}
@@ -59,10 +46,6 @@ public class FPCamera extends Camera{
 
 	public void setRotationSpeed(float rotationSpeed) {
 		this.rotationSpeed = rotationSpeed;
-	}
-
-	public void setYaw(float yaw) {
-		this.yaw = yaw;
 	}
 
 	public int getFordwardKey() {
@@ -149,58 +132,57 @@ public class FPCamera extends Camera{
 	@Override
 	public void update() {
 		GameObject obj = this.getGameObject();
-		Vector3f pos = obj.getPosition();
-		float rsin = (float) Math.sin(this.yaw);
-		float rcos = (float) Math.cos(this.yaw);
-		Vector3f go = new Vector3f(0, 0, 0);
-		float goPitch = 0;
-		float goYaw = 0;
-		float a360 = (float) (2 * Math.PI);
-		float a90 = (float) (Math.PI / 2);
+		Transform t = obj.getTransform();
+		Vector3f pos = t.getPosition();
+		Vector3f go = new Vector3f();
+		float rotAngle = (float) (rotationSpeed * DeltaTime.get());
+		float step = (float) (speed * DeltaTime.get());
 		if (Input.getKey(this.fordwardKey)) {
-			go.add(-1f * rsin, 0, -1f * rcos);
+			go.add(t.getFront().mul(step));
 		}
 		if (Input.getKey(this.backwardsKey)) {
-			go.add(1f * rsin, 0, 1f * rcos);
+			go.add(t.getBack().mul(step));
 		}
 		if (Input.getKey(this.leftKey)) {
-			go.add(-1f * rcos, 0, 1f * rsin);
+			go.add(t.getLeft().mul(step));
 		}
 		if (Input.getKey(this.rightKey)) {
-			go.add(1f * rcos, 0, -1f * rsin);
+			go.add(t.getRight().mul(step));
 		}
 		if (Input.getKey(this.upKey)) {
-			go.add(0, 1f, 0);
+			pos.add(0, step, 0);
 		}
 		if (Input.getKey(this.downKey)) {
-			go.add(0, -1f, 0);
+			pos.add(0, -step, 0);
 		}
 		if (Input.getKey(this.camUpKey)) {
-			goPitch += 1f;
+			t.rotateArround(t.getRight(), rotAngle);
+			if (t.getDown().y > 0) {
+				t.lookAt(new Vector3f(0, 1, 0), t.getUp());
+			}
 		}
 		if (Input.getKey(this.camDownKey)) {
-			goPitch -= 1f;
+			t.rotateArround(t.getRight(), -rotAngle);
+			if (t.getDown().y > 0) {
+				t.lookAt(new Vector3f(0, -1, 0), t.getUp());
+			}
 		}
 		if (Input.getKey(this.camLeftKey)) {
-			goYaw += 1f;
+			t.rotateArround(UP, rotAngle);
 		}
 		if (Input.getKey(this.camRightKey)) {
-			goYaw -= 1f;
+			t.rotateArround(UP, -rotAngle);
 		}
-		go.mul((float) DeltaTime.get()).mul(this.speed);
-		goYaw *= DeltaTime.get() * this.rotationSpeed;
-		goPitch *= DeltaTime.get() * this.rotationSpeed;
+		float lenCorrect = go.length();
+		float y = go.y;
+		go.y = 0;
+		float len = go.length();
+		if (len != 0) {
+			go.mul(lenCorrect / len);
+		} else {
+			t.getDown().mul(y, go);
+		}
 		pos.add(go);
-		this.yaw = (this.yaw +  goYaw) % a360;
-		if (this.yaw < 0) {
-			this.yaw = (float) (2 * Math.PI) - this.yaw;
-		}
-		this.pitch += goPitch;
-		this.pitch = this.pitch > a90 ? a90 : this.pitch < -a90 ? -a90 : this.pitch;
-		obj.setPosition(pos);
-		Quaternionf newRotation = new Quaternionf();
-		newRotation.rotateLocalX(this.pitch).rotateLocalY(this.yaw);
-		obj.setRotation(newRotation);
 	}
 	
 }

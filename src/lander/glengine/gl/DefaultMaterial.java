@@ -129,7 +129,7 @@ public class DefaultMaterial extends Material {
 		//directional
 		for (DirectionalLight light : dLights) {
 			Vector3f color = light.getColor();
-			Vector3f direction = light.getGameObject().getWorldRotationDirectionVector();
+			Vector3f direction = light.getGameObject().getTransform().getFront();
 			shader.setUniform("dirLights[" + counter + "].color", color.x, color.y, color.z);
 			shader.setUniform("dirLights[" + counter + "].direction", direction.x, direction.y, direction.z);
 			counter++;
@@ -139,7 +139,7 @@ public class DefaultMaterial extends Material {
 		counter = 0;
 		for (PointLight light : pLights) {
 			Vector3f color = light.getColor();
-			Vector3f position = light.getGameObject().getWorldPosition();
+			Vector3f position = light.getGameObject().getTransform().getWorldPosition();
 			shader.setUniform("pointLights[" + counter + "].color", color.x, color.y, color.z);
 			shader.setUniform("pointLights[" + counter + "].position", position.x, position.y, position.z);
 			shader.setUniform("pointLights[" + counter + "].atConstant", light.getAtConstant());
@@ -152,8 +152,8 @@ public class DefaultMaterial extends Material {
 		counter = 0;
 		for (Spotlight light : sLights) {
 			Vector3f color = light.getColor();
-			Vector3f direction = light.getGameObject().getWorldRotationDirectionVector();
-			Vector3f position = light.getGameObject().getWorldPosition();
+			Vector3f direction = light.getGameObject().getTransform().getFront();
+			Vector3f position = light.getGameObject().getTransform().getWorldPosition();
 			shader.setUniform("spotlights[" + counter + "].color", color.x, color.y, color.z);
 			shader.setUniform("spotlights[" + counter + "].position", position.x, position.y, position.z);
 			shader.setUniform("spotlights[" + counter + "].direction", direction.x, direction.y, direction.z);
