@@ -19,6 +19,8 @@ in vec3 inPOV;
 in vec3 inPos;
 in vec2 inTexCoords;
 
+layout(location = 0) out vec4 outColor;
+
 void main() {
 	//base color
 	vec4 texColor = color_diffuse;
@@ -50,5 +52,5 @@ void main() {
 	for (int i = 0; i < spotlightCount; i++) {
 		finalColor += calculateSpotlight(spotlights[i], norm, inPos, povDir, baseColor, specularColor, color_shininess.x);
 	}
-	gl_FragColor = vec4(finalColor, texColor.w);
+	outColor = vec4(finalColor, texColor.w);
 }
