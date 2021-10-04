@@ -1,34 +1,12 @@
 package lander.glengine.gl;
 
-import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glAttachShader;
-import static org.lwjgl.opengl.GL20.glCompileShader;
-import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glCreateShader;
-import static org.lwjgl.opengl.GL20.glDeleteProgram;
-import static org.lwjgl.opengl.GL20.glDeleteShader;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20.glGetShaderi;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glLinkProgram;
-import static org.lwjgl.opengl.GL20.glShaderSource;
-import static org.lwjgl.opengl.GL20.glUniform1f;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glUniform2f;
-import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL20.glUniform4f;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUseProgram;
-import static org.lwjgl.opengl.GL20.glValidateProgram;
-import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
+import static org.lwjgl.opengl.GL33.*;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL20;
 
 import lander.glengine.asset.Asset;
 import lander.glengine.engine.Task;
@@ -100,7 +78,13 @@ public class Shader {
 			glAttachShader(this.id, gs);
 		}
 		glLinkProgram(this.id);
-		glValidateProgram(this.id);
+		int linked = glGetProgrami(this.id, GL_LINK_STATUS);
+		if (linked == GL_FALSE) {
+			String error = glGetProgramInfoLog(this.id);
+			glDeleteProgram(this.id);
+			System.err.println("Error linking program: " + error);
+			this.id = 0;
+		} else glValidateProgram(this.id);
 		glDeleteShader(vs);
 		glDeleteShader(fs);
 		if (geometrySrcs != null) glDeleteShader(gs);
