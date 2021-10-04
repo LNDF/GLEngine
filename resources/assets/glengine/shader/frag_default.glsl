@@ -10,9 +10,9 @@ uniform float ambientLightLevel;
 uniform int spotlightCount;
 uniform int pointLightCount;
 uniform int dirLightCount;
-uniform Spotlight spotlights[64];
-uniform PointLight pointLights[128];
-uniform DirLight dirLights[16];
+uniform Spotlight spotlights[32];
+uniform PointLight pointLights[64];
+uniform DirLight dirLights[8];
 
 in vec3 inNormal;
 in vec3 inPOV;
