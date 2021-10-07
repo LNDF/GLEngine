@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL20;
-
 import lander.glengine.asset.Asset;
 import lander.glengine.engine.Task;
 import lander.glengine.engine.Utils;

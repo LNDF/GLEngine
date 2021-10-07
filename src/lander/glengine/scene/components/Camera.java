@@ -20,7 +20,7 @@ public class Camera extends Component implements Drawable {
 	private float FOV;
 	private float drawDistance;
 	
-	protected Vector3f lastPOVPos = null;
+	protected Vector3f lastPOVPos = new Vector3f();
 	
 	public Camera() {
 		this.is3D = false;
@@ -52,7 +52,7 @@ public class Camera extends Component implements Drawable {
 			}
 		}
 		vp.scale(scale).rotate(rot).translate(pos);
-		this.lastPOVPos = pos;
+		this.lastPOVPos = pos.mul(-1, this.lastPOVPos);
 		return vp;
 	}
 	
