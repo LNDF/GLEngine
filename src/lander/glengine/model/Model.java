@@ -1,6 +1,8 @@
 package lander.glengine.model;
 
-import static org.lwjgl.assimp.Assimp.*;
+import static org.lwjgl.assimp.Assimp.AI_SCENE_FLAGS_INCOMPLETE;
+import static org.lwjgl.assimp.Assimp.aiProcess_GenNormals;
+import static org.lwjgl.assimp.Assimp.aiProcess_Triangulate;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -27,7 +29,8 @@ import lander.glengine.scene.GameObject;
 
 public class Model {
 	
-	private ModelNode rootNode;
+	private MeshContainer[] meshes;
+	private int meshesPosition = 0;
 	
 	public static Vector4f DEFAULT_COLOR = new Vector4f(1, 1, 1, 1);
 	
@@ -47,28 +50,24 @@ public class Model {
 				scene.mRootNode() == null) {
 			throw new RuntimeException("Assimp Error: " + Assimp.aiGetErrorString());
 		}
-		this.rootNode = loadNode(asset, scene.mRootNode(), scene);
+		this.meshes = new MeshContainer[scene.mNumMeshes()];
+		loadNode(asset, scene.mRootNode(), scene);
 	}
 	
-	private ModelNode loadNode(Asset asset, AINode node, AIScene scene) {
-		String nodeName = node.mName().dataString();
+	private void loadNode(Asset asset, AINode node, AIScene scene) {
 		int numMeshes = node.mNumMeshes();
 		int numChildren = node.mNumChildren();
 		IntBuffer meshes = node.mMeshes();
 		PointerBuffer sceneMeshes = scene.mMeshes();
 		PointerBuffer children = node.mChildren();
-		MeshContainer[] modelNodeMeshes = null;
-		ModelNode[] modelNodeChildren = new ModelNode[numChildren];
-		if (numMeshes > 0) modelNodeMeshes = new MeshContainer[numMeshes];
 		for (int i = 0; i < numMeshes; i++) {
 			AIMesh aiMesh = AIMesh.create(sceneMeshes.get(meshes.get(i)));
-			modelNodeMeshes[i] = loadMesh(asset, aiMesh, scene);
+			this.meshes[this.meshesPosition++] = loadMesh(asset, aiMesh, scene);
 		}
 		for (int i = 0; i < numChildren; i++) {
 			AINode child = AINode.create(children.get(i));
-			modelNodeChildren[i] = loadNode(asset, child, scene);
+			loadNode(asset, child, scene);
 		}
-		return new ModelNode(nodeName, modelNodeMeshes, modelNodeChildren);
 	}
 	
 	private MeshContainer loadMesh(Asset asset, AIMesh aiMesh, AIScene scene) {
@@ -171,7 +170,9 @@ public class Model {
 	}
 	
 	public GameObject createGameObject() {
-		return this.rootNode.createGameObject();
+		GameObject obj = new GameObject();
+		obj.addComponent(new ModelRenderComponent(this.meshes));
+		return obj;
 	}
 	
 }

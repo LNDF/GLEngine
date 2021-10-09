@@ -27,9 +27,4 @@ public class MeshContainer {
 		return new DefaultMaterial(this.textures);
 	}
 	
-	public ModelRenderComponent createRenderComponent() {
-		Material material = this.createMaterial();
-		return new ModelRenderComponent(this.mesh, material);
-	}
-	
 }

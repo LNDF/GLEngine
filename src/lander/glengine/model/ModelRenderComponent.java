@@ -10,20 +10,25 @@ import lander.glengine.scene.RenderComponent;
 
 public class ModelRenderComponent extends RenderComponent {
 	
-	private Mesh mesh;
-	private Material material;
+	private Mesh[] meshes;
+	private Material[] materials;
 	
-	public ModelRenderComponent(Mesh mesh, Material material) {
-		this.mesh = mesh;
-		this.material = material;
+	public ModelRenderComponent(MeshContainer[] meshContainers) {
+		int pos = 0;
+		this.meshes = new Mesh[meshContainers.length];
+		this.materials = new Material[meshContainers.length];
+		for (MeshContainer container : meshContainers) {
+			this.meshes[pos] = container.getMesh();
+			this.materials[pos++] = container.createMaterial();
+		}
 	}
 	
-	public Mesh getMesh() {
-		return mesh;
+	public Mesh[] getMeshes() {
+		return meshes;
 	}
 	
-	public Material getMaterial() {
-		return material;
+	public Material[] getMaterials() {
+		return materials;
 	}
 	
 	@Override
@@ -31,9 +36,13 @@ public class ModelRenderComponent extends RenderComponent {
 		if (!this.getVisible()) return;
 		GameObject obj = this.getGameObject();
 		if (obj == null) return;
-		this.material.getShader().bind();
-		this.material.setUniform(vp, obj, pov);
-		this.mesh.draw();
+		for (int i = 0; i < this.meshes.length; i++) {
+			Mesh mesh = this.meshes[i];
+			Material material = this.materials[i];
+			material.getShader().bind();
+			material.setUniform(vp, obj, pov);
+			mesh.draw();
+		}
 	}
 
 	@Override
