@@ -79,20 +79,5 @@ public class Spotlight extends Component {
 	public void setColor(Vector3f color) {
 		this.color = color;
 	}
-
-	@Override
-	public void start() {
-		
-	}
-
-	@Override
-	public void update() {
-		
-	}
-
-	@Override
-	public void destroy() {
-		
-	}
 	
 }

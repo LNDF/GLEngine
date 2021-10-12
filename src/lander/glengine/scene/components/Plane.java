@@ -41,20 +41,5 @@ public class Plane extends RenderComponent {
 		this.material.setUniform(vp, this.getGameObject(), pov);
 		Plane.planeObject.draw();
 	}
-	
-	@Override
-	public void destroy() {
-		
-	}
-	
-	@Override
-	public void update() {
-		
-	}
-
-	@Override
-	public void start() {
-		
-	}
 
 }

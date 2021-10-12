@@ -54,21 +54,11 @@ public class LightsMain {
 		camObj.addComponent(pl);
 		pl1CObj.addChild(pl1Obj);
 		pl1CObj.addComponent(new Component() {
-
-			@Override
-			public void start() {
-				
-			}
-
+			
 			@Override
 			public void update() {
 				GameObject obj = this.getGameObject();
 				obj.getTransform().getRotation().rotateAxis((float) DeltaTime.get(), 1, 0, 0);
-			}
-
-			@Override
-			public void destroy() {
-				
 			}
 			
 		});

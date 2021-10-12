@@ -1,12 +1,14 @@
 package lander.glengine.scene;
 
-public abstract class Component {
+public class Component {
 	
 	private GameObject gameObject = null;
 	
-	public abstract void start();
-	public abstract void update();
-	public abstract void destroy();
+	public void start() {}
+	public void update()  {}
+	public void destroy()  {}
+	public void addToScene()  {}
+	public void removeFromScene()  {}
 	
 	public GameObject getGameObject() {
 		return this.gameObject;

@@ -81,20 +81,5 @@ public class Camera extends Component implements Drawable {
 	public void setDrawDistance(float drawDistance) {
 		this.drawDistance = drawDistance;
 	}
-
-	@Override
-	public void start() {
-		
-	}
-
-	@Override
-	public void update() {
-		
-	}
-
-	@Override
-	public void destroy() {
-		
-	}
 	
 }

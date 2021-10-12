@@ -51,11 +51,7 @@ public class Main {
 		scene.subscribeToUpdates();
 		scene.setAmbientLight(0.05f);
 		camObj.addComponent(new Component() {
-			@Override
-			public void start() {
-				
-			}
-
+			
 			@Override
 			public void update() {
 				if (Input.getKey(KeyEvent.VK_E)) {
@@ -63,11 +59,7 @@ public class Main {
 					rb.addForce(new Vector3f(0, 10, 0));
 				}
 			}
-
-			@Override
-			public void destroy() {
-				
-			}
+			
 		});
 		win.addDrawable(cam);
 		win.mainLoop();

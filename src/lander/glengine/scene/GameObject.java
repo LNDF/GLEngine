@@ -34,6 +34,7 @@ public class GameObject {
 		this.componentsToDestroy.remove(component);
 		component.setGameObject(this);
 		component.start();
+		if (this.getScene() != null) component.addToScene();
 	}
 	
 	public Component getComponent(Class<? extends Component> c) {
@@ -54,6 +55,7 @@ public class GameObject {
 	
 	public void destroyComponents() {
 		for (Component c : this.componentsToDestroy) {
+			if (this.getScene() != null) c.removeFromScene();
 			c.destroy();
 			c.setGameObject(null);
 		}
@@ -61,15 +63,24 @@ public class GameObject {
 	}
 	
 	public void destroy() {
-		if (this.getScene() != null) {
-			this.getScene().removeObject(this);
-		}
 		for (GameObject obj : this.children) {
 			obj.destroy();
 			obj.setParent(null);
 		}
+		if (this.getScene() == null) {
+			for (Component comp : this.components.values()) {
+				comp.removeFromScene();
+			}
+		}
+		for (Component comp : this.components.values()) {
+			comp.destroy();
+			comp.setGameObject(null);
+		}
+		this.destroyComponents();
+		if (this.getScene() != null) {
+			this.getScene().removeObject(this);
+		}
 		this.children.clear();
-		this.componentsToDestroy.clear();
 		this.components.clear();
 	}
 	

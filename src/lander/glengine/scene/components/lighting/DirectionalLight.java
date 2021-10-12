@@ -24,19 +24,4 @@ public class DirectionalLight extends Component {
 		this.color = color;
 	}
 
-	@Override
-	public void start() {
-		
-	}
-
-	@Override
-	public void update() {
-		
-	}
-
-	@Override
-	public void destroy() {
-		
-	}
-
 }

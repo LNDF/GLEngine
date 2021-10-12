@@ -73,20 +73,5 @@ public class Cube extends RenderComponent {
 		this.material.setUniform(vp, this.getGameObject(), pov);
 		Cube.cubeObject.draw();
 	}
-	
-	@Override
-	public void destroy() {
-		
-	}
-	
-	@Override
-	public void update() {
-		
-	}
-
-	@Override
-	public void start() {
-		
-	}
 
 }

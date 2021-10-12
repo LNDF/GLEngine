@@ -45,11 +45,6 @@ public class RigidBody extends Component {
 		z = this.velocity.z * dt;
 		position.add(x, y, z);
 	}
-
-	@Override
-	public void destroy() {
-		
-	}
 	
 	public void addForce(Vector3f force) {
 		this.force.add(force);

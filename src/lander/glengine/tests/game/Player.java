@@ -43,9 +43,4 @@ public class Player extends Component {
 		if (pos.x < -0.7) pos.x = -0.7f;
 	}
 
-	@Override
-	public void destroy() {
-		
-	}
-
 }
