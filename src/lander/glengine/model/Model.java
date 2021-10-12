@@ -131,7 +131,8 @@ public class Model {
 			textures.setDefaultColor(TextureRole.DIFFUSE, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
 			textures.setDefaultColor(TextureRole.SPECULAR, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR));
 		}
-		mesh.create(vertexBuffer, indexBuffer);
+		mesh.setVertices(vertexBuffer);
+		mesh.setIndices(indexBuffer);
 		return this.createMeshContainer(mesh, textures);
 	}
 	
@@ -167,6 +168,15 @@ public class Model {
 	
 	private MeshContainer createMeshContainer(Mesh mesh, Texture2DRoles textures) {
 		return new MeshContainer(mesh, textures);
+	}
+	
+	public Mesh getCombinedMesh() {
+		Mesh[] meshes = new Mesh[this.meshes.length];
+		int pos = 0;
+		for (MeshContainer container : this.meshes) {
+			meshes[pos++] = container.getMesh();
+		}
+		return Mesh.combine(meshes);
 	}
 	
 	public GameObject createGameObject() {

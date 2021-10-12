@@ -18,7 +18,9 @@ public class ModelRenderComponent extends RenderComponent {
 		this.meshes = new Mesh[meshContainers.length];
 		this.materials = new Material[meshContainers.length];
 		for (MeshContainer container : meshContainers) {
-			this.meshes[pos] = container.getMesh();
+			Mesh mesh = container.getMesh();
+			mesh.upload();
+			this.meshes[pos] = mesh;
 			this.materials[pos++] = container.createMaterial();
 		}
 	}
@@ -43,21 +45,6 @@ public class ModelRenderComponent extends RenderComponent {
 			material.setUniform(vp, obj, pov);
 			mesh.draw();
 		}
-	}
-
-	@Override
-	public void start() {
-		
-	}
-
-	@Override
-	public void update() {
-		
-	}
-
-	@Override
-	public void destroy() {
-		
 	}
 	
 	
