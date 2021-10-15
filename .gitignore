@@ -1,22 +1,13 @@
 # eclipse
 bin/
 
-# maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
+# gradle
+.gradle/
+build/
 
 # models
-resources/model/*
-resources/model2/*
+java/main/resources/model/*
+java/main/resources/model2/*
 
 
 puntos.bin
