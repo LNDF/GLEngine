@@ -4,6 +4,6 @@ import com.lndf.glengine.gl.Mesh;
 
 public abstract class PolyhedronCollider extends Collider {
 	
-	public abstract Mesh getMesh();
+	public abstract Mesh[] getMesh();
 	
 }

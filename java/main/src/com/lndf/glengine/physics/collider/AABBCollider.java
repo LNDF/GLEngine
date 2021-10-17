@@ -58,7 +58,7 @@ public class AABBCollider extends PolyhedronCollider {
 	}
 	
 	@Override
-	public Mesh getMesh() {
+	public Mesh[] getMesh() {
 		GameObject thisObject = this.getGameObject();
 		if (thisObject == null) return null;
 		Vector3f thisPos = thisObject.getTransform().getWorldPosition();
@@ -110,7 +110,7 @@ public class AABBCollider extends PolyhedronCollider {
 				24, 25, 26,
 				26, 27, 24
 		};
-		return new Mesh(vertices, indices);
+		return new Mesh[] {new Mesh(vertices, indices)};
 	}
 
 	public Vector3f getMin() {

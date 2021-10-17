@@ -170,12 +170,17 @@ public class Model {
 		return new MeshContainer(mesh, textures);
 	}
 	
-	public Mesh getCombinedMesh() {
+	public Mesh[] getMeshes() {
 		Mesh[] meshes = new Mesh[this.meshes.length];
 		int pos = 0;
 		for (MeshContainer container : this.meshes) {
 			meshes[pos++] = container.getMesh();
 		}
+		return meshes;
+	}
+	
+	public Mesh getCombinedMesh() {
+		Mesh[] meshes = this.getMeshes();
 		return Mesh.combine(meshes);
 	}
 	
