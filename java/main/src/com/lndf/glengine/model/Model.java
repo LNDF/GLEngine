@@ -75,36 +75,37 @@ public class Model {
 		int numVertices = aiMesh.mNumVertices();
 		int numFaces = aiMesh.mNumFaces();
 		int materialIndex = aiMesh.mMaterialIndex();
-		int vertexElements = mesh.getVertexElementCount();
 		AIVector3D.Buffer vertices = aiMesh.mVertices();
-		AIVector3D.Buffer normals = aiMesh.mNormals();
+		AIVector3D.Buffer modelNormals = aiMesh.mNormals();
 		AIFace.Buffer faces = aiMesh.mFaces();
-		float[] vertexBuffer = new float[vertexElements * numVertices];
-		int[] indexBuffer = new int[numFaces * 3];
-		AIVector3D.Buffer texCoords = aiMesh.mTextureCoords(0);
+		AIVector3D.Buffer modelTexCoords = aiMesh.mTextureCoords(0);
 		Texture2DRoles textures = new Texture2DRoles();
+		float[] positions = new float[numVertices * 3];
+		float[] normals = new float[numVertices * 3];
+		float[] texCoords = new float[numVertices * 2];
+		int[] indexBuffer = new int[numFaces * 3];
 		//Vertex buffer
 		if (vertices != null) { //positions
 			for (int i = 0; i < numVertices; i++) {
 				AIVector3D vertex = vertices.get(i);
-				vertexBuffer[(vertexElements * i) + 0] = vertex.x();
-				vertexBuffer[(vertexElements * i) + 1] = vertex.y();
-				vertexBuffer[(vertexElements * i) + 2] = vertex.z();
+				positions[(3 * i) + 0] = vertex.x();
+				positions[(3 * i) + 1] = vertex.y();
+				positions[(3 * i) + 2] = vertex.z();
 			}
 		}
-		if (texCoords != null) { //texture coordinates
+		if (modelTexCoords != null) { //texture coordinates
 			for (int i = 0; i < numVertices; i++) {
-				AIVector3D texCoord = texCoords.get(i);
-				vertexBuffer[(vertexElements * i) + 3] = texCoord.x();
-				vertexBuffer[(vertexElements * i) + 4] = texCoord.y();
+				AIVector3D texCoord = modelTexCoords.get(i);
+				texCoords[(2 * i) + 0] = texCoord.x();
+				texCoords[(2 * i) + 1] = texCoord.y();
 			}
 		}
-		if (normals != null) { //normals
+		if (modelNormals != null) { //normals
 			for (int i = 0; i < numVertices; i++) {
-				AIVector3D normal = normals.get(i);
-				vertexBuffer[(vertexElements * i) + 5] = normal.x();
-				vertexBuffer[(vertexElements * i) + 6] = normal.y();
-				vertexBuffer[(vertexElements * i) + 7] = normal.z();
+				AIVector3D normal = modelNormals.get(i);
+				normals[(3 * i) + 0] = normal.x();
+				normals[(3 * i) + 1] = normal.y();
+				normals[(3 * i) + 2] = normal.z();
 			}
 		}
 		//Index buffer
@@ -131,7 +132,9 @@ public class Model {
 			textures.setDefaultColor(TextureRole.DIFFUSE, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
 			textures.setDefaultColor(TextureRole.SPECULAR, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR));
 		}
-		mesh.setVertices(vertexBuffer);
+		mesh.setPositions(positions);
+		mesh.setTexCoords(texCoords);
+		mesh.setNormals(normals);
 		mesh.setIndices(indexBuffer);
 		return this.createMeshContainer(mesh, textures);
 	}

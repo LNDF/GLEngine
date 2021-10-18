@@ -10,6 +10,49 @@ public class AABBCollider extends PolyhedronCollider {
 	private Vector3f min;
 	private Vector3f max;
 	
+	private static final float[] AABB_NORMALS = {
+			 0.0f,  1.0f,  0.0f,
+			 0.0f,  1.0f,  0.0f,
+			 0.0f,  1.0f,  0.0f,
+			 0.0f,  1.0f,  0.0f,
+			 0.0f, -1.0f,  0.0f,
+			 0.0f, -1.0f,  0.0f,
+			 0.0f, -1.0f,  0.0f,
+			 0.0f, -1.0f,  0.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f,  1.0f,
+			 0.0f,  0.0f,  1.0f,
+			 0.0f,  0.0f,  1.0f,
+			 0.0f,  0.0f,  1.0f,
+			-1.0f,  0.0f,  0.0f,
+			-1.0f,  0.0f,  0.0f,
+			-1.0f,  0.0f,  0.0f,
+			-1.0f,  0.0f,  0.0f,
+			 1.0f,  0.0f,  0.0f,
+			 1.0f,  0.0f,  0.0f,
+			 1.0f,  0.0f,  0.0f,
+			 1.0f,  0.0f,  0.0f
+	};
+	private static final int[] AABB_INDICES = {
+			2,   1,  0,
+			0,   3,  2,
+			4,   5,  6,
+			6,   7,  4,
+			8,   9, 10,
+			10, 11,  8,
+			14, 13, 12,
+			12, 15, 14,
+			18, 17, 16,
+			16, 19, 18,
+			20, 21, 22,
+			22, 23, 20,
+			24, 25, 26,
+			26, 27, 24
+	};
+	
 	public AABBCollider(Vector3f min, Vector3f max) {
 		this.min = min;
 		this.max = max;
@@ -68,49 +111,33 @@ public class AABBCollider extends PolyhedronCollider {
 		float maxX = this.max.x + thisPos.x;
 		float maxY = this.max.y + thisPos.y;
 		float maxZ = this.max.z + thisPos.z;
-		float[] vertices = {
-				 minX, maxY, minZ,    0.0f, 1.0f,    0.0f,  1.0f,  0.0f,
-				 maxX, maxY, minZ,    1.0f, 1.0f,    0.0f,  1.0f,  0.0f,
-				 maxX, maxY, maxZ,    1.0f, 0.0f,    0.0f,  1.0f,  0.0f,
-				 minX, maxY, maxZ,    0.0f, 0.0f,    0.0f,  1.0f,  0.0f,
-				 minX, minY, minZ,    0.0f, 0.0f,    0.0f, -1.0f,  0.0f,
-				 maxX, minY, minZ,    1.0f, 0.0f,    0.0f, -1.0f,  0.0f,
-				 maxX, minY, maxZ,    1.0f, 1.0f,    0.0f, -1.0f,  0.0f,
-				 minX, minY, maxZ,    0.0f, 1.0f,    0.0f, -1.0f,  0.0f,
-				 maxX, maxY, minZ,    0.0f, 1.0f,    0.0f,  0.0f, -1.0f,
-				 maxX, minY, minZ,    0.0f, 0.0f,    0.0f,  0.0f, -1.0f,
-				 minX, minY, minZ,    1.0f, 0.0f,    0.0f,  0.0f, -1.0f,
-				 minX, maxY, minZ,    1.0f, 1.0f,    0.0f,  0.0f, -1.0f,
-				 maxX, maxY, maxZ,    1.0f, 1.0f,    0.0f,  0.0f,  1.0f,
-				 maxX, minY, maxZ,    1.0f, 0.0f,    0.0f,  0.0f,  1.0f,
-				 minX, minY, maxZ,    0.0f, 0.0f,    0.0f,  0.0f,  1.0f,
-				 minX, maxY, maxZ,    0.0f, 1.0f,    0.0f,  0.0f,  1.0f,
-				 minX, maxY, maxZ,    1.0f, 1.0f,   -1.0f,  0.0f,  0.0f,
-				 minX, minY, maxZ,    1.0f, 0.0f,   -1.0f,  0.0f,  0.0f,
-				 minX, minY, minZ,    0.0f, 0.0f,   -1.0f,  0.0f,  0.0f,
-				 minX, maxY, minZ,    0.0f, 1.0f,   -1.0f,  0.0f,  0.0f,
-				 maxX, maxY, maxZ,    0.0f, 1.0f,    1.0f,  0.0f,  0.0f,
-				 maxX, minY, maxZ,    0.0f, 0.0f,    1.0f,  0.0f,  0.0f,
-				 maxX, minY, minZ,    1.0f, 0.0f,    1.0f,  0.0f,  0.0f,
-				 maxX, maxY, minZ,    1.0f, 1.0f,    1.0f,  0.0f,  0.0f
+		float[] positions = {
+				 minX, maxY, minZ,
+				 maxX, maxY, minZ,
+				 maxX, maxY, maxZ,
+				 minX, maxY, maxZ,
+				 minX, minY, minZ,
+				 maxX, minY, minZ,
+				 maxX, minY, maxZ,
+				 minX, minY, maxZ,
+				 maxX, maxY, minZ,
+				 maxX, minY, minZ,
+				 minX, minY, minZ,
+				 minX, maxY, minZ,
+				 maxX, maxY, maxZ,
+				 maxX, minY, maxZ,
+				 minX, minY, maxZ,
+				 minX, maxY, maxZ,
+				 minX, maxY, maxZ,
+				 minX, minY, maxZ,
+				 minX, minY, minZ,
+				 minX, maxY, minZ,
+				 maxX, maxY, maxZ,
+				 maxX, minY, maxZ,
+				 maxX, minY, minZ,
+				 maxX, maxY, minZ
 		};
-		int[] indices = {
-				2,   1,  0,
-				0,   3,  2,
-				4,   5,  6,
-				6,   7,  4,
-				8,   9, 10,
-				10, 11,  8,
-				14, 13, 12,
-				12, 15, 14,
-				18, 17, 16,
-				16, 19, 18,
-				20, 21, 22,
-				22, 23, 20,
-				24, 25, 26,
-				26, 27, 24
-		};
-		return new Mesh[] {new Mesh(vertices, indices)};
+		return new Mesh[] {new Mesh(positions, AABBCollider.AABB_NORMALS, null, AABBCollider.AABB_INDICES)};
 	}
 
 	public Vector3f getMin() {

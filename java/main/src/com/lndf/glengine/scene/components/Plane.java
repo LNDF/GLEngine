@@ -15,17 +15,29 @@ public class Plane extends RenderComponent {
 	protected static Mesh planeObject;
 	
 	static {
-		float[] vertices = {
-				 0.5f,  0.5f, 0.0f,    1.0f, 1.0f,    0.0f, 0.0f, 1.0f,
-				 0.5f, -0.5f, 0.0f,    1.0f, 0.0f,    0.0f, 0.0f, 1.0f,
-				-0.5f,  0.5f, 0.0f,    0.0f, 1.0f,    0.0f, 0.0f, 1.0f,
-				-0.5f, -0.5f, 0.0f,    0.0f, 0.0f,    0.0f, 0.0f, 1.0f
+		float[] positions = {
+				 0.5f,  0.5f, 0.0f,
+				 0.5f, -0.5f, 0.0f,
+				-0.5f,  0.5f, 0.0f,
+				-0.5f, -0.5f, 0.0f
+		};
+		float[] normals = {
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f
+		};
+		float[] texCoords = {
+				1.0f, 1.0f,
+				1.0f, 0.0f,
+				0.0f, 1.0f,
+				0.0f, 0.0f
 		};
 		int[] indices = {
 				2, 1, 0,
 				2, 3, 1
 		};
-		Plane.planeObject = new Mesh(vertices, indices);
+		Plane.planeObject = new Mesh(positions, normals, texCoords, indices);
 	}
 	
 	public Plane(Material material) {

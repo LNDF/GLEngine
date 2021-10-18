@@ -15,11 +15,12 @@ public class MeshCollider extends PolyhedronCollider {
 	
 	public MeshCollider(Mesh[] meshes) {
 		VHACDParameters params = new VHACDParameters();
+		//params.setDebugEnabled(true);
 		for (Mesh mesh : meshes) {
-			VHACDResults res = VHACD.compute(mesh.getVertices(), mesh.getIndices(), params);
+			VHACDResults res = VHACD.compute(mesh.getPositions(), mesh.getIndices(), params);
 			for (int i = 0; i < res.size(); i++) {
 				VHACDHull hull = res.get(i);
-				this.meshes.add(new Mesh(hull.positions, hull.indexes));
+				this.meshes.add(new Mesh(hull.positions, null, null, hull.indexes));
 			}
 		}
 	}
