@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.model.Model;
-import com.lndf.glengine.physics.collider.MeshCollider;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Scene;
 import com.lndf.glengine.scene.components.FPCamera;
@@ -20,8 +19,6 @@ public class Main {
 		GameObject camObj = new GameObject();
 		FPCamera cam = new FPCamera((float) Math.PI / 2.0f, 100.0f);
 		DirectionalLight light = new DirectionalLight(new Vector3f(.5f,.5f,.5f));
-		new MeshCollider(model.getMeshes());
-		System.out.println(model.getCombinedMesh());
 		camObj.addComponent(cam);
 		camObj.addComponent(light);
 		camObj.addComponent(light);
