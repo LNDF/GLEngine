@@ -6,7 +6,6 @@ plugins {
     id 'java'
     id 'eclipse'
     id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "io.github.0ffz.github-packages" version "1.2.1"
 }
 
 project.ext.lwjglVersion = "3.2.3"
@@ -33,7 +32,6 @@ sourceSets {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven githubPackage.invoke("riccardobl")
 }
 
 dependencies {
@@ -90,7 +88,6 @@ dependencies {
 
 	implementation "org.joml:joml:${jomlVersion}"
 	
-	implementation "vhacd:vhacd-native:${vhacdVersion}"
 }
 
 tasks.withType(JavaCompile) {
