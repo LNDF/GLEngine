@@ -183,6 +183,11 @@ public class Texture2D {
 		});
 	}
 	
+	@Override
+	protected void finalize() throws Throwable {
+		this.close();
+	}
+	
 	public void bind(int slot) {
 		if (Texture2D.boundTextures.get(slot) == this.id) return;
 		Texture2D.boundTextures.put(slot, this.id);
