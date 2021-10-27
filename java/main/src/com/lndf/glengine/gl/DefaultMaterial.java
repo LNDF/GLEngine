@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import com.lndf.glengine.asset.Asset;
+import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
 import com.lndf.glengine.gl.texture.TextureRole;
@@ -21,6 +22,10 @@ public class DefaultMaterial extends Material {
 	private Texture2DRoles roles = new Texture2DRoles();
 	
 	public static Shader defaultShader = null;
+	
+	static {
+		Window.addTerminateTask(() -> defaultShader = null);
+	}
 	
 	public static Shader createDefaultShader() {
 		if (defaultShader != null) return defaultShader;

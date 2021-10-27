@@ -14,6 +14,10 @@ public class VertexBuffer {
 	
 	protected static int boundVertexBuffer = 0;
 	
+	static {
+		Window.addTerminateTask(() -> boundVertexBuffer = 0);
+	}
+	
 	protected VertexBuffer(boolean isStatic) {
 		this.id = glGenBuffers();
 		this.isStatic = isStatic;

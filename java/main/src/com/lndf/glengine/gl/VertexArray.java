@@ -16,6 +16,10 @@ public class VertexArray {
 	
 	protected static int boundVertexArray = 0;
 	
+	static {
+		Window.addTerminateTask(() -> boundVertexArray = 0);
+	}
+	
 	public VertexArray() {
 		this.id = glGenVertexArrays();
 	}

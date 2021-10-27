@@ -21,6 +21,8 @@ public class Window {
 	private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 	private LinkedList<Task> tasks = new LinkedList<Task>();
 	
+	private static LinkedList<Task> terminateTasks = new LinkedList<Task>();
+	
 	private long windowId;
 	
 	private static Window window;
@@ -40,9 +42,18 @@ public class Window {
 	}
 	
 	public static void terminate() {
+		for (Task task : Window.terminateTasks) task.execute();
 		glfwTerminate();
 		Window.window = null;
 		Input.unsetWindow();
+	}
+	
+	public static void addTerminateTask(Task task) {
+		Window.terminateTasks.add(task);
+	}
+	
+	public static void removeTerminateTask(Task task) {
+		Window.terminateTasks.remove(task);
 	}
 	
 	private void init() {

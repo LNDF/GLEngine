@@ -38,6 +38,11 @@ public class Texture2D {
 		for (int i = 0; i < 32; i++) {
 			Texture2D.boundTextures.put(i, 0);
 		}
+		Window.addTerminateTask(() -> {
+			for (int i = 0; i < 32; i++) {
+				Texture2D.boundTextures.put(i, 0);
+			}
+		});
 	}
 	
 	public Texture2D(Asset asset) {
