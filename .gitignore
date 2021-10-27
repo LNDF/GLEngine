@@ -8,9 +8,4 @@ bin/
 .gradle/
 build/
 
-# models
-java/main/resources/model/*
-java/main/resources/model2/*
-
-
 puntos.bin

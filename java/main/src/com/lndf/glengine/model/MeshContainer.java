@@ -24,7 +24,9 @@ public class MeshContainer {
 	}
 	
 	public Material createMaterial() {
-		return new DefaultMaterial(this.textures);
+		DefaultMaterial mat = new DefaultMaterial(this.textures);
+		mat.setShininess(Float.MAX_VALUE);
+		return mat;
 	}
 	
 }
