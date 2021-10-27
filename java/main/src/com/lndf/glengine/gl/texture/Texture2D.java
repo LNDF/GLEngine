@@ -31,6 +31,8 @@ public class Texture2D {
 	
 	private boolean closed = false;
 	
+	private Task closeTask = () -> this.close();
+	
 	protected static boolean STBImageVerticalFlipMode = false;
 	protected static HashMap<Integer, Integer> boundTextures = new HashMap<Integer, Integer>();
 	
@@ -46,6 +48,7 @@ public class Texture2D {
 	}
 	
 	public Texture2D(Asset asset) {
+		Window.addTerminateTask(closeTask);
 		this.id = glGenTextures();
 		this.setTexture(asset, 0);
 		this.autoGenerateMipmaps();
@@ -180,6 +183,7 @@ public class Texture2D {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
+		Window.removeTerminateTask(closeTask);
 		Window.getWindow().addEndOfLoopTask(new Task() {
 			@Override
 			public void execute() {

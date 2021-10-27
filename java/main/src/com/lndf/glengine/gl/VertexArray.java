@@ -14,6 +14,8 @@ public class VertexArray {
 	
 	private boolean closed = false;
 	
+	private Task closeTask = () -> this.close();
+	
 	protected static int boundVertexArray = 0;
 	
 	static {
@@ -21,12 +23,14 @@ public class VertexArray {
 	}
 	
 	public VertexArray() {
+		Window.addTerminateTask(closeTask);
 		this.id = glGenVertexArrays();
 	}
 	
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
+		Window.removeTerminateTask(closeTask);
 		Window.getWindow().addEndOfLoopTask(new Task() {
 			@Override
 			public void execute() {

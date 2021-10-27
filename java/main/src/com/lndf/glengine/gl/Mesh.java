@@ -1,5 +1,8 @@
 package com.lndf.glengine.gl;
 
+import com.lndf.glengine.engine.Task;
+import com.lndf.glengine.engine.Window;
+
 public class Mesh {
 	
 	private IndexBuffer indexBuffer = null;
@@ -12,7 +15,15 @@ public class Mesh {
 	private float[] texCoords;
 	private int[] indices;
 	
+	private Task uploadNullTask;
+	
 	public Mesh() {
+		uploadNullTask = () -> {
+			indexBuffer = null;
+			vertexBuffer = null;
+			vertexArray = null;
+			Window.removeTerminateTask(uploadNullTask);
+		};
 		this.vertexArrayLayout = new VertexArrayLayout();
 		this.createVertexArrayLayout(this.vertexArrayLayout);
 	}
@@ -59,6 +70,7 @@ public class Mesh {
 	
 	public void upload() {
 		if (this.isUploaded()) return;
+		Window.addTerminateTask(uploadNullTask);
 		int vsize = this.getVertexElementCount();
 		int vlen = this.positions.length + this.normals.length + this.texCoords.length;
 		float[] vertices = new float[vlen];
@@ -156,6 +168,7 @@ public class Mesh {
 	
 	public void close() {
 		if (!this.isUploaded()) return;
+		
 		this.vertexArray.close();
 		this.vertexBuffer.close();
 		this.indexBuffer.close();

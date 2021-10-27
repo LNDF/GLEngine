@@ -13,9 +13,12 @@ public class IndexBuffer {
 	
 	private boolean closed = false;
 	
+	private Task closeTask = () -> this.close();;
+	
 	//protected static int boundIndexBuffer = 0;
 	
 	public IndexBuffer(int[] buffer, boolean isStatic) {
+		Window.addTerminateTask(closeTask);
 		this.count = buffer.length;
 		this.id = glGenBuffers();
 		this.bind();
@@ -32,6 +35,7 @@ public class IndexBuffer {
 				glDeleteBuffers(IndexBuffer.this.id);
 			}
 		});
+		Window.removeTerminateTask(closeTask);
 	}
 	
 	public long getCount() {

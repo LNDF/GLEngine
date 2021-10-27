@@ -12,6 +12,8 @@ public class VertexBuffer {
 	
 	private boolean closed = false;
 	
+	private Task closeTask = () -> this.close();
+	
 	protected static int boundVertexBuffer = 0;
 	
 	static {
@@ -19,6 +21,7 @@ public class VertexBuffer {
 	}
 	
 	protected VertexBuffer(boolean isStatic) {
+		Window.addTerminateTask(closeTask);
 		this.id = glGenBuffers();
 		this.isStatic = isStatic;
 		this.bind();
@@ -37,6 +40,7 @@ public class VertexBuffer {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
+		Window.removeTerminateTask(closeTask);
 		Window.getWindow().addEndOfLoopTask(new Task() {
 			@Override
 			public void execute() {

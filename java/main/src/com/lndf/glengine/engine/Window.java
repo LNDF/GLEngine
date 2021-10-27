@@ -10,7 +10,6 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Window {
 	private String name;
@@ -19,9 +18,9 @@ public class Window {
 	private boolean resizable;
 	
 	private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
-	private LinkedList<Task> tasks = new LinkedList<Task>();
 	
-	private static LinkedList<Task> terminateTasks = new LinkedList<Task>();
+	private TaskList tasks = new TaskList();
+	private static TaskList terminateTasks = new TaskList();
 	
 	private long windowId;
 	
@@ -42,18 +41,18 @@ public class Window {
 	}
 	
 	public static void terminate() {
-		for (Task task : Window.terminateTasks) task.execute();
+		Window.terminateTasks.executeAll(false);
 		glfwTerminate();
 		Window.window = null;
 		Input.unsetWindow();
 	}
 	
 	public static void addTerminateTask(Task task) {
-		Window.terminateTasks.add(task);
+		Window.terminateTasks.addTask(task);
 	}
 	
 	public static void removeTerminateTask(Task task) {
-		Window.terminateTasks.remove(task);
+		Window.terminateTasks.removeTask(task);
 	}
 	
 	private void init() {
@@ -90,7 +89,7 @@ public class Window {
 				drawable.draw(this);
 			}
 			SceneManager.updateScenes();
-			while (!tasks.isEmpty()) tasks.poll().execute();
+			this.tasks.executeAll(true);
 			glfwSwapBuffers(this.windowId);
 			glfwPollEvents();
 		}
@@ -151,6 +150,6 @@ public class Window {
 	}
 	
 	public void addEndOfLoopTask(Task task) {
-		this.tasks.add(task);
+		this.tasks.addTask(task);
 	}
 }

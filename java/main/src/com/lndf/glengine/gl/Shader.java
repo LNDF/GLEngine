@@ -39,6 +39,10 @@ public class Shader {
 	
 	protected static int boundShader = 0;
 	
+	static {
+		Window.addTerminateTask(() -> boundShader = 0);
+	}
+	
 	public static int compileShader(int type, String src) {
 		int shader = glCreateShader(type);
 		glShaderSource(shader, src);
