@@ -19,8 +19,8 @@ public class Window {
 	
 	private ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 	
-	private TaskList tasks = new TaskList();
-	private static TaskList terminateTasks = new TaskList();
+	private RunnableList runnables = new RunnableList();
+	private static RunnableList terminateRunnables = new RunnableList();
 	
 	private long windowId;
 	
@@ -41,18 +41,18 @@ public class Window {
 	}
 	
 	public static void terminate() {
-		Window.terminateTasks.executeAll(false);
+		Window.terminateRunnables.executeAll(false);
 		glfwTerminate();
 		Window.window = null;
 		Input.unsetWindow();
 	}
 	
-	public static void addTerminateTask(Task task) {
-		Window.terminateTasks.addTask(task);
+	public static void addTerminateRunnable(Runnable runnable) {
+		Window.terminateRunnables.addRunnable(runnable);
 	}
 	
-	public static void removeTerminateTask(Task task) {
-		Window.terminateTasks.removeTask(task);
+	public static void removeTerminateRunnable(Runnable runnable) {
+		Window.terminateRunnables.removeRunnable(runnable);
 	}
 	
 	private void init() {
@@ -89,7 +89,7 @@ public class Window {
 				drawable.draw(this);
 			}
 			SceneManager.updateScenes();
-			this.tasks.executeAll(true);
+			this.runnables.executeAll(true);
 			glfwSwapBuffers(this.windowId);
 			glfwPollEvents();
 		}
@@ -149,7 +149,7 @@ public class Window {
 		this.drawables.remove(drawable);
 	}
 	
-	public void addEndOfLoopTask(Task task) {
-		this.tasks.addTask(task);
+	public void addEndOfLoopRunnable(Runnable runnable) {
+		this.runnables.addRunnable(runnable);
 	}
 }

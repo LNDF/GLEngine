@@ -2,7 +2,6 @@ package com.lndf.glengine.gl;
 
 import static org.lwjgl.opengl.GL33.*;
 
-import com.lndf.glengine.engine.Task;
 import com.lndf.glengine.engine.Window;
 
 public class VertexBuffer {
@@ -12,16 +11,16 @@ public class VertexBuffer {
 	
 	private boolean closed = false;
 	
-	private Task closeTask = () -> this.close();
+	private Runnable closeRunnable = () -> this.close();
 	
 	protected static int boundVertexBuffer = 0;
 	
 	static {
-		Window.addTerminateTask(() -> boundVertexBuffer = 0);
+		Window.addTerminateRunnable(() -> boundVertexBuffer = 0);
 	}
 	
 	protected VertexBuffer(boolean isStatic) {
-		Window.addTerminateTask(closeTask);
+		Window.addTerminateRunnable(closeRunnable);
 		this.id = glGenBuffers();
 		this.isStatic = isStatic;
 		this.bind();
@@ -40,10 +39,10 @@ public class VertexBuffer {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeTerminateTask(closeTask);
-		Window.getWindow().addEndOfLoopTask(new Task() {
+		Window.removeTerminateRunnable(closeRunnable);
+		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
 			@Override
-			public void execute() {
+			public void run() {
 				glDeleteBuffers(VertexBuffer.this.id);
 			}
 		});

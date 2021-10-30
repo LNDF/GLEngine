@@ -8,7 +8,6 @@ import java.util.HashMap;
 import org.joml.Matrix4f;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.engine.Task;
 import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.engine.Window;
 
@@ -40,7 +39,7 @@ public class Shader {
 	protected static int boundShader = 0;
 	
 	static {
-		Window.addTerminateTask(() -> boundShader = 0);
+		Window.addTerminateRunnable(() -> boundShader = 0);
 	}
 	
 	public static int compileShader(int type, String src) {
@@ -96,9 +95,9 @@ public class Shader {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.getWindow().addEndOfLoopTask(new Task() {
+		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
 			@Override
-			public void execute() {
+			public void run() {
 				glDeleteProgram(Shader.this.id);
 			}
 		});

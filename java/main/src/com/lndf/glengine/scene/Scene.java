@@ -7,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import com.lndf.glengine.engine.SceneManager;
-import com.lndf.glengine.engine.Task;
-import com.lndf.glengine.engine.TaskList;
+import com.lndf.glengine.engine.RunnableList;
 import com.lndf.glengine.scene.components.lighting.DirectionalLight;
 import com.lndf.glengine.scene.components.lighting.PointLight;
 import com.lndf.glengine.scene.components.lighting.Spotlight;
@@ -20,7 +19,7 @@ public class Scene {
 	
 	private float ambientLight;
 	
-	private TaskList updateTasks = new TaskList();
+	private RunnableList updateRunnables = new RunnableList();
 	
 	//caches
 	private HashSet<RenderComponent> renderComponentCache = null;
@@ -144,7 +143,7 @@ public class Scene {
 			obj.destroyComponents();
 			obj.getTransform().checkCache();
 		}
-		this.updateTasks.executeAll(false);
+		this.updateRunnables.executeAll(false);
 		for (GameObject obj : this.gameObjectsToDestroy) {
 			obj.setScene(null);
 		}
@@ -175,12 +174,12 @@ public class Scene {
 		this.ambientLight = ambientLight;
 	}
 	
-	public void addUpdateTask(Task task) {
-		this.updateTasks.addTask(task);
+	public void addUpdateRunnable(Runnable runnable) {
+		this.updateRunnables.addRunnable(runnable);
 	}
 	
-	public void removeTask(Task task) {
-		this.updateTasks.removeTask(task);
+	public void removeRunnable(Runnable runnable) {
+		this.updateRunnables.removeRunnable(runnable);
 	}
 	
 }

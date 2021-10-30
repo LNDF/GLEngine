@@ -2,7 +2,6 @@ package com.lndf.glengine.gl;
 
 import static org.lwjgl.opengl.GL33.*;
 
-import com.lndf.glengine.engine.Task;
 import com.lndf.glengine.engine.Window;
 
 public class IndexBuffer {
@@ -13,12 +12,12 @@ public class IndexBuffer {
 	
 	private boolean closed = false;
 	
-	private Task closeTask = () -> this.close();;
+	private Runnable closeRunnable = () -> this.close();;
 	
 	//protected static int boundIndexBuffer = 0;
 	
 	public IndexBuffer(int[] buffer, boolean isStatic) {
-		Window.addTerminateTask(closeTask);
+		Window.addTerminateRunnable(closeRunnable);
 		this.count = buffer.length;
 		this.id = glGenBuffers();
 		this.bind();
@@ -29,13 +28,13 @@ public class IndexBuffer {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.getWindow().addEndOfLoopTask(new Task() {
+		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
 			@Override
-			public void execute() {
+			public void run() {
 				glDeleteBuffers(IndexBuffer.this.id);
 			}
 		});
-		Window.removeTerminateTask(closeTask);
+		Window.removeTerminateRunnable(closeRunnable);
 	}
 	
 	public long getCount() {

@@ -24,7 +24,7 @@ public class DefaultMaterial extends Material {
 	public static Shader defaultShader = null;
 	
 	static {
-		Window.addTerminateTask(() -> defaultShader = null);
+		Window.addTerminateRunnable(() -> defaultShader = null);
 	}
 	
 	public static Shader createDefaultShader() {

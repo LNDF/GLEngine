@@ -11,7 +11,6 @@ import java.util.HashMap;
 import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.engine.Task;
 import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.engine.Window;
 
@@ -31,7 +30,7 @@ public class Texture2D {
 	
 	private boolean closed = false;
 	
-	private Task closeTask = () -> this.close();
+	private Runnable closeRunnable = () -> this.close();
 	
 	protected static boolean STBImageVerticalFlipMode = false;
 	protected static HashMap<Integer, Integer> boundTextures = new HashMap<Integer, Integer>();
@@ -40,7 +39,7 @@ public class Texture2D {
 		for (int i = 0; i < 32; i++) {
 			Texture2D.boundTextures.put(i, 0);
 		}
-		Window.addTerminateTask(() -> {
+		Window.addTerminateRunnable(() -> {
 			for (int i = 0; i < 32; i++) {
 				Texture2D.boundTextures.put(i, 0);
 			}
@@ -48,7 +47,7 @@ public class Texture2D {
 	}
 	
 	public Texture2D(Asset asset) {
-		Window.addTerminateTask(closeTask);
+		Window.addTerminateRunnable(closeRunnable);
 		this.id = glGenTextures();
 		this.setTexture(asset, 0);
 		this.autoGenerateMipmaps();
@@ -183,10 +182,10 @@ public class Texture2D {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeTerminateTask(closeTask);
-		Window.getWindow().addEndOfLoopTask(new Task() {
+		Window.removeTerminateRunnable(closeRunnable);
+		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
 			@Override
-			public void execute() {
+			public void run() {
 				glDeleteTextures(Texture2D.this.id);
 			}
 		});

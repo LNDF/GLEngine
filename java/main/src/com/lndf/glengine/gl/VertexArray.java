@@ -4,7 +4,6 @@ import static org.lwjgl.opengl.GL33.*;
 
 import java.util.ArrayList;
 
-import com.lndf.glengine.engine.Task;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.VertexArrayLayout.VertexArrayLayoutElement;
 
@@ -14,26 +13,26 @@ public class VertexArray {
 	
 	private boolean closed = false;
 	
-	private Task closeTask = () -> this.close();
+	private Runnable closeRunnable = () -> this.close();
 	
 	protected static int boundVertexArray = 0;
 	
 	static {
-		Window.addTerminateTask(() -> boundVertexArray = 0);
+		Window.addTerminateRunnable(() -> boundVertexArray = 0);
 	}
 	
 	public VertexArray() {
-		Window.addTerminateTask(closeTask);
+		Window.addTerminateRunnable(closeRunnable);
 		this.id = glGenVertexArrays();
 	}
 	
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeTerminateTask(closeTask);
-		Window.getWindow().addEndOfLoopTask(new Task() {
+		Window.removeTerminateRunnable(closeRunnable);
+		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
 			@Override
-			public void execute() {
+			public void run() {
 				glDeleteVertexArrays(VertexArray.this.id);
 			}
 		});
