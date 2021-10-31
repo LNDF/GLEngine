@@ -5,12 +5,12 @@ import org.joml.Vector3f;
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.primitives.Cube;
+import com.lndf.glengine.primitives.Plane;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Scene;
 import com.lndf.glengine.scene.components.Camera;
-import com.lndf.glengine.scene.components.Cube;
 import com.lndf.glengine.scene.components.FPCamera;
-import com.lndf.glengine.scene.components.Plane;
 
 public class Level extends Scene {
 	
@@ -31,10 +31,10 @@ public class Level extends Scene {
 		this.roadEdgeTex = new Texture2D(new Asset("resource:/testapp/road_edge.png"));
 		this.roadEdge = new TextureMaterial(this.roadEdgeTex, 1, 250, 0, 1300f);
 		GameObject ground = new GameObject();
-		GameObject grassObj = new GameObject();
-		GameObject roadObj = new GameObject();
-		GameObject roadEdge1Obj = new GameObject();
-		GameObject roadEdge2Obj = new GameObject();
+		Plane grassObj = new Plane(this.grass);
+		Plane roadObj = new Plane(this.road);
+		Cube roadEdge1Obj = new Cube(this.roadEdge);
+		Cube roadEdge2Obj = new Cube(this.roadEdge);
 		GameObject camObject = new GameObject();
 		Actor player = new Actor(false);
 		this.addObject(player);
@@ -55,19 +55,6 @@ public class Level extends Scene {
 		ground.addChild(roadEdge2Obj);
 		roadEdge2Obj.getTransform().setPosition(new Vector3f(2, 0, 0.01f));
 		roadEdge2Obj.getTransform().setScale(new Vector3f(0.2f, 94, 0.2f));
-		//this.addObject(roadEdge1Obj);
-		//this.addObject(roadEdge2Obj);
-		//add grass plane
-		Plane grassPlane = new Plane(this.grass);
-		grassObj.addComponent(grassPlane);
-		//add road plane
-		Plane roadPlane = new Plane(this.road);
-		roadObj.addComponent(roadPlane);
-		//edd edge road cubes
-		Cube edgeRoad1Cube = new Cube(this.roadEdge);
-		Cube edgeRoad2Cube = new Cube(this.roadEdge);
-		roadEdge1Obj.addComponent(edgeRoad1Cube);
-		roadEdge2Obj.addComponent(edgeRoad2Cube);
 		//Cam setup
 		this.cam = new FPCamera((float) (Math.PI / 4), 100.0f);
 		this.addObject(camObject);

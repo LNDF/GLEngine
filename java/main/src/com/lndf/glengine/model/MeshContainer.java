@@ -7,14 +7,20 @@ import com.lndf.glengine.gl.texture.Texture2DRoles;
 
 public class MeshContainer {
 	
+	private String name;
 	private Mesh mesh;
 	private Texture2DRoles textures;
 	
-	public MeshContainer(Mesh mesh, Texture2DRoles textures) {
+	public MeshContainer(String name, Mesh mesh, Texture2DRoles textures) {
+		this.name = name;
 		this.mesh = mesh;
 		this.textures = textures;
 	}
 
+	public String getName() {
+		return name;
+	}
+	
 	public Mesh getMesh() {
 		return mesh;
 	}

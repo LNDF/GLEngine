@@ -7,10 +7,10 @@ import com.lndf.glengine.engine.DeltaTime;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.DefaultMaterial;
 import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.primitives.Cube;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Scene;
-import com.lndf.glengine.scene.components.Cube;
 import com.lndf.glengine.scene.components.FPCamera;
 import com.lndf.glengine.scene.components.lighting.DirectionalLight;
 import com.lndf.glengine.scene.components.lighting.PointLight;
@@ -41,9 +41,7 @@ public class LightsMain {
 		for (int j = 0; j < 10; j++) {
 			for (int k = 0; k < 10; k++) {
 				for (int i = 0; i < 10; i++) {
-					Cube box = new Cube(material);
-					GameObject boxObj = new GameObject();
-					boxObj.addComponent(box);
+					Cube boxObj = new Cube(material);
 					boxObj.getTransform().setPosition(new Vector3f(i * 3, k * 4, j * 3));
 					boxObj.getTransform().rotateEuler(new Vector3f((float) Math.toRadians(i * 10), (float) Math.toRadians(j * k), (float) Math.toRadians(k * i)));
 					scene.addObject(boxObj);

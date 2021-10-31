@@ -5,9 +5,10 @@ import org.joml.Vector3f;
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.DeltaTime;
 import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.primitives.Plane;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
-import com.lndf.glengine.scene.components.Plane;
+import com.lndf.glengine.scene.components.MeshRenderer;
 
 public class Record extends GameObject {
 	
@@ -24,7 +25,7 @@ public class Record extends GameObject {
 		this.getTransform().setScale(new Vector3f(4, 1, 1));
 		this.getTransform().rotateEuler(new Vector3f((float) (Math.PI / 2), 0, 0));
 		Record.instances++;
-		Plane plane = new Plane(Record.material);
+		MeshRenderer plane = Plane.getMeshRenderer(Record.material);
 		this.addComponent(plane);
 		this.addComponent(new Component() {
 			

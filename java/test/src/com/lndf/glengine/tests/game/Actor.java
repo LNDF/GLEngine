@@ -2,8 +2,9 @@ package com.lndf.glengine.tests.game;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.primitives.Cube;
 import com.lndf.glengine.scene.GameObject;
-import com.lndf.glengine.scene.components.Cube;
+import com.lndf.glengine.scene.components.MeshRenderer;
 
 public class Actor extends GameObject {
 	
@@ -17,7 +18,7 @@ public class Actor extends GameObject {
 			Actor.material = new TextureMaterial(Actor.texture, 1, 1, 0, 0);
 		}
 		Actor.instances++;
-		Cube cube = new Cube(Actor.material);
+		MeshRenderer cube = Cube.getMeshRenderer(Actor.material);
 		this.addComponent(cube);
 		if (!isEnemy) {
 			Player p = new Player();

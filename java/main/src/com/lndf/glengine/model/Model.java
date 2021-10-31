@@ -21,11 +21,13 @@ import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
 import com.lndf.glengine.asset.Asset;
+import com.lndf.glengine.gl.Material;
 import com.lndf.glengine.gl.Mesh;
 import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
 import com.lndf.glengine.gl.texture.TextureRole;
 import com.lndf.glengine.scene.GameObject;
+import com.lndf.glengine.scene.components.MeshRenderer;
 
 public class Model {
 	
@@ -72,6 +74,7 @@ public class Model {
 	
 	private MeshContainer loadMesh(Asset asset, AIMesh aiMesh, AIScene scene) {
 		Mesh mesh = new Mesh();
+		String meshName = aiMesh.mName().dataString();
 		int numVertices = aiMesh.mNumVertices();
 		int numFaces = aiMesh.mNumFaces();
 		int materialIndex = aiMesh.mMaterialIndex();
@@ -136,7 +139,7 @@ public class Model {
 		mesh.setTexCoords(texCoords);
 		mesh.setNormals(normals);
 		mesh.setIndices(indexBuffer);
-		return this.createMeshContainer(mesh, textures);
+		return this.createMeshContainer(meshName, mesh, textures);
 	}
 	
 	private ArrayList<Texture2D> loadTextures(Asset asset, AIMaterial material, int type) {
@@ -169,8 +172,8 @@ public class Model {
 		}
 	}
 	
-	private MeshContainer createMeshContainer(Mesh mesh, Texture2DRoles textures) {
-		return new MeshContainer(mesh, textures);
+	private MeshContainer createMeshContainer(String meshName, Mesh mesh, Texture2DRoles textures) {
+		return new MeshContainer(meshName, mesh, textures);
 	}
 	
 	public Mesh[] getMeshes() {
@@ -189,7 +192,14 @@ public class Model {
 	
 	public GameObject createGameObject() {
 		GameObject obj = new GameObject();
-		obj.addComponent(new ModelRenderComponent(this.meshes));
+		MeshRenderer meshRenderer = new MeshRenderer();
+		for (MeshContainer container : this.meshes) {
+			String name = container.getName();
+			Mesh mesh = container.getMesh();
+			Material material = container.createMaterial();
+			meshRenderer.addMesh(name, mesh, material);
+		}
+		obj.addComponent(meshRenderer);
 		return obj;
 	}
 	
