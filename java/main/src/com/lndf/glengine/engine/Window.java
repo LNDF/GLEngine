@@ -109,6 +109,10 @@ public class Window {
 		return Window.window;
 	}
 	
+	public void setClose(boolean shouldClose) {
+		glfwSetWindowShouldClose(this.windowId, shouldClose);
+	}
+	
 	public long getWindowId() {
 		return this.windowId;
 	}
