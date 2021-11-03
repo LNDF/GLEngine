@@ -182,4 +182,11 @@ public class Scene {
 		this.updateRunnables.removeRunnable(runnable);
 	}
 	
+	public GameObject searchObject(String searchingName) {
+		for (GameObject obj : this.gameObjects) {
+			if (obj.getName() == searchingName) return obj;
+		}
+		return null;
+	}
+	
 }

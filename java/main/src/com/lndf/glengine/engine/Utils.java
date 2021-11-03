@@ -3,7 +3,9 @@ package com.lndf.glengine.engine;
 import java.awt.Color;
 import java.nio.ByteBuffer;
 
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.assimp.AIMatrix4x4;
 
 public class Utils {
 	
@@ -26,6 +28,15 @@ public class Utils {
 	
 	public static ByteBuffer byteBufferFromArray(byte[] bytes) {
 		return BufferUtils.createByteBuffer(bytes.length).put(bytes).flip();
+	}
+	
+	public static Matrix4f fromAssimpMatrix4x4(AIMatrix4x4 input) {
+		return new Matrix4f(
+				input.a1(), input.b1(), input.c1(), input.d1(),
+				input.a2(), input.b2(), input.c2(), input.d2(),
+				input.a3(), input.b3(), input.c3(), input.d3(),
+				input.a4(), input.b4(), input.c4(), input.d4()
+		);
 	}
 	
 }

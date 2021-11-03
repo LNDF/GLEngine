@@ -6,17 +6,11 @@ import org.joml.Vector3f;
 
 public class Transform {
 	
-	private Matrix4f customTransformBefore = new Matrix4f().identity();
-	private Matrix4f customTransformAfter = new Matrix4f().identity();
-	
 	private Vector3f position = new Vector3f(0, 0, 0);
 	private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
 	private Vector3f scale = new Vector3f(1, 1, 1);
 	
 	//old
-	private Matrix4f oldCustomTransformBefore = new Matrix4f().identity();
-	private Matrix4f oldCustomTransformAfter = new Matrix4f().identity();
-	
 	private Vector3f oldPosition = new Vector3f(0, 0, 0);
 	private Quaternionf oldRotation = new Quaternionf(0, 0, 0, 1);
 	private Vector3f oldScale = new Vector3f(1, 1, 1);
@@ -36,13 +30,9 @@ public class Transform {
 	}
 	
 	public void checkCache() {
-		if (!this.customTransformBefore.equals(this.oldCustomTransformBefore) ||
-			!this.customTransformAfter.equals(this.oldCustomTransformAfter) ||
-			!this.position.equals(this.oldPosition) ||
+		if (!this.position.equals(this.oldPosition) ||
 			!this.rotation.equals(this.oldRotation) ||
 			!this.scale.equals(this.oldScale)) {
-			this.oldCustomTransformBefore = new Matrix4f(this.customTransformBefore);
-			this.oldCustomTransformAfter = new Matrix4f(this.customTransformAfter);
 			this.oldPosition = new Vector3f(this.position);
 			this.oldRotation = new Quaternionf(this.rotation);
 			this.oldScale = new Vector3f(this.scale);
@@ -57,11 +47,10 @@ public class Transform {
 	public Matrix4f getTransformation() {
 		this.checkCache();
 		if (this.transformation != null) return new Matrix4f(this.transformation);
-		Matrix4f b = new Matrix4f(this.customTransformBefore);
-		Matrix4f a = new Matrix4f(this.customTransformAfter);
-		a.translate(this.position).rotate(this.rotation).scale(this.scale).mul(b);
-		this.transformation = new Matrix4f(a);
-		return a;
+		Matrix4f base = new Matrix4f().identity();
+		base.translate(this.position).rotate(this.rotation).scale(this.scale);
+		this.transformation = new Matrix4f(base);
+		return base;
 	}
 	
 	public Matrix4f getWorldTransformation() {
@@ -121,24 +110,6 @@ public class Transform {
 	
 	public Vector3f getDown() {
 		return this.getTransformation().transformDirection(new Vector3f(UP).mul(-1));
-	}
-	
-	public Matrix4f getCustomTransformBefore() {
-		return customTransformBefore;
-	}
-
-	public void setCustomTransformBefore(Matrix4f customTransformBefore) {
-		if (customTransformBefore == null) customTransformBefore = new Matrix4f().identity();
-		this.customTransformBefore.set(customTransformBefore);
-	}
-
-	public Matrix4f getCustomTransformAfter() {
-		return customTransformAfter;
-	}
-
-	public void setCustomTransformAfter(Matrix4f customTransformAfter) {
-		if (customTransformAfter == null) customTransformAfter = new Matrix4f().identity();
-		this.customTransformAfter.set(customTransformAfter);
 	}
 
 	public Vector3f getPosition() {

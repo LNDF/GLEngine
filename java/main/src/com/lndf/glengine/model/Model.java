@@ -13,6 +13,7 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
+import org.lwjgl.assimp.AIMatrix4x4;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AINode;
 import org.lwjgl.assimp.AIScene;
@@ -21,22 +22,23 @@ import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
 import com.lndf.glengine.asset.Asset;
+import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.gl.Material;
 import com.lndf.glengine.gl.Mesh;
 import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
 import com.lndf.glengine.gl.texture.TextureRole;
 import com.lndf.glengine.scene.GameObject;
+import com.lndf.glengine.scene.Transform;
 import com.lndf.glengine.scene.components.MeshRenderer;
 
 public class Model {
 	
-	private MeshContainer[] meshes;
-	private int meshesPosition = 0;
-	
 	public static Vector4f DEFAULT_COLOR = new Vector4f(1, 1, 1, 1);
 	
 	private HashMap<String, Texture2D> textures = new HashMap<String, Texture2D>();
+	
+	private ModelNode rootNode;
 	
 	public Model(Asset asset) {
 		this.loadModel(asset);
@@ -52,24 +54,27 @@ public class Model {
 				scene.mRootNode() == null) {
 			throw new RuntimeException("Assimp Error: " + Assimp.aiGetErrorString());
 		}
-		this.meshes = new MeshContainer[scene.mNumMeshes()];
-		loadNode(asset, scene.mRootNode(), scene);
+		this.rootNode = loadNode(asset, scene.mRootNode(), scene);
 	}
 	
-	private void loadNode(Asset asset, AINode node, AIScene scene) {
+	private ModelNode loadNode(Asset asset, AINode node, AIScene scene) {
 		int numMeshes = node.mNumMeshes();
 		int numChildren = node.mNumChildren();
+		AIMatrix4x4 transform = node.mTransformation();
+		MeshContainer[] meshContainers = new MeshContainer[numMeshes];
+		ModelNode[] nodeChildren = new ModelNode[numChildren];
 		IntBuffer meshes = node.mMeshes();
 		PointerBuffer sceneMeshes = scene.mMeshes();
 		PointerBuffer children = node.mChildren();
 		for (int i = 0; i < numMeshes; i++) {
 			AIMesh aiMesh = AIMesh.create(sceneMeshes.get(meshes.get(i)));
-			this.meshes[this.meshesPosition++] = loadMesh(asset, aiMesh, scene);
+			meshContainers[i] = loadMesh(asset, aiMesh, scene);
 		}
 		for (int i = 0; i < numChildren; i++) {
 			AINode child = AINode.create(children.get(i));
-			loadNode(asset, child, scene);
+			nodeChildren[i] = loadNode(asset, child, scene);
 		}
+		return new ModelNode(null, nodeChildren, meshContainers, Utils.fromAssimpMatrix4x4(transform));
 	}
 	
 	private MeshContainer loadMesh(Asset asset, AIMesh aiMesh, AIScene scene) {
@@ -176,24 +181,29 @@ public class Model {
 		return new MeshContainer(meshName, mesh, textures);
 	}
 	
-	public Mesh[] getMeshes() {
-		Mesh[] meshes = new Mesh[this.meshes.length];
-		int pos = 0;
-		for (MeshContainer container : this.meshes) {
-			meshes[pos++] = container.getMesh();
-		}
-		return meshes;
-	}
-	
-	public Mesh getCombinedMesh() {
-		Mesh[] meshes = this.getMeshes();
-		return Mesh.combine(meshes);
+	public ModelNode getRootNode() {
+		return rootNode;
 	}
 	
 	public GameObject createGameObject() {
-		GameObject obj = new GameObject();
+		return this.createGameObject("");
+	}
+	
+	public GameObject createGameObject(String suffix) {
+		return this.createGameObject(suffix, rootNode);
+	}
+	
+	private GameObject createGameObject(String suffix, ModelNode node) {
+		GameObject obj = new GameObject(node.getName() + suffix);
+		Transform transform = obj.getTransform();
+		transform.setPosition(node.getPosition());
+		transform.setScale(node.getScale());
+		transform.setRotation(node.getRotation());
+		for (ModelNode childNode : node.getChildren()) {
+			obj.addChild(this.createGameObject(suffix, childNode));
+		}
 		MeshRenderer meshRenderer = new MeshRenderer();
-		for (MeshContainer container : this.meshes) {
+		for (MeshContainer container : node.getMeshContainers()) {
 			String name = container.getName();
 			Mesh mesh = container.getMesh();
 			Material material = container.createMaterial();

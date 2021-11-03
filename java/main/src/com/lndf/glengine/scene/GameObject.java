@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 public class GameObject {
 	
+	private String name;
+	
 	private ConcurrentHashMap<Class<? extends Component>, Component> components = new ConcurrentHashMap<Class<? extends Component>, Component>();
 	private KeySetView<Component, Boolean> componentsToDestroy = ConcurrentHashMap.newKeySet();
 	
@@ -17,7 +19,23 @@ public class GameObject {
 	private HashSet<GameObject> children = new HashSet<GameObject>();
 	private GameObject parent;
 	
+	public GameObject(String name) {
+		this.name = name;
+	}
+	
+	public GameObject() {
+		this("");
+	}
+	
 	private Transform transform = new Transform(this);
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 	
 	public Scene getScene() {
 		return this.scene;
@@ -90,6 +108,15 @@ public class GameObject {
 	
 	private void setParent(GameObject parent) {
 		this.parent = parent;
+	}
+	
+	public GameObject search(String searchingName) {
+		if (this.name == searchingName) return this;
+		for (GameObject child : this.children) {
+			GameObject result = child.search(searchingName);
+			if (result != null) return result;
+		}
+		return null;
 	}
 	
 	public Set<GameObject> getChildren() {
