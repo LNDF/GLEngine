@@ -1,8 +1,6 @@
 package com.lndf.glengine.model;
 
-import static org.lwjgl.assimp.Assimp.AI_SCENE_FLAGS_INCOMPLETE;
-import static org.lwjgl.assimp.Assimp.aiProcess_GenNormals;
-import static org.lwjgl.assimp.Assimp.aiProcess_Triangulate;
+import static org.lwjgl.assimp.Assimp.*;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -10,16 +8,7 @@ import java.util.HashMap;
 
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIColor4D;
-import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMaterial;
-import org.lwjgl.assimp.AIMatrix4x4;
-import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AINode;
-import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.AIString;
-import org.lwjgl.assimp.AIVector3D;
-import org.lwjgl.assimp.Assimp;
+import org.lwjgl.assimp.*;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Utils;
@@ -39,12 +28,15 @@ public class Model {
 	private HashMap<String, Texture2D> textures = new HashMap<String, Texture2D>();
 	
 	private ModelNode rootNode;
+	private Asset asset;
+	private float unitScaleFactor = 1f;
 	
 	public Model(Asset asset) {
 		this.loadModel(asset);
 	}
 	
 	private void loadModel(Asset asset) {
+		this.asset = asset;
 		AIScene scene = ModelImporter.importScene(asset,
 				aiProcess_Triangulate |
 				aiProcess_GenNormals
@@ -54,12 +46,32 @@ public class Model {
 				scene.mRootNode() == null) {
 			throw new RuntimeException("Assimp Error: " + Assimp.aiGetErrorString());
 		}
-		this.rootNode = loadNode(asset, scene.mRootNode(), scene);
+		if (scene.mMetaData() != null) {
+			AIMetaDataEntry unitScaleFactor = this.getEntryFromMetaData(scene.mMetaData(), "UnitScaleFactor");
+			if (unitScaleFactor != null) {
+				double factor = unitScaleFactor.mData(8).getDouble();
+				this.unitScaleFactor = (float) (factor / 100.0);
+			}
+		}
+		this.rootNode = loadNode(scene.mRootNode(), scene);
 	}
 	
-	private ModelNode loadNode(Asset asset, AINode node, AIScene scene) {
+	private AIMetaDataEntry getEntryFromMetaData(AIMetaData metaData, String target) {
+		int numProperties = metaData.mNumProperties();
+		AIString.Buffer keys = metaData.mKeys();
+		AIMetaDataEntry.Buffer values = metaData.mValues();
+		for (int i = 0; i < numProperties; i++) {
+			if (keys.get(i).dataString().equals(target)) {
+				return values.get(i);
+			}
+		}
+		return null;
+	}
+	
+	private ModelNode loadNode(AINode node, AIScene scene) {
 		int numMeshes = node.mNumMeshes();
 		int numChildren = node.mNumChildren();
+		String nodeName = node.mName().dataString();
 		AIMatrix4x4 transform = node.mTransformation();
 		MeshContainer[] meshContainers = new MeshContainer[numMeshes];
 		ModelNode[] nodeChildren = new ModelNode[numChildren];
@@ -68,16 +80,16 @@ public class Model {
 		PointerBuffer children = node.mChildren();
 		for (int i = 0; i < numMeshes; i++) {
 			AIMesh aiMesh = AIMesh.create(sceneMeshes.get(meshes.get(i)));
-			meshContainers[i] = loadMesh(asset, aiMesh, scene);
+			meshContainers[i] = loadMesh(aiMesh, scene);
 		}
 		for (int i = 0; i < numChildren; i++) {
 			AINode child = AINode.create(children.get(i));
-			nodeChildren[i] = loadNode(asset, child, scene);
+			nodeChildren[i] = loadNode(child, scene);
 		}
-		return new ModelNode(null, nodeChildren, meshContainers, Utils.fromAssimpMatrix4x4(transform));
+		return new ModelNode(nodeName, nodeChildren, meshContainers, Utils.fromAssimpMatrix4x4(transform));
 	}
 	
-	private MeshContainer loadMesh(Asset asset, AIMesh aiMesh, AIScene scene) {
+	private MeshContainer loadMesh(AIMesh aiMesh, AIScene scene) {
 		Mesh mesh = new Mesh();
 		String meshName = aiMesh.mName().dataString();
 		int numVertices = aiMesh.mNumVertices();
@@ -129,12 +141,12 @@ public class Model {
 		if (materialIndex > 0) {
 			AIMaterial material = AIMaterial.create(scene.mMaterials().get(materialIndex));
 			//textures
-			textures.put(TextureRole.AMBIENT, this.loadTextures(asset, material, Assimp.aiTextureType_AMBIENT));
-			textures.put(TextureRole.DIFFUSE, this.loadTextures(asset, material, Assimp.aiTextureType_DIFFUSE));
-			textures.put(TextureRole.LIGHTMAP, this.loadTextures(asset, material, Assimp.aiTextureType_LIGHTMAP));
-			textures.put(TextureRole.NORMAL, this.loadTextures(asset, material, Assimp.aiTextureType_NORMALS));
-			textures.put(TextureRole.SPECULAR, this.loadTextures(asset, material, Assimp.aiTextureType_SPECULAR));
-			textures.put(TextureRole.SHININESS, this.loadTextures(asset, material, Assimp.aiTextureType_SHININESS));
+			textures.put(TextureRole.AMBIENT, this.loadTextures(material, Assimp.aiTextureType_AMBIENT));
+			textures.put(TextureRole.DIFFUSE, this.loadTextures(material, Assimp.aiTextureType_DIFFUSE));
+			textures.put(TextureRole.LIGHTMAP, this.loadTextures( material, Assimp.aiTextureType_LIGHTMAP));
+			textures.put(TextureRole.NORMAL, this.loadTextures( material, Assimp.aiTextureType_NORMALS));
+			textures.put(TextureRole.SPECULAR, this.loadTextures(material, Assimp.aiTextureType_SPECULAR));
+			textures.put(TextureRole.SHININESS, this.loadTextures(material, Assimp.aiTextureType_SHININESS));
 			//colors
 			textures.setDefaultColor(TextureRole.AMBIENT, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT));
 			textures.setDefaultColor(TextureRole.DIFFUSE, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
@@ -147,7 +159,7 @@ public class Model {
 		return this.createMeshContainer(meshName, mesh, textures);
 	}
 	
-	private ArrayList<Texture2D> loadTextures(Asset asset, AIMaterial material, int type) {
+	private ArrayList<Texture2D> loadTextures(AIMaterial material, int type) {
 		int textureCount = Assimp.aiGetMaterialTextureCount(material, type);
 		if (textureCount <= 0) return null;
 		ArrayList<Texture2D> textures = new ArrayList<Texture2D>();
@@ -190,7 +202,9 @@ public class Model {
 	}
 	
 	public GameObject createGameObject(String suffix) {
-		return this.createGameObject(suffix, rootNode);
+		GameObject result = this.createGameObject(suffix, rootNode);
+		result.getTransform().getScale().mul(unitScaleFactor);
+		return result;
 	}
 	
 	private GameObject createGameObject(String suffix, ModelNode node) {
