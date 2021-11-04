@@ -31,16 +31,17 @@ public class Model {
 	private Asset asset;
 	private float unitScaleFactor = 1f;
 	
-	public Model(Asset asset) {
-		this.loadModel(asset);
+	public Model(Asset asset, ModelImporterSettings settings) {
+		this.asset = asset;
+		this.loadModel(settings);
 	}
 	
-	private void loadModel(Asset asset) {
-		this.asset = asset;
-		AIScene scene = ModelImporter.importScene(asset,
-				aiProcess_Triangulate |
-				aiProcess_GenNormals
-		);
+	public Model(Asset asset) {
+		this(asset, ModelImporterSettings.getDefaultSettings());
+	}
+	
+	private void loadModel(ModelImporterSettings settings) {
+		AIScene scene = ModelImporter.importScene(asset, settings);
 		if (scene == null ||
 				(scene.mFlags() & AI_SCENE_FLAGS_INCOMPLETE) != 0 || 
 				scene.mRootNode() == null) {

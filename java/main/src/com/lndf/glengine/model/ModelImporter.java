@@ -8,16 +8,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIFile;
-import org.lwjgl.assimp.AIFileCloseProc;
-import org.lwjgl.assimp.AIFileFlushProc;
-import org.lwjgl.assimp.AIFileIO;
-import org.lwjgl.assimp.AIFileOpenProc;
-import org.lwjgl.assimp.AIFileReadProc;
-import org.lwjgl.assimp.AIFileSeek;
-import org.lwjgl.assimp.AIFileTellProc;
-import org.lwjgl.assimp.AIFileWriteProc;
-import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.*;
 import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.asset.Asset;
@@ -110,16 +101,21 @@ public class ModelImporter {
 	
 	private static final AIFileCloseProc AI_FILE_CLOSE_PROC = AIFileCloseProc.create((pFileIO, pFile) -> {});
 	
-	public static AIScene importScene(Asset asset, int flags) {
+	public static AIScene importScene(Asset asset, ModelImporterSettings settings) {
 		try (MemoryStack stack = stackPush()) {
-	        return aiImportFileEx(
+			AIPropertyStore store = Assimp.aiCreatePropertyStore();
+			settings.configurePropertyStore(store);
+			AIScene scene = aiImportFileExWithProperties(
 	            asset.toString(),
-	            flags,
+	            settings.getFlags(),
 	            AIFileIO.callocStack(stack)
 	                .OpenProc(ModelImporter.AI_FILE_OPEN_PROC)
 	                .CloseProc(ModelImporter.AI_FILE_CLOSE_PROC)
-	                .UserData(-1L)
+	                .UserData(-1L),
+	            store
 	        );
+			Assimp.aiReleasePropertyStore(store);
+			return scene;
 	    }
 	}
 }
