@@ -16,12 +16,12 @@ public class ModelNode {
 	private Vector3f scale;
 	private Quaternionf rotation;
 	
-	public ModelNode(String name, ModelNode[] children, MeshContainer[] meshContainers, Matrix4f transform) {
+	public ModelNode(String name, ModelNode[] children, MeshContainer[] meshContainers, Matrix4f transform, float scaleFactor) {
 		this.name = name;
 		this.children = children;
 		this.meshContainers = meshContainers;
-		this.position = transform.getTranslation(new Vector3f());
-		this.scale = transform.getScale(new Vector3f());
+		this.position = transform.getTranslation(new Vector3f()).mul(scaleFactor);
+		this.scale = transform.getScale(new Vector3f()).mul(scaleFactor);
 		this.rotation = transform.getUnnormalizedRotation(new Quaternionf());
 	}
 	

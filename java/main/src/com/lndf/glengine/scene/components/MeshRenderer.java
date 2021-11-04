@@ -13,8 +13,8 @@ import com.lndf.glengine.scene.RenderComponent;
 
 public class MeshRenderer extends RenderComponent {
 	
-	private HashMap<String, Mesh> meshes = new HashMap<String, Mesh>();
-	private HashMap<String, Material> materials = new HashMap<String, Material>();
+	private HashMap<Mesh, String> meshes = new HashMap<Mesh, String>();
+	private HashMap<Mesh, Material> materials = new HashMap<Mesh, Material>();
 	
 	public MeshRenderer() {
 		
@@ -25,20 +25,20 @@ public class MeshRenderer extends RenderComponent {
 	}
 	
 	public void addMesh(String meshName, Mesh mesh, Material material) {
-		meshes.put(meshName, mesh);
-		materials.put(meshName, material);
+		meshes.put(mesh, meshName);
+		materials.put(mesh, material);
 	}
 	
-	public void removeMesh(String meshName) {
-		meshes.remove(meshName);
-		materials.remove(meshName);
+	public void removeMesh(Mesh mesh) {
+		meshes.remove(mesh);
+		materials.remove(mesh);
 	}
 	
-	public HashMap<String, Mesh> getMeshes() {
+	public HashMap<Mesh, String> getMeshes() {
 		return meshes;
 	}
 	
-	public HashMap<String, Material> getMaterials() {
+	public HashMap<Mesh, Material> getMaterials() {
 		return materials;
 	}
 
@@ -47,10 +47,8 @@ public class MeshRenderer extends RenderComponent {
 		if (!this.getVisible()) return;
 		GameObject obj = this.getGameObject();
 		if (obj == null) return;
-		for (Map.Entry<String, Mesh> meshWithName : this.meshes.entrySet()) {
-			String name = meshWithName.getKey();
-			Mesh mesh = meshWithName.getValue();
-			Material material = materials.get(name);
+		for (Mesh mesh : this.meshes.keySet()) {
+			Material material = materials.get(mesh);
 			if (material == null) continue;
 			material.getShader().bind();
 			material.setUniform(vp, obj, pov);

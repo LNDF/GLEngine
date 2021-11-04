@@ -53,7 +53,7 @@ public class Model {
 				this.unitScaleFactor = (float) (factor / 100.0);
 			}
 		}
-		this.rootNode = loadNode(scene.mRootNode(), scene);
+		this.rootNode = loadNode(scene.mRootNode(), scene, true);
 	}
 	
 	private AIMetaDataEntry getEntryFromMetaData(AIMetaData metaData, String target) {
@@ -68,7 +68,7 @@ public class Model {
 		return null;
 	}
 	
-	private ModelNode loadNode(AINode node, AIScene scene) {
+	private ModelNode loadNode(AINode node, AIScene scene, boolean isRootNode) {
 		int numMeshes = node.mNumMeshes();
 		int numChildren = node.mNumChildren();
 		String nodeName = node.mName().dataString();
@@ -84,9 +84,9 @@ public class Model {
 		}
 		for (int i = 0; i < numChildren; i++) {
 			AINode child = AINode.create(children.get(i));
-			nodeChildren[i] = loadNode(child, scene);
+			nodeChildren[i] = loadNode(child, scene, false);
 		}
-		return new ModelNode(nodeName, nodeChildren, meshContainers, Utils.fromAssimpMatrix4x4(transform));
+		return new ModelNode(nodeName, nodeChildren, meshContainers, Utils.fromAssimpMatrix4x4(transform), isRootNode ? 1 : this.unitScaleFactor);
 	}
 	
 	private MeshContainer loadMesh(AIMesh aiMesh, AIScene scene) {
@@ -202,9 +202,7 @@ public class Model {
 	}
 	
 	public GameObject createGameObject(String suffix) {
-		GameObject result = this.createGameObject(suffix, rootNode);
-		result.getTransform().getScale().mul(unitScaleFactor);
-		return result;
+		return this.createGameObject(suffix, rootNode);
 	}
 	
 	private GameObject createGameObject(String suffix, ModelNode node) {
