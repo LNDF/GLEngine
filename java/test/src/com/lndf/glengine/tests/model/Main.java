@@ -23,7 +23,7 @@ public class Main {
 		camObj.addComponent(light);
 		camObj.addComponent(light);
 		GameObject persona = model.createGameObject();
-		//persona.getTransform().setScale(new Vector3f(0.01f, 0.01f, 0.01f));
+		persona.getTransform().setScale(new Vector3f(0.01f, 0.01f, 0.01f));
 		scene.addObject(persona);
 		scene.addObject(camObj);
 		win.addDrawable(cam);

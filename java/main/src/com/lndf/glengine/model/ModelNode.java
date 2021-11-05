@@ -1,6 +1,5 @@
 package com.lndf.glengine.model;
 
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -16,13 +15,13 @@ public class ModelNode {
 	private Vector3f scale;
 	private Quaternionf rotation;
 	
-	public ModelNode(String name, ModelNode[] children, MeshContainer[] meshContainers, Matrix4f transform, float scaleFactor) {
+	public ModelNode(String name, ModelNode[] children, MeshContainer[] meshContainers, Vector3f position, Vector3f scale, Quaternionf rotation) {
 		this.name = name;
 		this.children = children;
 		this.meshContainers = meshContainers;
-		this.position = transform.getTranslation(new Vector3f()).mul(scaleFactor);
-		this.scale = transform.getScale(new Vector3f()).mul(scaleFactor);
-		this.rotation = transform.getUnnormalizedRotation(new Quaternionf());
+		this.position = position;
+		this.scale = scale;
+		this.rotation = rotation;
 	}
 	
 	public String getName() {

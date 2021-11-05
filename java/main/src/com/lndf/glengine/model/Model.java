@@ -6,6 +6,8 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -51,7 +53,7 @@ public class Model {
 			AIMetaDataEntry unitScaleFactor = this.getEntryFromMetaData(scene.mMetaData(), "UnitScaleFactor");
 			if (unitScaleFactor != null) {
 				double factor = unitScaleFactor.mData(8).getDouble();
-				this.unitScaleFactor = (float) (factor / 100.0);
+				this.unitScaleFactor = (float) factor;
 			}
 		}
 		this.rootNode = loadNode(scene.mRootNode(), scene, true);
@@ -74,6 +76,14 @@ public class Model {
 		int numChildren = node.mNumChildren();
 		String nodeName = node.mName().dataString();
 		AIMatrix4x4 transform = node.mTransformation();
+		Vector3f position = new Vector3f();
+		Vector3f scale = new Vector3f();
+		Quaternionf rotation = new Quaternionf();
+		Utils.decomposeAssimpMatrix4x4(transform, position, scale, rotation);
+		if (!isRootNode) {
+			position.mul(unitScaleFactor);
+			scale.mul(unitScaleFactor);
+		}
 		MeshContainer[] meshContainers = new MeshContainer[numMeshes];
 		ModelNode[] nodeChildren = new ModelNode[numChildren];
 		IntBuffer meshes = node.mMeshes();
@@ -87,7 +97,7 @@ public class Model {
 			AINode child = AINode.create(children.get(i));
 			nodeChildren[i] = loadNode(child, scene, false);
 		}
-		return new ModelNode(nodeName, nodeChildren, meshContainers, Utils.fromAssimpMatrix4x4(transform), isRootNode ? 1 : this.unitScaleFactor);
+		return new ModelNode(nodeName, nodeChildren, meshContainers, position, scale, rotation);
 	}
 	
 	private MeshContainer loadMesh(AIMesh aiMesh, AIScene scene) {
