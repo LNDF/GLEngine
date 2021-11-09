@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL33.*;
 import static org.lwjgl.stb.STBImage.*;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -46,10 +47,25 @@ public class Texture2D {
 		});
 	}
 	
-	public Texture2D(Asset asset) {
+	public Texture2D() {
 		Window.addTerminateRunnable(closeRunnable);
 		this.id = glGenTextures();
+	}
+	
+	public Texture2D(Asset asset) {
+		this();
 		this.setTexture(asset, 0);
+		this.autoGenerateMipmaps();
+		this.setMinFilters();
+		this.setMagFilters();
+		this.setWrapHorizontal(TextureWrap.REPEAT);
+		this.setWrapVertical(TextureWrap.REPEAT);
+		this.setBorderColor(Color.BLACK);
+	}
+	
+	public Texture2D(ByteBuffer input) {
+		this();
+		this.setTexture(input, 0);
 		this.autoGenerateMipmaps();
 		this.setMinFilters();
 		this.setMagFilters();
@@ -60,15 +76,21 @@ public class Texture2D {
 	
 	public void setTexture(Asset asset, int mipmapLevel) {
 		try {
+			this.setTexture(asset.getByteBuffer(), mipmapLevel);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setTexture(ByteBuffer input, int mipmapLevel) {
+		try (MemoryStack stack = MemoryStack.stackPush();) {
 			Texture2D.setSTBImageVerticalFlipMode(true);
-			MemoryStack stack = MemoryStack.stackPush();
 			IntBuffer w = stack.mallocInt(1);
 			IntBuffer h = stack.mallocInt(1);
 			IntBuffer c = stack.mallocInt(1); //Not used
-			ByteBuffer input = asset.getByteBuffer();
 			ByteBuffer img = stbi_load_from_memory(input, w, h, c, 4);
 			if (img == null) {
-				throw new RuntimeException("Couldn't load texture " + asset.toString() + ". Reason: " + stbi_failure_reason());
+				throw new RuntimeException("Couldn't load texture. Reason: " + stbi_failure_reason());
 			}
 			int width = w.get(0);
 			int height = h.get(0);
@@ -77,8 +99,6 @@ public class Texture2D {
 			this.bind();
 			glTexImage2D(GL_TEXTURE_2D, mipmapLevel, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
 			stbi_image_free(img);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 	

@@ -56,6 +56,10 @@ public class Model {
 				this.unitScaleFactor = (float) factor;
 			}
 		}
+		for (int i = 0; i < scene.mNumTextures(); i++) {
+			AITexture t = AITexture.create(scene.mTextures().get(i));
+			System.out.println(t.mFilename());
+		}
 		this.rootNode = loadNode(scene.mRootNode(), scene, true);
 	}
 	
@@ -152,12 +156,12 @@ public class Model {
 		if (materialIndex > 0) {
 			AIMaterial material = AIMaterial.create(scene.mMaterials().get(materialIndex));
 			//textures
-			textures.put(TextureRole.AMBIENT, this.loadTextures(material, Assimp.aiTextureType_AMBIENT));
-			textures.put(TextureRole.DIFFUSE, this.loadTextures(material, Assimp.aiTextureType_DIFFUSE));
-			textures.put(TextureRole.LIGHTMAP, this.loadTextures( material, Assimp.aiTextureType_LIGHTMAP));
-			textures.put(TextureRole.NORMAL, this.loadTextures( material, Assimp.aiTextureType_NORMALS));
-			textures.put(TextureRole.SPECULAR, this.loadTextures(material, Assimp.aiTextureType_SPECULAR));
-			textures.put(TextureRole.SHININESS, this.loadTextures(material, Assimp.aiTextureType_SHININESS));
+			textures.put(TextureRole.AMBIENT, this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT));
+			textures.put(TextureRole.DIFFUSE, this.loadTextures(scene, material, Assimp.aiTextureType_DIFFUSE));
+			textures.put(TextureRole.LIGHTMAP, this.loadTextures(scene, material, Assimp.aiTextureType_LIGHTMAP));
+			textures.put(TextureRole.NORMAL, this.loadTextures(scene, material, Assimp.aiTextureType_NORMALS));
+			textures.put(TextureRole.SPECULAR, this.loadTextures(scene, material, Assimp.aiTextureType_SPECULAR));
+			textures.put(TextureRole.SHININESS, this.loadTextures(scene, material, Assimp.aiTextureType_SHININESS));
 			//colors
 			textures.setDefaultColor(TextureRole.AMBIENT, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT));
 			textures.setDefaultColor(TextureRole.DIFFUSE, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
@@ -170,7 +174,7 @@ public class Model {
 		return this.createMeshContainer(meshName, mesh, textures);
 	}
 	
-	private ArrayList<Texture2D> loadTextures(AIMaterial material, int type) {
+	private ArrayList<Texture2D> loadTextures(AIScene scene, AIMaterial material, int type) {
 		int textureCount = Assimp.aiGetMaterialTextureCount(material, type);
 		if (textureCount <= 0) return null;
 		ArrayList<Texture2D> textures = new ArrayList<Texture2D>();
@@ -181,13 +185,46 @@ public class Model {
 			if (this.textures.containsKey(texPath)) {
 				textures.add(this.textures.get(texPath));
 			} else {
-				Asset textureAsset = asset.getRelativeAsset(texPath);
-				Texture2D texture = new Texture2D(textureAsset);
-				this.textures.put(texPath, texture);
-				textures.add(texture);
+				AITexture embedded = getEmbeddedTexture(scene, texPath);
+				if (embedded != null) {
+					//TODO: implement embeded texture loading
+				} else {
+					Asset textureAsset = asset.getRelativeAsset(texPath);
+					Texture2D texture = new Texture2D(textureAsset);
+					this.textures.put(texPath, texture);
+					textures.add(texture);
+				}
 			}
 		}
 		return textures;
+	}
+	
+	private String getShortFilename(String filename) {
+		int lastSlash = filename.lastIndexOf('/');
+		if (lastSlash == -1) {
+			lastSlash = filename.lastIndexOf('\\');
+		}
+		if (lastSlash == -1) return null;
+		return filename.substring(lastSlash + 1);
+	}
+	
+	private AITexture getEmbeddedTexture(AIScene scene, String filename) {
+		if (filename == null) return null;
+		int mNumTextures = scene.mNumTextures();
+		PointerBuffer textures = scene.mTextures();
+		if (filename.startsWith("*")) {
+			int index = Integer.parseInt(filename.substring(1));
+			if (0 > index || mNumTextures <= index) return null;
+			return AITexture.create(textures.get(index));
+		}
+		String shortFilename = getShortFilename(filename);
+		if (shortFilename == null) return null;
+		for (int i = 0; i < mNumTextures; i++) {
+			AITexture texture = AITexture.create(textures.get(i));
+			String shortTextureFilename = getShortFilename(texture.mFilename().dataString());
+			if (shortFilename.equals(shortTextureFilename)) return texture;
+		}
+		return null;
 	}
 	
 	private Vector4f getMaterialColor(AIMaterial material, String type) {

@@ -61,7 +61,7 @@ public class Asset {
 	public byte[] getBytes() throws IOException  {
 		InputStream is = null;
 		is = this.getInputStream();
-		if (is == null) throw new FileNotFoundException(this.path);
+		if (is == null) throw new FileNotFoundException(this.toString());
 		byte[] b = null;
 		try {
 			b = is.readAllBytes();

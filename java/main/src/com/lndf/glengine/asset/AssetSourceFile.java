@@ -10,12 +10,12 @@ public class AssetSourceFile implements AssetSource {
 
 	@Override
 	public InputStream getInputStream(String path) throws FileNotFoundException {
-		return new FileInputStream(path);
+		return new FileInputStream(path.replace('\\', '/'));
 	}
 
 	@Override
 	public OutputStream getOutputStream(String path) throws FileNotFoundException {
-		return new FileOutputStream(path);
+		return new FileOutputStream(path.replace('\\', '/'));
 	}
 	
 }

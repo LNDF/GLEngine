@@ -8,7 +8,7 @@ public class AssetSourceResource implements AssetSource {
 
 	@Override
 	public InputStream getInputStream(String path) throws FileNotFoundException {
-		return AssetSourceResource.class.getResourceAsStream(path);
+		return AssetSourceResource.class.getResourceAsStream(path.replace('\\', '/'));
 	}
 
 	@Override
