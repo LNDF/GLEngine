@@ -15,7 +15,7 @@ public class Main {
 	public static void main(String[] args) {
 		Window win = Window.createWindow("AAA", 800, 600, true);
 		Scene scene = new Scene();
-		Model model = new Model(new Asset("resource:/model/demomodel.fbx"));
+		Model model = new Model(new Asset("resource:/model/Emilioteca.fbx"));
 		GameObject camObj = new GameObject();
 		FPCamera cam = new FPCamera((float) Math.PI / 2.0f, 1000.0f);
 		DirectionalLight light = new DirectionalLight(new Vector3f(.5f,.5f,.5f));
@@ -23,7 +23,7 @@ public class Main {
 		camObj.addComponent(light);
 		camObj.addComponent(light);
 		GameObject persona = model.createGameObject();
-		persona.getTransform().setScale(new Vector3f(0.01f, 0.01f, 0.01f));
+		//persona.getTransform().setScale(new Vector3f(0.01f, 0.01f, 0.01f));
 		scene.addObject(persona);
 		scene.addObject(camObj);
 		win.addDrawable(cam);
