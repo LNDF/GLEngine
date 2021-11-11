@@ -55,17 +55,16 @@ public class Texture2D {
 	public Texture2D(Asset asset) {
 		this();
 		this.setTexture(asset, 0);
-		this.autoGenerateMipmaps();
-		this.setMinFilters();
-		this.setMagFilters();
-		this.setWrapHorizontal(TextureWrap.REPEAT);
-		this.setWrapVertical(TextureWrap.REPEAT);
-		this.setBorderColor(Color.BLACK);
+		this.setDefaultTextureSettings();
 	}
 	
 	public Texture2D(ByteBuffer input) {
 		this();
 		this.setTexture(input, 0);
+		this.setDefaultTextureSettings();
+	}
+	
+	public void setDefaultTextureSettings() {
 		this.autoGenerateMipmaps();
 		this.setMinFilters();
 		this.setMagFilters();
@@ -82,6 +81,13 @@ public class Texture2D {
 		}
 	}
 	
+	public void setUncompressedTexture(ByteBuffer input, int mipmapLevel, int width, int height, int format, int pixelSize) {
+		this.width.put(mipmapLevel, width);
+		this.height.put(mipmapLevel, height);
+		this.bind();
+		glTexImage2D(GL_TEXTURE_2D, mipmapLevel, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, input);
+	}
+	
 	public void setTexture(ByteBuffer input, int mipmapLevel) {
 		try (MemoryStack stack = MemoryStack.stackPush();) {
 			Texture2D.setSTBImageVerticalFlipMode(true);
@@ -94,10 +100,7 @@ public class Texture2D {
 			}
 			int width = w.get(0);
 			int height = h.get(0);
-			this.width.put(mipmapLevel, width);
-			this.height.put(mipmapLevel, height);
-			this.bind();
-			glTexImage2D(GL_TEXTURE_2D, mipmapLevel, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+			this.setUncompressedTexture(img, mipmapLevel, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
 			stbi_image_free(img);
 		}
 	}

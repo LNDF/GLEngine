@@ -2,6 +2,9 @@ package com.lndf.glengine.model;
 
 import static org.lwjgl.assimp.Assimp.*;
 
+import static org.lwjgl.opengl.GL20.*;
+
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +14,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
+import org.lwjgl.system.MemoryUtil;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Utils;
@@ -187,7 +191,25 @@ public class Model {
 			} else {
 				AITexture embedded = getEmbeddedTexture(scene, texPath);
 				if (embedded != null) {
-					//TODO: implement embeded texture loading
+					int embTexWidth = embedded.mWidth();
+					int embTexHeight = embedded.mHeight();
+					if (embTexHeight == 0) {
+						long address = embedded.pcData(0).address0();
+						ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, embTexWidth);
+						Texture2D texture = new Texture2D(textureRaw);
+						this.textures.put(texPath, texture);
+						textures.add(texture);
+					} else {
+						int capacity = embTexWidth * embTexHeight * AITexel.SIZEOF;
+						long address = embedded.pcData(0).address0();
+						ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, capacity);
+						Texture2D texture = new Texture2D();
+						texture.setUncompressedTexture(textureRaw, 0, embTexWidth, embTexHeight, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV);
+						texture.setDefaultTextureSettings();
+						this.textures.put(texPath, texture);
+						textures.add(texture);
+						
+					}
 				} else {
 					Asset textureAsset = asset.getRelativeAsset(texPath);
 					Texture2D texture = new Texture2D(textureAsset);
