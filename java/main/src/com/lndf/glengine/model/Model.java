@@ -157,7 +157,7 @@ public class Model {
 			}
 		}
 		//Material and textures
-		if (materialIndex > 0) {
+		if (materialIndex >= 0) {
 			AIMaterial material = AIMaterial.create(scene.mMaterials().get(materialIndex));
 			//textures
 			textures.put(TextureRole.AMBIENT, this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT));
