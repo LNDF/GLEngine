@@ -26,7 +26,7 @@ public abstract class Material {
 		Shader shader = this.getShader();
 		shader.setUniform("pov", pov.x, pov.y, pov.z);
 		shader.setUniform("vp", vp);
-		shader.setUniform("model", obj.getTransform().getWorldTransformation());
+		shader.setUniform("model", obj.getTransform().getWorldMatrix());
 	}
 	
 	public abstract void setUniform(Matrix4f vp, GameObject obj, Vector3f pov);

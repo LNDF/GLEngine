@@ -141,7 +141,6 @@ public class Scene {
 				comp.update();
 			}
 			obj.destroyComponents();
-			obj.getTransform().checkCache();
 		}
 		this.updateRunnables.executeAll(false);
 		for (GameObject obj : this.gameObjectsToDestroy) {

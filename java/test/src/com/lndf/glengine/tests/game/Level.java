@@ -1,5 +1,6 @@
 package com.lndf.glengine.tests.game;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.lndf.glengine.asset.Asset;
@@ -59,7 +60,8 @@ public class Level extends Scene {
 		this.cam = new FPCamera((float) (Math.PI / 4), 100.0f);
 		this.addObject(camObject);
 		camObject.addComponent(this.cam);
-		camObject.getTransform().getRotation().rotateAxis((float) (Math.PI) / -12, 1, 0, 0);
+		Quaternionf camRotation = camObject.getTransform().getRotation().rotateAxis((float) (Math.PI) / -12, 1, 0, 0);
+		camObject.getTransform().setRotation(camRotation);
 		camObject.getTransform().setPosition(new Vector3f(0, 2, 3));
 	}
 	

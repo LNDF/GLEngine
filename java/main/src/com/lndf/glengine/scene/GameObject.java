@@ -107,6 +107,7 @@ public class GameObject {
 	}
 	
 	private void setParent(GameObject parent) {
+		this.transform.clearLocalCache();
 		this.parent = parent;
 	}
 	

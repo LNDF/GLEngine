@@ -6,169 +6,255 @@ import org.joml.Vector3f;
 
 public class Transform {
 	
-	private Vector3f position = new Vector3f(0, 0, 0);
-	private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
-	private Vector3f scale = new Vector3f(1, 1, 1);
-	
-	//old
-	private Vector3f oldPosition = new Vector3f(0, 0, 0);
-	private Quaternionf oldRotation = new Quaternionf(0, 0, 0, 1);
-	private Vector3f oldScale = new Vector3f(1, 1, 1);
-	
-	private Matrix4f transformation = null;
-	
-	private GameObject obj;
-	
 	//for rotation
 	private static final Vector3f FRONT = new Vector3f(0, 0, -1);
 	private static final Vector3f RIGHT = new Vector3f(1, 0, 0);
 	private static final Vector3f UP = new Vector3f(0, 1, 0);
+	
+	//caches
+	private Matrix4f cacheLocalMatrix = null;
+	private Matrix4f cacheParentMatrix = null;
+	private Matrix4f cacheParentMatrixInv = null;
+	private Vector3f cacheWorldPosition = null;
+	private Vector3f cacheWorldScale = null;
+	private Quaternionf cacheWorldRotation = null;
+	
+	private Vector3f position = new Vector3f(0, 0, 0);
+	private Vector3f scale = new Vector3f(1, 1, 1);
+	private Quaternionf rotation = new Quaternionf(0, 0, 0, 1);
+	
+	private GameObject obj;
+	
+	private Vector3f tmpV = new Vector3f();
+	private Quaternionf tmpQ = new Quaternionf();
 	
 	public Transform(GameObject obj) {
 		if (obj == null) throw new RuntimeException("GameObject is null");
 		this.obj = obj;
 	}
 	
-	public void checkCache() {
-		if (!this.position.equals(this.oldPosition) ||
-			!this.rotation.equals(this.oldRotation) ||
-			!this.scale.equals(this.oldScale)) {
-			this.oldPosition = new Vector3f(this.position);
-			this.oldRotation = new Quaternionf(this.rotation);
-			this.oldScale = new Vector3f(this.scale);
-			this.clearCache();
+	public void clearParentCache() {
+		if (this.cacheParentMatrix != null ||
+			this.cacheParentMatrixInv != null ||
+			this.cacheWorldPosition != null ||
+			this.cacheWorldScale != null ||
+			this.cacheWorldRotation != null) {
+			
+			this.cacheParentMatrix = null;
+			this.cacheParentMatrixInv = null;
+			this.cacheWorldPosition = null;
+			this.cacheWorldScale = null;
+			this.cacheWorldRotation = null;
+			for (GameObject child : this.obj.getChildren()) {
+				child.getTransform().clearParentCache();
+			}
 		}
 	}
 	
-	public void clearCache() {
-		this.transformation = null;
-	}
-	
-	public Matrix4f getTransformation() {
-		this.checkCache();
-		if (this.transformation != null) return new Matrix4f(this.transformation);
-		Matrix4f base = new Matrix4f().identity();
-		base.translate(this.position).rotate(this.rotation).scale(this.scale);
-		this.transformation = new Matrix4f(base);
-		return base;
-	}
-	
-	public Matrix4f getWorldTransformation() {
-		Matrix4f parent = this.getParentTransformation();
-		Matrix4f t = this.getTransformation();
-		if (parent != null) {
-			Matrix4f p = new Matrix4f(parent);
-			p.mul(t, t);
+	public void clearLocalCache() {
+		if (this.cacheLocalMatrix != null ||
+			this.cacheWorldPosition != null ||
+			this.cacheWorldScale != null ||
+			this.cacheWorldRotation != null) {
+			
+			this.cacheLocalMatrix = null;
+			this.cacheWorldPosition = null;
+			this.cacheWorldScale = null;
+			this.cacheWorldRotation = null;
+			for (GameObject child : this.obj.getChildren()) {
+				child.getTransform().clearParentCache();
+			}
 		}
-		return t;
-	}
-	private Transform getParentTransform() {
-		if (obj.getParent() == null) return null;
-		return obj.getParent().getTransform();
 	}
 	
-	public Quaternionf getWorldRotation() {
-		Quaternionf q = new Quaternionf(this.rotation);
-		Transform t = this.getParentTransform();
-		if (t != null) t.getWorldRotation().mul(q, q);
-		return q;
+	public Matrix4f getLocalMatrix() {
+		if (this.cacheLocalMatrix != null) {
+			return new Matrix4f(this.cacheLocalMatrix);
+		}
+		Matrix4f localMatrix = new Matrix4f().identity();
+		localMatrix.translate(this.position).rotate(this.rotation).scale(this.scale);
+		this.cacheLocalMatrix = localMatrix;
+		return new Matrix4f(localMatrix);
+	}
+	
+	public Matrix4f getParentMatrix() {
+		if (this.cacheParentMatrix != null) {
+			return new Matrix4f(this.cacheParentMatrix);
+		}
+		GameObject parentObj = this.obj.getParent();
+		if (parentObj != null) {
+			Transform pTrans = parentObj.getTransform();
+			Matrix4f p = pTrans.getParentMatrix();
+			Matrix4f l = pTrans.getLocalMatrix();
+			this.cacheParentMatrix = p.mul(l);
+			return new Matrix4f(this.cacheParentMatrix);
+		}
+		return new Matrix4f().identity();
+	}
+	
+	public Matrix4f getInverseParentMatrix() {
+		if (this.cacheParentMatrixInv != null) {
+			return new Matrix4f(this.cacheParentMatrixInv);
+		}
+		Matrix4f inv = this.getParentMatrix();
+		this.cacheParentMatrixInv = inv.invert();
+		return new Matrix4f(inv);
+	}
+	
+	public Matrix4f getWorldMatrix() {
+		Matrix4f parent = this.getParentMatrix();
+		Matrix4f local = this.getLocalMatrix();
+		return parent.mul(local);
+	}
+	
+	public Vector3f getPosition() {
+		return new Vector3f(this.position);
+	}
+	
+	public Vector3f getScale() {
+		return new Vector3f(this.scale);
+	}
+	
+	public Quaternionf getRotation() {
+		return new Quaternionf(this.rotation);
+	}
+	
+	public void setPosition(Vector3f position) {
+		this.position.set(position);
+		this.clearLocalCache();
+	}
+	
+	public void setScale(Vector3f scale) {
+		this.scale.set(scale);
+		this.clearLocalCache();
+	}
+	
+	public void setRotation(Quaternionf rotation) {
+		this.rotation.set(rotation);
+		this.clearLocalCache();
 	}
 	
 	public Vector3f getWorldPosition() {
-		return this.getWorldTransformation().getTranslation(new Vector3f());
+		if (this.cacheWorldPosition != null) {
+			return new Vector3f(this.cacheWorldPosition);
+		}
+		this.cacheWorldPosition = this.getWorldMatrix().getTranslation(new Vector3f());
+		return new Vector3f(this.cacheWorldPosition);
 	}
 	
 	public Vector3f getWorldScale() {
-		return this.getWorldTransformation().getScale(new Vector3f());
+		if (this.cacheWorldScale != null) {
+			return new Vector3f(this.cacheWorldScale);
+		}
+		this.cacheWorldScale = this.getWorldMatrix().getScale(new Vector3f());
+		return new Vector3f(this.cacheWorldScale);
 	}
 	
-	private Matrix4f getParentTransformation() {
-		Transform t = this.getParentTransform();
-		if (t == null) return null;
-		return t.getWorldTransformation();
+	public Quaternionf getWorldRotation() {
+		if (this.cacheWorldRotation != null) {
+			return new Quaternionf(this.cacheWorldRotation);
+		}
+		this.cacheWorldRotation = this.getWorldMatrix().getUnnormalizedRotation(new Quaternionf());
+		return new Quaternionf(this.cacheWorldRotation);
+	}
+	
+	public void setWorldPosition(Vector3f position) {
+		this.setPosition(position);
+		this.getInverseParentMatrix().transformPosition(this.position);
+	}
+	
+	public void setWorldScale(Vector3f scale) {
+		this.setScale(scale);
+		this.scale.div(this.getParentMatrix().getScale(tmpV));
+	}
+	
+	public void setWorldRotation(Quaternionf rotation) {
+		this.setRotation(rotation);
+		this.rotation.div(this.getParentMatrix().getUnnormalizedRotation(tmpQ));
 	}
 	
 	public Vector3f getFront() {
-		return this.getTransformation().transformDirection(new Vector3f(FRONT));
+		return this.getLocalMatrix().transformDirection(new Vector3f(FRONT));
 	}
-	
+
 	public Vector3f getRight() {
-		return this.getTransformation().transformDirection(new Vector3f(RIGHT));
+		return this.getLocalMatrix().transformDirection(new Vector3f(RIGHT));
 	}
-	
+
 	public Vector3f getUp() {
-		return this.getTransformation().transformDirection(new Vector3f(UP));
+		return this.getLocalMatrix().transformDirection(new Vector3f(UP));
 	}
-	
+
 	public Vector3f getBack() {
-		return this.getTransformation().transformDirection(new Vector3f(FRONT).mul(-1));
+		return this.getLocalMatrix().transformDirection(new Vector3f(FRONT).mul(-1));
 	}
-	
+
 	public Vector3f getLeft() {
-		return this.getTransformation().transformDirection(new Vector3f(RIGHT).mul(-1));
+		return this.getLocalMatrix().transformDirection(new Vector3f(RIGHT).mul(-1));
+	}
+
+	public Vector3f getDown() {
+		return this.getLocalMatrix().transformDirection(new Vector3f(UP).mul(-1));
 	}
 	
-	public Vector3f getDown() {
-		return this.getTransformation().transformDirection(new Vector3f(UP).mul(-1));
+	public Vector3f getWorldFront() {
+		return this.getWorldMatrix().transformDirection(new Vector3f(FRONT));
 	}
 
-	public Vector3f getPosition() {
-		return position;
+	public Vector3f getWorldRight() {
+		return this.getWorldMatrix().transformDirection(new Vector3f(RIGHT));
 	}
 
-	public void setPosition(Vector3f position) {
-		if (position == null) position = new Vector3f(0, 0, 0);
-		this.position.set(position);
+	public Vector3f getWorldUp() {
+		return this.getWorldMatrix().transformDirection(new Vector3f(UP));
 	}
 
-	public Quaternionf getRotation() {
-		return rotation;
+	public Vector3f getWorldBack() {
+		return this.getWorldMatrix().transformDirection(new Vector3f(FRONT).mul(-1));
 	}
 
-	public void setRotation(Quaternionf rotation) {
-		if (rotation == null) rotation = new Quaternionf(0, 0, 0, 1);
-		this.rotation.set(rotation);
+	public Vector3f getWorldLeft() {
+		return this.getWorldMatrix().transformDirection(new Vector3f(RIGHT).mul(-1));
 	}
 
-	public Vector3f getScale() {
-		return scale;
-	}
-
-	public void setScale(Vector3f scale) {
-		if (scale == null) scale = new Vector3f(1, 1, 1);
-		this.scale.set(scale);
+	public Vector3f getWorldDown() {
+		return this.getWorldMatrix().transformDirection(new Vector3f(UP).mul(-1));
 	}
 	
 	public void rotateArround(Vector3f axis, float angle) {
-		this.rotation.set(new Quaternionf().rotateAxis(angle, axis).mul(this.rotation).normalize());
+		this.setRotation(new Quaternionf().rotateAxis(angle, axis).mul(this.getRotation()).normalize());
+	}
+	
+	public void worldRotateArround(Vector3f axis, float angle) {
+		this.setWorldRotation(new Quaternionf().rotateAxis(angle, axis).mul(this.getWorldRotation()).normalize());
 	}
 	
 	public void lookAt(Vector3f front, Vector3f up) {
 		float fx = -front.x, fy = -front.y, fz = -front.z;
 		float ux = -up.x, uy = -up.y, uz = -up.z;
-		
+
 		//normalize dir
 		float fl = (float) Math.sqrt(fx * fx + fy * fy + fz * fz);
 		fx /= fl;
 		fy /= fl;
 		fz /= fl;
-		
+
 		//right
 		float rx = fy * uz - fz * uy;
 		float ry = fz * ux - fx * uz;
 		float rz = fx * uy - fy * ux;
-		
+
 		//normalize left
 		float rl = (float) Math.sqrt(rx * rx + ry * ry + rz * rz);
 		rx /= rl;
 		ry /= rl;
 		rz /= rl;
-		
+
 		//normalized up
 		ux = fy * rz - fz * ry;
 		uy = fz * rx - fx * rz;
 		uz = fx * ry - fy * rx;
-		
+
 		//Calculate as matrix: row 0 = right, row 1 = up, row 2 = front
 		float x, y, z, w, s;
 		float trace = rx + uy + fz;
@@ -199,10 +285,19 @@ public class Transform {
 		}
 		float l = (float) Math.sqrt(x * x + y * y + z * z + w * w);
 		this.rotation.set(x / l, y / l, z / l, w / l);
+		this.clearLocalCache();
+	}
+	
+	public void worldLookAt(Vector3f front, Vector3f up) {
+		this.lookAt(front, up);
+		this.rotation.div(this.getParentMatrix().getUnnormalizedRotation(tmpQ));
 	}
 	
 	public void rotateEuler(Vector3f angles) {
-		this.rotation.rotationXYZ(angles.x, angles.y, angles.z);
+		this.setRotation(this.getRotation().rotationXYZ(angles.x, angles.y, angles.z));
 	}
 	
+	public void worldRotateEuler(Vector3f angles) {
+		this.setWorldRotation(this.getWorldRotation().rotateXYZ(angles.x, angles.y, angles.z));
+	}
 }

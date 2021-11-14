@@ -183,6 +183,7 @@ public class FPCamera extends Camera{
 			t.getDown().mul(y, go);
 		}
 		pos.add(go);
+		t.setPosition(pos);
 	}
 	
 }

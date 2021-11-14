@@ -58,7 +58,7 @@ public class TextureMaterial extends Material {
 	@Override
 	public void setUniform(Matrix4f vp, GameObject obj, Vector3f pov) {
 		Matrix4f mvp = new Matrix4f(vp);
-		mvp.mul(obj.getTransform().getWorldTransformation());
+		mvp.mul(obj.getTransform().getWorldMatrix());
 		this.texture.bind();
 		this.offsetX = (this.offsetX + this.speedX * (float) DeltaTime.get()) % this.repeatX;
 		this.offsetY = (this.offsetY + this.speedY * (float) DeltaTime.get()) % this.repeatY;

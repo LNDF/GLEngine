@@ -42,6 +42,7 @@ public class Enemy extends Component {
 			go.destroy();
 			return;
 		}
+		go.getTransform().setPosition(pos);
 		Player player = GameState.player;
 		if (pos.z >= -2.5f && pos.z <= -1.5f) {
 			if (this.derecha == player.derecha) {

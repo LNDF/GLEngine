@@ -43,6 +43,7 @@ public class Record extends GameObject {
 				if (pos.z > 50f) {
 					this.getGameObject().destroy();
 				}
+				getTransform().setPosition(pos);
 			}
 
 			@Override

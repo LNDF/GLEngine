@@ -41,6 +41,7 @@ public class Player extends Component {
 		}
 		if (pos.x > 0.7) pos.x = 0.7f;
 		if (pos.x < -0.7) pos.x = -0.7f;
+		this.getGameObject().getTransform().setPosition(pos);
 	}
 
 }
