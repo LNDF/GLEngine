@@ -19,6 +19,9 @@ public class GameObject {
 	private HashSet<GameObject> children = new HashSet<GameObject>();
 	private GameObject parent;
 	
+	private Transform transform = new Transform(this);
+	private GameObjectPhysXManager physx = new GameObjectPhysXManager(this);
+	
 	public GameObject(String name) {
 		this.name = name;
 	}
@@ -26,8 +29,6 @@ public class GameObject {
 	public GameObject() {
 		this("");
 	}
-	
-	private Transform transform = new Transform(this);
 	
 	public String getName() {
 		return name;
@@ -49,10 +50,13 @@ public class GameObject {
 		if (component.getGameObject() != null) return;
 		Class<? extends Component> c = component.getClass();
 		this.components.put(c, component);
+		boolean isNew = !this.componentsToDestroy.contains(component);
 		this.componentsToDestroy.remove(component);
 		component.setGameObject(this);
-		component.start();
-		if (this.getScene() != null) component.addToScene();
+		if (isNew) {
+			component.addToGameObject();
+			if (this.getScene() != null) component.addToScene();
+		}
 	}
 	
 	public Component getComponent(Class<? extends Component> c) {
@@ -74,7 +78,7 @@ public class GameObject {
 	public void destroyComponents() {
 		for (Component c : this.componentsToDestroy) {
 			if (this.getScene() != null) c.removeFromScene();
-			c.destroy();
+			c.removeFromGameObject();
 			c.setGameObject(null);
 		}
 		this.componentsToDestroy.clear();
@@ -91,7 +95,7 @@ public class GameObject {
 			}
 		}
 		for (Component comp : this.components.values()) {
-			comp.destroy();
+			comp.removeFromGameObject();
 			comp.setGameObject(null);
 		}
 		this.destroyComponents();
@@ -100,6 +104,7 @@ public class GameObject {
 		}
 		this.children.clear();
 		this.components.clear();
+		this.physx.destroy();
 	}
 	
 	public GameObject getParent() {
@@ -145,4 +150,9 @@ public class GameObject {
 	public Transform getTransform() {
 		return this.transform;
 	}
+	
+	public GameObjectPhysXManager getPhysx() {
+		return physx;
+	}
+	
 }

@@ -14,7 +14,7 @@ public class Player extends Component {
 	public float spawnCooldown = 10;
 	
 	@Override
-	public void start() {
+	public void addToGameObject() {
 		this.getGameObject().getTransform().setPosition(new Vector3f(-0.7f, 0.6f, -2f));;
 	}
 

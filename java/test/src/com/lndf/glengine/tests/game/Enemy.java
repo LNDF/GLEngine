@@ -17,7 +17,7 @@ public class Enemy extends Component {
 	private boolean spawned = false;
 	
 	@Override
-	public void start() {
+	public void addToGameObject() {
 		GameObject go = this.getGameObject();
 		go.getTransform().setPosition(new Vector3f(this.derecha ? 0.7f : -0.7f, -1.2f, -70f));
 		GameState.enemigos.add(go);
@@ -56,7 +56,7 @@ public class Enemy extends Component {
 	}
 
 	@Override
-	public void destroy() {
+	public void removeFromGameObject() {
 		if (!GameState.noBorrar) {
 			GameState.enemigos.remove(this.getGameObject());
 		}

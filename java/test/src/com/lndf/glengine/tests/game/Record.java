@@ -29,11 +29,9 @@ public class Record extends GameObject {
 		this.addComponent(plane);
 		this.addComponent(new Component() {
 			
-			Vector3f pos = getTransform().getPosition();
-			
 			@Override
-			public void start() {
-				pos.set(new Vector3f(0, 0.06f, -45f));
+			public void addToGameObject() {
+				getTransform().setPosition(new Vector3f(0, 0.06f, -45f));
 			}
 
 			@Override
@@ -44,11 +42,6 @@ public class Record extends GameObject {
 					this.getGameObject().destroy();
 				}
 				getTransform().setPosition(pos);
-			}
-
-			@Override
-			public void destroy() {
-				
 			}
 			
 		});

@@ -4,9 +4,9 @@ public class Component {
 	
 	private GameObject gameObject = null;
 	
-	public void start() {}
 	public void update()  {}
-	public void destroy()  {}
+	public void addToGameObject() {}
+	public void removeFromGameObject()  {}
 	public void addToScene()  {}
 	public void removeFromScene()  {}
 	

@@ -29,6 +29,7 @@ public class Main {
 		win.addDrawable(cam);
 		scene.subscribeToUpdates();
 		win.mainLoop();
+		scene.destroy();
 		Window.terminate();
 	}
 	

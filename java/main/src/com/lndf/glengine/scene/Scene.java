@@ -6,11 +6,19 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
-import com.lndf.glengine.engine.SceneManager;
+import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
+
+import com.lndf.glengine.engine.DeltaTime;
+import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.engine.RunnableList;
+import com.lndf.glengine.engine.SceneManager;
 import com.lndf.glengine.scene.components.lighting.DirectionalLight;
 import com.lndf.glengine.scene.components.lighting.PointLight;
 import com.lndf.glengine.scene.components.lighting.Spotlight;
+
+import physx.common.PxVec3;
+import physx.physics.PxScene;
 
 public class Scene {
 	
@@ -18,6 +26,9 @@ public class Scene {
 	private KeySetView<GameObject, Boolean> gameObjectsToDestroy = ConcurrentHashMap.newKeySet();
 	
 	private float ambientLight;
+	
+	private PxScene physXScene;
+	private double physXDelta = 0.0;
 	
 	private RunnableList updateRunnables = new RunnableList();
 	
@@ -28,6 +39,7 @@ public class Scene {
 	private HashSet<Spotlight> spotlightCache = null;
 	
 	public Scene() {
+		this.physXScene = PhysXManager.createScene(new Vector3f(0, -9.81f, 0));
 		this.ambientLight = 0.01f;
 	}
 	
@@ -146,6 +158,22 @@ public class Scene {
 		for (GameObject obj : this.gameObjectsToDestroy) {
 			obj.setScene(null);
 		}
+		double simulationTime = PhysXManager.getSimulationTime();
+		this.physXDelta += DeltaTime.get();
+		if (physXDelta >= simulationTime) {
+			int steps = (int) (physXDelta / simulationTime);
+			this.physXDelta %= simulationTime;
+			for (GameObject obj : this.gameObjects) {
+				obj.getPhysx().pushPoseToRigidBody();
+			}
+			for (int i = 0; i < steps; i++) {
+				physXScene.simulate((float) simulationTime);
+				physXScene.fetchResults(true);
+			}
+			for (GameObject obj : this.gameObjects) {
+				obj.getPhysx().pullPoseFromRigidBody();
+			}
+		}
 	}
 	
 	public void destroy() {
@@ -155,6 +183,7 @@ public class Scene {
 			obj.setScene(null);
 		}
 		this.gameObjects.clear();
+		this.physXScene.release();
 	}
 	
 	public void subscribeToUpdates() {
@@ -171,6 +200,21 @@ public class Scene {
 
 	public void setAmbientLight(float ambientLight) {
 		this.ambientLight = ambientLight;
+	}
+	
+	public PxScene getPhysXScene() {
+		return physXScene;
+	}
+	
+	public Vector3f getGravity() {
+		PxVec3 pv = physXScene.getGravity();
+		return new Vector3f(pv.getX(), pv.getY(), pv.getZ());
+	}
+	
+	public void setGravity(Vector3f gravity) {
+		try (MemoryStack mem = MemoryStack.stackPush()) {
+			physXScene.setGravity(PxVec3.createAt(mem, MemoryStack::nmalloc, gravity.x, gravity.y, gravity.z));
+		}
 	}
 	
 	public void addUpdateRunnable(Runnable runnable) {
