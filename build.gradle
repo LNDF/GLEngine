@@ -10,6 +10,7 @@ plugins {
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.10.2"
+project.ext.physxVersion = "0.4.15"
 
 group = 'com.lndf.GLEngine'
 version = '0.0.1-SNAPSHOT'
@@ -94,6 +95,13 @@ dependencies {
 	runtimeOnly "org.lwjgl:lwjgl-stb::natives-windows"
 
 	implementation "org.joml:joml:${jomlVersion}"
+	
+	//PhysX
+	implementation "de.fabmax:physx-jni:$physxVersion"
+	
+    runtimeOnly "de.fabmax:physx-jni:$physxVersion:native-win64"
+    runtimeOnly "de.fabmax:physx-jni:$physxVersion:native-linux64"
+    runtimeOnly "de.fabmax:physx-jni:$physxVersion:native-mac64"
 	
 }
 

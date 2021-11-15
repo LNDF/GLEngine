@@ -38,6 +38,7 @@ public class Window {
 		}
 		this.init();
 		Input.setWindow(this);
+		PhysXManager.start();
 	}
 	
 	public static void terminate() {
@@ -45,6 +46,7 @@ public class Window {
 		glfwTerminate();
 		Window.window = null;
 		Input.unsetWindow();
+		PhysXManager.stop();
 	}
 	
 	public static void addTerminateRunnable(Runnable runnable) {
