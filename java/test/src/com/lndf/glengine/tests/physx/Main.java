@@ -1,5 +1,6 @@
 package com.lndf.glengine.tests.physx;
 
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import com.lndf.glengine.engine.Window;
@@ -25,6 +26,7 @@ public class Main {
 		obj.addComponent(dirLight);
 		obj.addComponent(cam);
 		cube.addComponent(cubeRigid);
+		cube.getTransform().setPosition(new Vector3f(0, 30, -20));
 		win.addDrawable(cam);
 		scene.addObject(obj);
 		scene.addObject(cube);

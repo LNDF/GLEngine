@@ -43,7 +43,18 @@ public class GameObject {
 	}
 	
 	public void setScene(Scene scene) {
+		if (this.scene != null) {
+			for (Component comp : this.components.values()) {
+				comp.removeFromScene();
+			}
+		}
+		this.physx.updateScene(scene);
 		this.scene = scene;
+		if (this.scene != null) {
+			for (Component comp : this.components.values()) {
+				comp.addToScene();
+			}
+		}
 	}
 	
 	public void addComponent(Component component) {
