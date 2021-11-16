@@ -56,7 +56,7 @@ public class LightsMain {
 			@Override
 			public void update() {
 				GameObject obj = this.getGameObject();
-				obj.getTransform().getRotation().rotateAxis((float) DeltaTime.get(), 1, 0, 0);
+				obj.getTransform().setRotation(obj.getTransform().getRotation().rotateAxis((float) DeltaTime.get(), 1, 0, 0));
 			}
 			
 		});

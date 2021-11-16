@@ -11,9 +11,12 @@ import physx.common.PxVec3;
 import physx.cooking.PxCooking;
 import physx.cooking.PxCookingParams;
 import physx.extensions.PxDefaultAllocator;
+import physx.physics.PxFilterData;
 import physx.physics.PxPhysics;
 import physx.physics.PxScene;
 import physx.physics.PxSceneDesc;
+import physx.physics.PxSceneFlagEnum;
+import physx.physics.PxSceneFlags;
 
 public class PhysXManager {
 	
@@ -23,6 +26,7 @@ public class PhysXManager {
 	private static PxDefaultErrorCallback defaultErrorCallback;
 	private static PxFoundation foundation;
 	private static PxPhysics physics;
+	private static PxFilterData filterData;
 	private static PxCookingParams cookingParams;
 	private static PxCooking cooking;
 	private static PxTolerancesScale toleranceScale;
@@ -36,6 +40,11 @@ public class PhysXManager {
 		foundation = PxTopLevelFunctions.CreateFoundation(PX_PHYSX_VERSION, defaultAllocator, defaultErrorCallback);
 		toleranceScale = new PxTolerancesScale();
 		physics = PxTopLevelFunctions.CreatePhysics(PX_PHYSX_VERSION, foundation, toleranceScale);
+		filterData = new PxFilterData(0, 0, 0, 0);
+		filterData.setWord0(1);
+		filterData.setWord1(0xffffffff);
+		filterData.setWord2(0);
+		filterData.setWord3(0);
 		cookingParams = new PxCookingParams(toleranceScale);
 		cooking = PxTopLevelFunctions.CreateCooking(PX_PHYSX_VERSION, foundation, cookingParams);
 	}
@@ -43,6 +52,7 @@ public class PhysXManager {
 	public static void stop() {
 		cooking.release();
 		cookingParams.destroy();
+		filterData.destroy();
 		physics.release();
 		toleranceScale.destroy();
 		foundation.release();
@@ -53,9 +63,11 @@ public class PhysXManager {
 	public static PxScene createScene(Vector3f gravity) {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxSceneDesc desc = PxSceneDesc.createAt(mem, MemoryStack::nmalloc, physics.getTolerancesScale());
+			//PxSceneFlags flags = PxSceneFlags.createAt(mem, MemoryStack::nmalloc, (1<<5) | (1<<6));
 			desc.setGravity(PxVec3.createAt(mem, MemoryStack::nmalloc, gravity.x, gravity.y, gravity.z));
 			desc.setCpuDispatcher(PxTopLevelFunctions.DefaultCpuDispatcherCreate(cpuThreads));
 			desc.setFilterShader(PxTopLevelFunctions.DefaultFilterShader());
+			//desc.setFlags(flags);
 			return physics.createScene(desc);
 		}
 	}
@@ -66,6 +78,10 @@ public class PhysXManager {
 
 	public static PxPhysics getPhysics() {
 		return physics;
+	}
+	
+	public static PxFilterData getDefaultFilterData() {
+		return filterData;
 	}
 
 	public static PxCookingParams getCookingParams() {

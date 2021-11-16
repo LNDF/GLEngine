@@ -27,6 +27,10 @@ public class PhysicalMaterial {
 		});
 	}
 	
+	public PxMaterial getPxMaterial() {
+		return pxMaterial;
+	}
+	
 	public float getStaticFriction() {
 		return this.pxMaterial.getStaticFriction();
 	}

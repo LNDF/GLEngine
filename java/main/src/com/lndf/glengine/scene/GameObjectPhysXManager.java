@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.engine.PhysXManager;
-import com.lndf.glengine.scene.components.physics.Shape;
+import com.lndf.glengine.scene.components.physics.Collider;
 
 import physx.common.PxIDENTITYEnum;
 import physx.common.PxQuat;
@@ -27,13 +27,13 @@ public class GameObjectPhysXManager {
 	private boolean userRigid = false;
 	private PxRigidActor rigid = null;
 	
-	private HashSet<Shape> shapes = new HashSet<Shape>();
+	private HashSet<Collider> shapes = new HashSet<Collider>();
 	
 	public GameObjectPhysXManager(GameObject object) {
 		this.object = object;
 	}
 	
-	public void addShape(Shape shape) {
+	public void addShape(Collider shape) {
 		this.shapes.add(shape);
 		if (this.rigid == null) {
 			userRigid = false;
@@ -42,7 +42,7 @@ public class GameObjectPhysXManager {
 		this.rigid.attachShape(shape.getPhysXShape());
 	}
 	
-	public void removeShape(Shape shape) {
+	public void removeShape(Collider shape) {
 		if (this.shapes.contains(shape)) {
 			this.shapes.remove(shape);
 			this.rigid.detachShape(shape.getPhysXShape());
@@ -84,8 +84,12 @@ public class GameObjectPhysXManager {
 	private void swapRigidBody(PxRigidActor newRigid) {
 		Scene scene = object.getScene();
 		if (scene != null) scene.getPhysXScene().removeActor(this.rigid);
-		for (Shape shape : this.shapes) {
-			this.rigid.detachShape(shape.getPhysXShape());
+		if (this.rigid != null) {
+			for (Collider shape : this.shapes) {
+				this.rigid.detachShape(shape.getPhysXShape());
+			}
+		}
+		for (Collider shape : this.shapes) {
 			newRigid.attachShape(shape.getPhysXShape());
 		}
 		this.rigid = newRigid;
@@ -120,7 +124,7 @@ public class GameObjectPhysXManager {
 		}
 		if (!jp.equals(this.lastScale)) {
 			this.lastScale = js;
-			for (Shape shape : this.shapes) {
+			for (Collider shape : this.shapes) {
 				shape.scaleChanged(js);
 			}
 		}
@@ -138,7 +142,7 @@ public class GameObjectPhysXManager {
 	}
 	
 	public void destroy() {
-		for (Shape shape : this.shapes) {
+		for (Collider shape : this.shapes) {
 			this.rigid.detachShape(shape.getPhysXShape());
 		}
 		if (this.rigid != null) {

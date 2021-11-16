@@ -8,15 +8,16 @@ import com.lndf.glengine.scene.Component;
 
 import physx.physics.PxShape;
 
-public abstract class Shape extends Component {
+public abstract class Collider extends Component {
 	
 	private PhysicalMaterial material;
 	
 	public abstract PxShape getPhysXShape();
 	public abstract void destroy();
-	public abstract void scaleChanged(Vector3f newScale);
 	
-	private Shape(PhysicalMaterial material) {
+	public void scaleChanged(Vector3f newScale) {}
+	
+	protected Collider(PhysicalMaterial material) {
 		this.material = material;
 	}
 	
