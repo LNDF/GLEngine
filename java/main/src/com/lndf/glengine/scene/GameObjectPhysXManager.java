@@ -128,7 +128,11 @@ public class GameObjectPhysXManager implements EngineResource {
 		if (!jp.equals(this.lastScale)) {
 			this.lastScale = js;
 			for (Collider shape : this.shapes) {
-				shape.scaleChanged(js);
+				if (shape.getShouldScale()) {
+					this.rigid.detachShape(shape.getPhysXShape());
+					shape.scale();
+					this.rigid.attachShape(shape.getPhysXShape());
+				}
 			}
 		}
 	}

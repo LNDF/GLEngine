@@ -12,11 +12,12 @@ import physx.physics.PxShape;
 public abstract class Collider extends Component implements EngineResource {
 	
 	private PhysicalMaterial material;
+	private boolean shouldScale = true;
 	
 	public abstract PxShape getPhysXShape();
 	public abstract void pxDestroy();
 	
-	public void scaleChanged(Vector3f newScale) {}
+	public abstract void scale();
 	
 	protected Collider(PhysicalMaterial material) {
 		Engine.addEngineResource(this);
@@ -25,6 +26,14 @@ public abstract class Collider extends Component implements EngineResource {
 	
 	public PhysicalMaterial getMaterial() {
 		return material;
+	}
+	
+	public void setShouldScale(boolean shouldScale) {
+		this.shouldScale = shouldScale;
+	}
+	
+	public boolean getShouldScale() {
+		return shouldScale;
 	}
 	
 	@Override
