@@ -18,7 +18,7 @@ public abstract class Material {
 		return this.shader;
 	}
 	
-	public void close() {
+	public void destroy() {
 		
 	}
 	

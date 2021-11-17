@@ -46,8 +46,8 @@ public class TextureMaterial extends Material {
 	}
 	
 	@Override
-	public void close() {
-		super.close();
+	public void destroy() {
+		super.destroy();
 		TextureMaterial.instances--;
 		if (TextureMaterial.instances <= 0) {
 			if (TextureMaterial.offShader != null) TextureMaterial.offShader.close();

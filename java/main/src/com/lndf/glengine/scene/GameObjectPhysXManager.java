@@ -6,7 +6,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
+import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.scene.components.physics.Collider;
 
 import physx.common.PxIDENTITYEnum;
@@ -16,7 +18,7 @@ import physx.common.PxVec3;
 import physx.physics.PxRigidActor;
 import physx.physics.PxRigidStatic;
 
-public class GameObjectPhysXManager {
+public class GameObjectPhysXManager implements EngineResource {
 	
 	private Vector3f lastPos = null;
 	private Vector3f lastScale = null;
@@ -30,6 +32,7 @@ public class GameObjectPhysXManager {
 	private HashSet<Collider> shapes = new HashSet<Collider>();
 	
 	public GameObjectPhysXManager(GameObject object) {
+		Window.addEngineResource(this);
 		this.object = object;
 	}
 	
@@ -46,7 +49,7 @@ public class GameObjectPhysXManager {
 		if (this.shapes.contains(shape)) {
 			this.shapes.remove(shape);
 			this.rigid.detachShape(shape.getPhysXShape());
-			if (this.shapes.size() == 0 || !this.userRigid) {
+			if (this.shapes.size() == 0 && !this.userRigid) {
 				this.rigid.release();
 				this.rigid = null;
 			}
@@ -63,14 +66,14 @@ public class GameObjectPhysXManager {
 	}
 	
 	public void unsetRigidBody() {
-		this.userRigid = false;
 		PxRigidActor oldRigid = this.rigid;
 		if (this.shapes.size() > 0) {
 			this.createDefaultRigidBody();
 		} else {
 			this.rigid = null;
 		}
-		if (oldRigid != null) oldRigid.release();
+		if (oldRigid != null && !this.userRigid) oldRigid.release();
+		this.userRigid = false;
 	}
 	
 	private void createDefaultRigidBody() {
@@ -142,14 +145,21 @@ public class GameObjectPhysXManager {
 	}
 	
 	public void destroy() {
+		if (this.shapes == null) return;
 		for (Collider shape : this.shapes) {
 			this.rigid.detachShape(shape.getPhysXShape());
 		}
 		if (this.rigid != null) {
-			this.rigid.release();
+			if (!this.userRigid) this.rigid.release();
 			this.rigid = null;
 		}
 		this.shapes.clear();
+		this.shapes = null;
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

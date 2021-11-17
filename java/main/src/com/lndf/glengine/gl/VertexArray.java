@@ -4,16 +4,15 @@ import static org.lwjgl.opengl.GL33.*;
 
 import java.util.ArrayList;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.VertexArrayLayout.VertexArrayLayoutElement;
 
-public class VertexArray {
+public class VertexArray implements EngineResource {
 	
 	private int id;
 	
 	private boolean closed = false;
-	
-	private Runnable closeRunnable = () -> this.close();
 	
 	protected static int boundVertexArray = 0;
 	
@@ -22,20 +21,20 @@ public class VertexArray {
 	}
 	
 	public VertexArray() {
-		Window.addTerminateRunnable(closeRunnable);
+		Window.addEngineResource(this);
 		this.id = glGenVertexArrays();
 	}
 	
-	public void close() {
+	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeTerminateRunnable(closeRunnable);
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
-			@Override
-			public void run() {
-				glDeleteVertexArrays(VertexArray.this.id);
-			}
-		});
+		Window.removeEngineResource(this);
+		glDeleteVertexArrays(VertexArray.this.id);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public int getId() {

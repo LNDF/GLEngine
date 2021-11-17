@@ -2,9 +2,10 @@ package com.lndf.glengine.gl;
 
 import static org.lwjgl.opengl.GL33.*;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Window;
 
-public class IndexBuffer {
+public class IndexBuffer implements EngineResource {
 	
 	private long count;
 	private int id;
@@ -12,12 +13,10 @@ public class IndexBuffer {
 	
 	private boolean closed = false;
 	
-	private Runnable closeRunnable = () -> this.close();;
-	
 	//protected static int boundIndexBuffer = 0;
 	
 	public IndexBuffer(int[] buffer, boolean isStatic) {
-		Window.addTerminateRunnable(closeRunnable);
+		Window.addEngineResource(this);
 		this.count = buffer.length;
 		this.id = glGenBuffers();
 		this.bind();
@@ -25,16 +24,16 @@ public class IndexBuffer {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer, isStatic ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
 	}
 	
-	public void close() {
+	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
-			@Override
-			public void run() {
-				glDeleteBuffers(IndexBuffer.this.id);
-			}
-		});
-		Window.removeTerminateRunnable(closeRunnable);
+		Window.removeEngineResource(this);
+		glDeleteBuffers(IndexBuffer.this.id);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public long getCount() {

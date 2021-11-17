@@ -1,30 +1,30 @@
 package com.lndf.glengine.physics;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.engine.Window;
 
 import physx.physics.PxMaterial;
 
-public class PhysicalMaterial {
+public class PhysicalMaterial implements EngineResource {
 	
 	private PxMaterial pxMaterial;
 	
 	public PhysicalMaterial(float staticFriction, float dynamicFriction, float restitution) {
+		Window.addEngineResource(this);
 		this.pxMaterial = PhysXManager.getPhysics().createMaterial(staticFriction, dynamicFriction, restitution);
 	}
 	
 	public void destroy() {
+		if (this.pxMaterial == null) return;
+		Window.removeEngineResource(this);
 		this.pxMaterial.release();
+		this.pxMaterial = null;
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
-			@Override
-			public void run() {
-				destroy();
-			}
-		});
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public PxMaterial getPxMaterial() {

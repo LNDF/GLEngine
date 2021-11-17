@@ -3,7 +3,6 @@ package com.lndf.glengine.tests.physx;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.DefaultMaterial;
 import com.lndf.glengine.physics.PhysicalMaterial;
@@ -44,7 +43,7 @@ public class Main {
 		scene.subscribeToUpdates();
 		win.mainLoop();
 		scene.destroy();
-		mat.close();
+		mat.destroy();
 		Window.terminate();
 	}
 	

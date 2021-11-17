@@ -15,8 +15,6 @@ import physx.physics.PxFilterData;
 import physx.physics.PxPhysics;
 import physx.physics.PxScene;
 import physx.physics.PxSceneDesc;
-import physx.physics.PxSceneFlagEnum;
-import physx.physics.PxSceneFlags;
 
 public class PhysXManager {
 	

@@ -53,8 +53,8 @@ public class Record extends GameObject {
 		GameState.record = null;
 		Record.instances--;
 		if (Record.instances <= 0) {
-			Record.texture.close();
-			Record.material.close();
+			Record.texture.destroy();
+			Record.material.destroy();
 		}
 	}
 	

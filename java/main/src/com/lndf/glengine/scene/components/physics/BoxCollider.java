@@ -27,7 +27,7 @@ public class BoxCollider extends Collider {
 	}
 
 	@Override
-	public void destroy() {
+	public void pxDestroy() {
 		box.release();
 	}
 	

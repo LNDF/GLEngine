@@ -1,15 +1,16 @@
 package com.lndf.glengine.engine;
 
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL33.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 import com.lndf.glengine.gl.Drawable;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL33.*;
-
-import java.util.ArrayList;
 
 public class Window {
 	private String name;
@@ -21,6 +22,10 @@ public class Window {
 	
 	private RunnableList runnables = new RunnableList();
 	private static RunnableList terminateRunnables = new RunnableList();
+	
+	private static boolean destroyingResources = false;
+	private static LinkedList<EngineResource> engineResources = new LinkedList<EngineResource>();
+	private static LinkedList<EngineResource> removedEngineResources = new LinkedList<EngineResource>();
 	
 	private long windowId;
 	
@@ -43,18 +48,17 @@ public class Window {
 	
 	public static void terminate() {
 		Window.terminateRunnables.executeAll(false);
+		Window.destroyingResources = true;
+		for (EngineResource resource : Window.engineResources) {
+			resource.destroy();
+		}
+		Window.destroyingResources = false;
+		Window.engineResources.removeAll(Window.removedEngineResources);
+		Window.removedEngineResources.clear();
 		glfwTerminate();
 		Window.window = null;
 		Input.unsetWindow();
 		PhysXManager.stop();
-	}
-	
-	public static void addTerminateRunnable(Runnable runnable) {
-		Window.terminateRunnables.addRunnable(runnable);
-	}
-	
-	public static void removeTerminateRunnable(Runnable runnable) {
-		Window.terminateRunnables.removeRunnable(runnable);
 	}
 	
 	private void init() {
@@ -157,5 +161,28 @@ public class Window {
 	
 	public void addEndOfLoopRunnable(Runnable runnable) {
 		this.runnables.addRunnable(runnable);
+	}
+	
+	public static void addTerminateRunnable(Runnable runnable) {
+		Window.terminateRunnables.addRunnable(runnable);
+	}
+	
+	public static void removeTerminateRunnable(Runnable runnable) {
+		Window.terminateRunnables.removeRunnable(runnable);
+	}
+	
+	public static void addEngineResource(EngineResource resource) {
+		if (Window.destroyingResources) {
+			Window.removedEngineResources.remove(resource);
+		}
+		Window.engineResources.add(resource);
+	}
+	
+	public static void removeEngineResource(EngineResource resource) {
+		if (Window.destroyingResources) {
+			Window.removedEngineResources.add(resource);
+		} else {
+			Window.engineResources.remove(resource);
+		}
 	}
 }

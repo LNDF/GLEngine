@@ -73,9 +73,9 @@ public class LightsMain {
 		scene.addObject(pl1CObj);
 		win.addDrawable(cam);
 		win.mainLoop();
-		material.close();
-		boxTexture.close();
-		boxTextureSpecular.close();
+		material.destroy();
+		boxTexture.destroy();
+		boxTextureSpecular.destroy();
 		scene.destroy();
 		Window.terminate();
 	}

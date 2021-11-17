@@ -2,22 +2,24 @@ package com.lndf.glengine.scene.components.physics;
 
 import org.joml.Vector3f;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.scene.Component;
 
 import physx.physics.PxShape;
 
-public abstract class Collider extends Component {
+public abstract class Collider extends Component implements EngineResource {
 	
 	private PhysicalMaterial material;
 	
 	public abstract PxShape getPhysXShape();
-	public abstract void destroy();
+	public abstract void pxDestroy();
 	
 	public void scaleChanged(Vector3f newScale) {}
 	
 	protected Collider(PhysicalMaterial material) {
+		Window.addEngineResource(this);
 		this.material = material;
 	}
 	
@@ -35,14 +37,14 @@ public abstract class Collider extends Component {
 		this.getGameObject().getPhysx().removeShape(this);
 	}
 	
+	public void destroy() {
+		Window.removeEngineResource(this);
+		this.pxDestroy();
+	}
+	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
-			@Override
-			public void run() {
-				destroy();
-			}
-		});
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

@@ -1,8 +1,9 @@
 package com.lndf.glengine.gl;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Window;
 
-public class Mesh {
+public class Mesh implements EngineResource {
 	
 	private IndexBuffer indexBuffer = null;
 	private VertexBuffer vertexBuffer = null;
@@ -14,15 +15,7 @@ public class Mesh {
 	private float[] texCoords;
 	private int[] indices;
 	
-	private Runnable uploadNullRunnable;
-	
 	public Mesh() {
-		uploadNullRunnable = () -> {
-			indexBuffer = null;
-			vertexBuffer = null;
-			vertexArray = null;
-			Window.removeTerminateRunnable(uploadNullRunnable);
-		};
 		this.vertexArrayLayout = new VertexArrayLayout();
 		this.createVertexArrayLayout(this.vertexArrayLayout);
 	}
@@ -69,7 +62,7 @@ public class Mesh {
 	
 	public void upload() {
 		if (this.isUploaded()) return;
-		Window.addTerminateRunnable(uploadNullRunnable);
+		Window.addEngineResource(this);
 		int vsize = this.getVertexElementCount();
 		int vlen = this.positions.length + this.normals.length + this.texCoords.length;
 		float[] vertices = new float[vlen];
@@ -165,12 +158,12 @@ public class Mesh {
 		this.indexBuffer.draw();
 	}
 	
-	public void close() {
+	public void destroy() {
 		if (!this.isUploaded()) return;
-		
-		this.vertexArray.close();
-		this.vertexBuffer.close();
-		this.indexBuffer.close();
+		Window.removeEngineResource(this);
+		this.vertexArray.destroy();
+		this.vertexBuffer.destroy();
+		this.indexBuffer.destroy();
 		this.vertexArray = null;
 		this.vertexBuffer = null;
 		this.indexBuffer = null;
@@ -178,7 +171,7 @@ public class Mesh {
 	
 	@Override
 	protected void finalize() {
-		this.close();
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

@@ -2,16 +2,15 @@ package com.lndf.glengine.gl;
 
 import static org.lwjgl.opengl.GL33.*;
 
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Window;
 
-public class VertexBuffer {
+public class VertexBuffer implements EngineResource {
 	
 	private int id;
 	private boolean isStatic;
 	
 	private boolean closed = false;
-	
-	private Runnable closeRunnable = () -> this.close();
 	
 	protected static int boundVertexBuffer = 0;
 	
@@ -20,7 +19,7 @@ public class VertexBuffer {
 	}
 	
 	protected VertexBuffer(boolean isStatic) {
-		Window.addTerminateRunnable(closeRunnable);
+		Window.addEngineResource(this);
 		this.id = glGenBuffers();
 		this.isStatic = isStatic;
 		this.bind();
@@ -36,16 +35,16 @@ public class VertexBuffer {
 		glBufferData(GL_ARRAY_BUFFER, buffer, isStatic ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
 	}
 	
-	public void close() {
+	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeTerminateRunnable(closeRunnable);
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
-			@Override
-			public void run() {
-				glDeleteBuffers(VertexBuffer.this.id);
-			}
-		});
+		Window.removeEngineResource(this);
+		glDeleteBuffers(VertexBuffer.this.id);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public int getId() {

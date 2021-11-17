@@ -72,12 +72,12 @@ public class Level extends Scene {
 	@Override
 	public void destroy() {
 		super.destroy();
-		this.grass.close();
-		this.grassTex.close();
-		this.road.close();
-		this.roadTex.close();
-		this.roadEdge.close();
-		this.roadEdgeTex.close();
+		this.grass.destroy();
+		this.grassTex.destroy();
+		this.road.destroy();
+		this.roadTex.destroy();
+		this.roadEdge.destroy();
+		this.roadEdgeTex.destroy();
 	}
 	
 }

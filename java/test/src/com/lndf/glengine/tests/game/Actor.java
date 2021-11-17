@@ -34,8 +34,8 @@ public class Actor extends GameObject {
 		super.destroy();
 		Actor.instances--;
 		if (Actor.instances <= 0) {
-			Actor.texture.close();
-			Actor.material.close();
+			Actor.texture.destroy();
+			Actor.material.destroy();
 		}
 	}
 	

@@ -12,10 +12,11 @@ import java.util.HashMap;
 import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.asset.Asset;
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.engine.Window;
 
-public class Texture2D {
+public class Texture2D implements EngineResource {
 	
 	private int id;
 	private HashMap<Integer, Integer> width = new HashMap<Integer, Integer>();
@@ -30,8 +31,6 @@ public class Texture2D {
 	private Color borderColor;
 	
 	private boolean closed = false;
-	
-	private Runnable closeRunnable = () -> this.close();
 	
 	protected static boolean STBImageVerticalFlipMode = false;
 	protected static HashMap<Integer, Integer> boundTextures = new HashMap<Integer, Integer>();
@@ -48,7 +47,7 @@ public class Texture2D {
 	}
 	
 	public Texture2D() {
-		Window.addTerminateRunnable(closeRunnable);
+		Window.addEngineResource(this);
 		this.id = glGenTextures();
 	}
 	
@@ -202,21 +201,16 @@ public class Texture2D {
 		}
 	}
 
-	public void close() {
+	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeTerminateRunnable(closeRunnable);
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
-			@Override
-			public void run() {
-				glDeleteTextures(Texture2D.this.id);
-			}
-		});
+		Window.removeEngineResource(this);
+		glDeleteTextures(Texture2D.this.id);
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		this.close();
+		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public void bind(int slot) {
