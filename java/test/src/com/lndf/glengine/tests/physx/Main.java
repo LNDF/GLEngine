@@ -3,7 +3,7 @@ package com.lndf.glengine.tests.physx;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.DefaultMaterial;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.primitives.Cube;
@@ -17,7 +17,7 @@ import com.lndf.glengine.scene.components.physics.DynamicRigidBody;
 public class Main {
 	
 	public static void main(String[] args) {
-		Window win = Window.createWindow("PhysX", 800, 600, true);
+		Engine.createWindow("PhysX", 800, 600, true);
 		Scene scene = new Scene();
 		DefaultMaterial mat = new DefaultMaterial(new Vector4f(0, 0, 1, 1), new Vector4f(1, 1, 1, 1), 30);
 		Cube cube = new Cube(mat);
@@ -36,15 +36,15 @@ public class Main {
 		cube2.addComponent(boxColl2);
 		cube.getTransform().setPosition(new Vector3f(0, 3.5f, -8));
 		cube2.getTransform().setPosition(new Vector3f(0, -1, -8));
-		win.addDrawable(cam);
+		Engine.addDrawable(cam);
 		scene.addObject(obj);
 		scene.addObject(cube);
 		scene.addObject(cube2);
 		scene.subscribeToUpdates();
-		win.mainLoop();
+		Engine.mainLoop();
 		scene.destroy();
 		mat.destroy();
-		Window.terminate();
+		Engine.terminate();
 	}
 	
 }

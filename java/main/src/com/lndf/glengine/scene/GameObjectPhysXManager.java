@@ -8,7 +8,7 @@ import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.scene.components.physics.Collider;
 
 import physx.common.PxIDENTITYEnum;
@@ -32,7 +32,7 @@ public class GameObjectPhysXManager implements EngineResource {
 	private HashSet<Collider> shapes = new HashSet<Collider>();
 	
 	public GameObjectPhysXManager(GameObject object) {
-		Window.addEngineResource(this);
+		Engine.addEngineResource(this);
 		this.object = object;
 	}
 	
@@ -159,7 +159,7 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

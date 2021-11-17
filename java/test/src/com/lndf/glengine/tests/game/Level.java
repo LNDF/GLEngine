@@ -4,7 +4,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.engine.Window;
 import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.primitives.Cube;
 import com.lndf.glengine.primitives.Plane;
@@ -24,7 +23,7 @@ public class Level extends Scene {
 	
 	private FPCamera cam;
 	
-	public Level(Window window) {
+	public Level() {
 		this.grassTex = new Texture2D(new Asset("resource:/testapp/grass.png"));
 		this.grass = new TextureMaterial(this.grassTex, 50, 50, 0, 100f);
 		this.roadTex = new Texture2D(new Asset("resource:/testapp/road.png"));

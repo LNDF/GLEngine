@@ -3,7 +3,7 @@ package com.lndf.glengine.tests.model;
 import org.joml.Vector3f;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.model.Model;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Scene;
@@ -13,7 +13,7 @@ import com.lndf.glengine.scene.components.lighting.DirectionalLight;
 public class Main {
 	
 	public static void main(String[] args) {
-		Window win = Window.createWindow("AAA", 800, 600, true);
+		Engine.createWindow("AAA", 800, 600, true);
 		Scene scene = new Scene();
 		Model model = new Model(new Asset("resource:/model/demomodel.fbx"));
 		GameObject camObj = new GameObject();
@@ -26,11 +26,11 @@ public class Main {
 		//persona.getTransform().setScale(new Vector3f(0.01f, 0.01f, 0.01f));
 		scene.addObject(persona);
 		scene.addObject(camObj);
-		win.addDrawable(cam);
+		Engine.addDrawable(cam);
 		scene.subscribeToUpdates();
-		win.mainLoop();
+		Engine.mainLoop();
 		scene.destroy();
-		Window.terminate();
+		Engine.terminate();
 	}
 	
 }

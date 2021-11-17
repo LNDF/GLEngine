@@ -14,7 +14,7 @@ import org.lwjgl.system.MemoryStack;
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.Utils;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 
 public class Texture2D implements EngineResource {
 	
@@ -39,7 +39,7 @@ public class Texture2D implements EngineResource {
 		for (int i = 0; i < 32; i++) {
 			Texture2D.boundTextures.put(i, 0);
 		}
-		Window.addTerminateRunnable(() -> {
+		Engine.addTerminateRunnable(() -> {
 			for (int i = 0; i < 32; i++) {
 				Texture2D.boundTextures.put(i, 0);
 			}
@@ -47,7 +47,7 @@ public class Texture2D implements EngineResource {
 	}
 	
 	public Texture2D() {
-		Window.addEngineResource(this);
+		Engine.addEngineResource(this);
 		this.id = glGenTextures();
 	}
 	
@@ -204,13 +204,13 @@ public class Texture2D implements EngineResource {
 	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeEngineResource(this);
+		Engine.removeEngineResource(this);
 		glDeleteTextures(Texture2D.this.id);
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public void bind(int slot) {

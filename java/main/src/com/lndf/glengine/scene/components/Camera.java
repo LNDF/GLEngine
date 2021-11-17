@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.Drawable;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
@@ -32,7 +32,7 @@ public class Camera extends Component implements Drawable {
 		this.drawDistance = drawDistance;
 	}
 	
-	public Matrix4f makeViewProjection(Window window) {
+	public Matrix4f makeViewProjection() {
 		GameObject obj = this.getGameObject();
 		if (obj == null) return null;
 		Transform t = obj.getTransform();
@@ -41,13 +41,13 @@ public class Camera extends Component implements Drawable {
 		Vector3f pos = t.getWorldPosition().mul(-1);
 		Vector3f scale = t.getWorldScale();
 		if (this.is3D) { 
-			vp.perspective(FOV, (float) window.getWidth() / (float) window.getHeight(), 0.01f, this.drawDistance);
+			vp.perspective(FOV, (float) Engine.getWidth() / (float) Engine.getHeight(), 0.01f, this.drawDistance);
 		} else {
-			if (window.getWidth() > window.getHeight()) {
-				float ratio = (float) window.getWidth() / (float) window.getHeight();
+			if (Engine.getWidth() > Engine.getHeight()) {
+				float ratio = (float) Engine.getWidth() / (float) Engine.getHeight();
 				vp.setOrtho(-ratio, ratio, -1.0f, 1.0f, -1.0f, 1.0f);
 			} else {
-				float ratio = (float) window.getHeight() / (float) window.getWidth();
+				float ratio = (float) Engine.getHeight() / (float) Engine.getWidth();
 				vp.setOrtho(-1.0f, 1.0f, -ratio, ratio, -1.0f, 1.0f);
 			}
 		}
@@ -56,10 +56,10 @@ public class Camera extends Component implements Drawable {
 		return vp;
 	}
 	
-	public void draw(Window window) {
+	public void draw() {
 		Scene current = this.getScene();
 		if (current == null) return;
-		Matrix4f vp = this.makeViewProjection(window);
+		Matrix4f vp = this.makeViewProjection();
 		for (RenderComponent comp : current.getRenderComponents()) {
 			comp.setGLSettings();
 			comp.render(vp, this.lastPOVPos);

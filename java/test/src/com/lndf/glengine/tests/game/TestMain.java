@@ -1,6 +1,6 @@
 package com.lndf.glengine.tests.game;
 
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 
 public class TestMain {
 	
@@ -9,14 +9,14 @@ public class TestMain {
 		GameState.running = true;
 		GameState.cargarPuntos("puntos.bin");
 		GameState.reset();
-		Window win = Window.createWindow("TEST", 500, 500, true);
-		Level level = new Level(win);
-		win.addDrawable(level.getCamera());
+		Engine.createWindow("TEST", 500, 500, true);
+		Level level = new Level();
+		Engine.addDrawable(level.getCamera());
 		level.subscribeToUpdates();
-		win.mainLoop();
+		Engine.mainLoop();
 		level.destroy();
 		GameState.guardarPuntos("puntos.bin");
-		Window.terminate();
+		Engine.terminate();
 		GameState.running = false;
 	}
 	

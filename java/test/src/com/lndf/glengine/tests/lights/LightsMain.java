@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.DeltaTime;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.DefaultMaterial;
 import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.primitives.Cube;
@@ -19,7 +19,7 @@ import com.lndf.glengine.scene.components.lighting.Spotlight;
 public class LightsMain {
 	
 	public static void main(String[] args) {
-		Window win = Window.createWindow("Lights test", 800, 600, true);
+		Engine.createWindow("Lights test", 800, 600, true);
 		Texture2D boxTexture = new Texture2D(new Asset("resource:/lights/box.png"));
 		Texture2D boxTextureSpecular = new Texture2D(new Asset("resource:/lights/box_specular.png"));
 		DefaultMaterial material = new DefaultMaterial(boxTexture, boxTextureSpecular, 80);
@@ -71,13 +71,13 @@ public class LightsMain {
 		scene.addObject(pl2Obj);
 		scene.addObject(camObj);
 		scene.addObject(pl1CObj);
-		win.addDrawable(cam);
-		win.mainLoop();
+		Engine.addDrawable(cam);
+		Engine.mainLoop();
 		material.destroy();
 		boxTexture.destroy();
 		boxTextureSpecular.destroy();
 		scene.destroy();
-		Window.terminate();
+		Engine.terminate();
 	}
 	
 }

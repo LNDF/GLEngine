@@ -3,7 +3,7 @@ package com.lndf.glengine.gl;
 import static org.lwjgl.opengl.GL33.*;
 
 import com.lndf.glengine.engine.EngineResource;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 
 public class VertexBuffer implements EngineResource {
 	
@@ -15,11 +15,11 @@ public class VertexBuffer implements EngineResource {
 	protected static int boundVertexBuffer = 0;
 	
 	static {
-		Window.addTerminateRunnable(() -> boundVertexBuffer = 0);
+		Engine.addTerminateRunnable(() -> boundVertexBuffer = 0);
 	}
 	
 	protected VertexBuffer(boolean isStatic) {
-		Window.addEngineResource(this);
+		Engine.addEngineResource(this);
 		this.id = glGenBuffers();
 		this.isStatic = isStatic;
 		this.bind();
@@ -38,13 +38,13 @@ public class VertexBuffer implements EngineResource {
 	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeEngineResource(this);
+		Engine.removeEngineResource(this);
 		glDeleteBuffers(VertexBuffer.this.id);
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public int getId() {

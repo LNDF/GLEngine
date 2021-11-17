@@ -3,7 +3,7 @@ package com.lndf.glengine.gl;
 import static org.lwjgl.opengl.GL33.*;
 
 import com.lndf.glengine.engine.EngineResource;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 
 public class IndexBuffer implements EngineResource {
 	
@@ -16,7 +16,7 @@ public class IndexBuffer implements EngineResource {
 	//protected static int boundIndexBuffer = 0;
 	
 	public IndexBuffer(int[] buffer, boolean isStatic) {
-		Window.addEngineResource(this);
+		Engine.addEngineResource(this);
 		this.count = buffer.length;
 		this.id = glGenBuffers();
 		this.bind();
@@ -27,13 +27,13 @@ public class IndexBuffer implements EngineResource {
 	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeEngineResource(this);
+		Engine.removeEngineResource(this);
 		glDeleteBuffers(IndexBuffer.this.id);
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public long getCount() {

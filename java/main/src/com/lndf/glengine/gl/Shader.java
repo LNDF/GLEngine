@@ -9,7 +9,7 @@ import org.joml.Matrix4f;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Utils;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 
 public class Shader {
 	
@@ -39,7 +39,7 @@ public class Shader {
 	protected static int boundShader = 0;
 	
 	static {
-		Window.addTerminateRunnable(() -> boundShader = 0);
+		Engine.addTerminateRunnable(() -> boundShader = 0);
 	}
 	
 	public static int compileShader(int type, String src) {
@@ -95,7 +95,7 @@ public class Shader {
 	public void close() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.getWindow().addEndOfLoopRunnable(new Runnable() {
+		Engine.addEndOfLoopRunnable(new Runnable() {
 			@Override
 			public void run() {
 				glDeleteProgram(Shader.this.id);

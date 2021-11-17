@@ -9,7 +9,7 @@ public class SceneManager {
 	public static HashSet<Scene> scenes = new HashSet<Scene>();
 	
 	static {
-		Window.addTerminateRunnable(() -> SceneManager.scenes.clear());
+		Engine.addTerminateRunnable(() -> SceneManager.scenes.clear());
 	}
 	
 	public static void updateScenes() {

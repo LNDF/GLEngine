@@ -1,7 +1,7 @@
 package com.lndf.glengine.gl;
 
 import com.lndf.glengine.engine.EngineResource;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 
 public class Mesh implements EngineResource {
 	
@@ -62,7 +62,7 @@ public class Mesh implements EngineResource {
 	
 	public void upload() {
 		if (this.isUploaded()) return;
-		Window.addEngineResource(this);
+		Engine.addEngineResource(this);
 		int vsize = this.getVertexElementCount();
 		int vlen = this.positions.length + this.normals.length + this.texCoords.length;
 		float[] vertices = new float[vlen];
@@ -160,7 +160,7 @@ public class Mesh implements EngineResource {
 	
 	public void destroy() {
 		if (!this.isUploaded()) return;
-		Window.removeEngineResource(this);
+		Engine.removeEngineResource(this);
 		this.vertexArray.destroy();
 		this.vertexBuffer.destroy();
 		this.indexBuffer.destroy();
@@ -171,7 +171,7 @@ public class Mesh implements EngineResource {
 	
 	@Override
 	protected void finalize() {
-		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

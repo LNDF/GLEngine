@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL33.*;
 import java.util.ArrayList;
 
 import com.lndf.glengine.engine.EngineResource;
-import com.lndf.glengine.engine.Window;
+import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.VertexArrayLayout.VertexArrayLayoutElement;
 
 public class VertexArray implements EngineResource {
@@ -17,24 +17,24 @@ public class VertexArray implements EngineResource {
 	protected static int boundVertexArray = 0;
 	
 	static {
-		Window.addTerminateRunnable(() -> boundVertexArray = 0);
+		Engine.addTerminateRunnable(() -> boundVertexArray = 0);
 	}
 	
 	public VertexArray() {
-		Window.addEngineResource(this);
+		Engine.addEngineResource(this);
 		this.id = glGenVertexArrays();
 	}
 	
 	public void destroy() {
 		if (this.closed) return;
 		this.closed = true;
-		Window.removeEngineResource(this);
+		Engine.removeEngineResource(this);
 		glDeleteVertexArrays(VertexArray.this.id);
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Window.getWindow().addEndOfLoopRunnable(() -> this.destroy());
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public int getId() {
