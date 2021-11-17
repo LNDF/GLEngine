@@ -31,6 +31,8 @@ public class PhysXManager {
 	
 	private static int cpuThreads = 4;
 	private static double simulationTime = 1.0 / 60.0;
+	private static double recoverSimulationTime = 1.0 / 60.0;
+	private static int recoverTriggerMultiplier = 3;
 	
 	public static void start() {
 		defaultAllocator = new PxDefaultAllocator();
@@ -108,6 +110,22 @@ public class PhysXManager {
 
 	public static void setSimulationTime(double simulationTime) {
 		PhysXManager.simulationTime = simulationTime;
+	}
+	
+	public static double getRecoverSimulationTime() {
+		return recoverSimulationTime;
+	}
+
+	public static void setRecoverSimulationTime(double recoverSimulationTime) {
+		PhysXManager.recoverSimulationTime = recoverSimulationTime;
+	}
+
+	public static int getRecoverTriggerMultiplier() {
+		return recoverTriggerMultiplier;
+	}
+
+	public static void setRecoverTriggerMultiplier(int recoverTriggerMultiplier) {
+		PhysXManager.recoverTriggerMultiplier = recoverTriggerMultiplier;
 	}
 	
 }

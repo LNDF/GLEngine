@@ -29,6 +29,7 @@ public class Scene {
 	
 	private PxScene physXScene;
 	private double physXDelta = 0.0;
+	private boolean physXRecovering = false;
 	
 	private RunnableList updateRunnables = new RunnableList();
 	
@@ -159,7 +160,17 @@ public class Scene {
 			obj.setScene(null);
 		}
 		double simulationTime = PhysXManager.getSimulationTime();
+		double recoverSimulationTime = PhysXManager.getRecoverSimulationTime();
+		int recoverTriggerMultiplier = PhysXManager.getRecoverTriggerMultiplier();
 		this.physXDelta += DeltaTime.get();
+		if (this.physXDelta >= simulationTime * recoverTriggerMultiplier) {
+			this.physXRecovering = true;
+		} else if (this.physXDelta < recoverSimulationTime) {
+			this.physXRecovering = false;
+		}
+		if (this.physXRecovering) {
+			simulationTime = recoverSimulationTime;
+		}
 		if (physXDelta >= simulationTime) {
 			int steps = (int) (physXDelta / simulationTime);
 			this.physXDelta %= simulationTime;
