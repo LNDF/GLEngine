@@ -12,9 +12,8 @@ import com.lndf.glengine.scene.Scene;
 import com.lndf.glengine.scene.components.FPCamera;
 import com.lndf.glengine.scene.components.lighting.DirectionalLight;
 import com.lndf.glengine.scene.components.physics.BoxCollider;
+import com.lndf.glengine.scene.components.physics.CapsuleCollider;
 import com.lndf.glengine.scene.components.physics.DynamicRigidBody;
-
-import physx.physics.PxRigidDynamicLockFlagEnum;
 
 public class Main {
 	
@@ -26,7 +25,7 @@ public class Main {
 		Cube cube2 = new Cube(mat);
 		DynamicRigidBody cubeRigid = new DynamicRigidBody();
 		PhysicalMaterial pMat = new PhysicalMaterial(0.5f, 0.5f, 0.5f);
-		BoxCollider boxColl= new BoxCollider(pMat);
+		CapsuleCollider boxColl= new CapsuleCollider(pMat);
 		BoxCollider boxColl2= new BoxCollider(pMat);
 		FPCamera cam = new FPCamera((float) Math.PI / 4, 100);
 		GameObject obj = new GameObject();
@@ -36,8 +35,10 @@ public class Main {
 		cube.addComponent(cubeRigid);
 		cube.addComponent(boxColl);
 		cube2.addComponent(boxColl2);
-		cube2.getTransform().setScale(new Vector3f(100, 1, 100));
-		cube.getTransform().setPosition(new Vector3f(0, 200.5f, -8));
+		cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
+		//cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
+		//cube2.getTransform().setScale(new Vector3f(100, 1, 100));
+		cube.getTransform().setPosition(new Vector3f(0, 3, -8));
 		cube2.getTransform().setPosition(new Vector3f(0, -1, -8));
 		Engine.addDrawable(cam);
 		scene.addObject(obj);
