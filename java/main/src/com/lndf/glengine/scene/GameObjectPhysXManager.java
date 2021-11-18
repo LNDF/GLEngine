@@ -130,7 +130,7 @@ public class GameObjectPhysXManager implements EngineResource {
 			for (Collider shape : this.shapes) {
 				if (shape.getShouldScale()) {
 					this.rigid.detachShape(shape.getPhysXShape());
-					shape.scale();
+					shape.pxDestroy();
 					this.rigid.attachShape(shape.getPhysXShape());
 				}
 			}
@@ -146,6 +146,10 @@ public class GameObjectPhysXManager implements EngineResource {
 		if (newScene != null) {
 			newScene.getPhysXScene().addActor(rigid);
 		}
+	}
+	
+	public PxRigidActor getPxRigid() {
+		return this.rigid;
 	}
 	
 	public void destroy() {

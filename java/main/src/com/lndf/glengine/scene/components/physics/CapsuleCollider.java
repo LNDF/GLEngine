@@ -31,14 +31,19 @@ public class CapsuleCollider extends Collider {
 			float r = radius, h = height;
 			if (obj != null) {
 				Vector3f scale = obj.getTransform().getWorldScale();
-				r *= scale.y;
-				h *= (float) Math.max(scale.x, scale.z);
+				r *= scale.x;
+				h *= (float) Math.max(scale.y, scale.z);
 			}
 			PxCapsuleGeometry capsuleGeom = PxCapsuleGeometry.createAt(mem, MemoryStack::nmalloc, r, h);
 			PxShape capsule = PhysXManager.getPhysics().createShape(capsuleGeom, material.getPxMaterial(), true);
 			capsule.setSimulationFilterData(PhysXManager.getDefaultFilterData());
 			return capsule;
 		}
+	}
+	
+	@Override
+	public boolean isPxCreated() {
+		return this.capsule != null;
 	}
 	
 	@Override

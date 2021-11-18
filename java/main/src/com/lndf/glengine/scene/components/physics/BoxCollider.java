@@ -45,6 +45,11 @@ public class BoxCollider extends Collider {
 	}
 	
 	@Override
+	public boolean isPxCreated() {
+		return this.box != null;
+	}
+	
+	@Override
 	public PxShape getPhysXShape() {
 		if (this.box == null) {
 			this.box = BoxCollider.create(this.getMaterial(), this.getGameObject(), x, y, z);
@@ -54,13 +59,10 @@ public class BoxCollider extends Collider {
 
 	@Override
 	public void pxDestroy() {
-		if (box != null) box.release();
-	}
-	
-	@Override
-	public void scale() {
-		if (this.box != null) box.release();
-		this.box = BoxCollider.create(this.getMaterial(), this.getGameObject(), x, y, z);
+		if (box != null) {
+			this.box.release();
+			this.box = null;
+		}
 	}
 	
 }
