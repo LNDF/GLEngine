@@ -38,7 +38,7 @@ public abstract class Collider extends Component implements EngineResource {
 	public void recreate() {
 		if (!this.isPxCreated()) return;
 		GameObject obj = this.getGameObject();
-		PxRigidActor rigid;
+		PxRigidActor rigid = null;
 		if (obj != null) {
 			rigid = obj.getPhysx().getPxRigid();
 			rigid.detachShape(this.getPhysXShape());

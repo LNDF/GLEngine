@@ -29,7 +29,7 @@ public class Main {
 		Cube cube2 = new Cube(mat);
 		DynamicRigidBody cubeRigid = new DynamicRigidBody();
 		PhysicalMaterial pMat = new PhysicalMaterial(0.5f, 0.5f, 0.5f);
-		SphereCollider boxColl= new SphereCollider(pMat);
+		BoxCollider boxColl= new BoxCollider(pMat);
 		BoxCollider boxColl2= new BoxCollider(pMat);
 		FPCamera cam = new FPCamera((float) Math.PI / 4, 100);
 		GameObject obj = new GameObject();
@@ -40,7 +40,9 @@ public class Main {
 			public void update() {
 				if (Input.getKey(KeyEvent.VK_F)) {
 					Vector3f s = cube.getTransform().getScale();
-					s.add(new Vector3f(1,1,1));
+					s.x++;
+					s.y += 2;
+					s.z += 3;
 					cube.getTransform().setScale(s);
 				}
 			}
@@ -51,8 +53,8 @@ public class Main {
 		cube.addComponent(cubeRigid);
 		cube.addComponent(boxColl);
 		cube2.addComponent(boxColl2);
-		//cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
-		//cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
+		cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
+		cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
 		cube2.getTransform().setScale(new Vector3f(100, 1, 100));
 		cube.getTransform().setPosition(new Vector3f(0, 3, -8));
 		cube2.getTransform().setPosition(new Vector3f(0, -1, -8));

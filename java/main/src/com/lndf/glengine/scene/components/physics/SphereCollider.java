@@ -58,5 +58,14 @@ public class SphereCollider extends Collider {
 			this.sphere = null;
 		}
 	}
+
+	public float getRadius() {
+		return radius;
+	}
+
+	public void setRadius(float radius) {
+		this.radius = radius;
+		this.recreate();
+	}
 	
 }

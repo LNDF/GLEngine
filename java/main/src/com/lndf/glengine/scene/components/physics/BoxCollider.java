@@ -64,5 +64,32 @@ public class BoxCollider extends Collider {
 			this.box = null;
 		}
 	}
+
+	public float getX() {
+		return x;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+		this.recreate();
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+		this.recreate();
+	}
+
+	public float getZ() {
+		return z;
+	}
+
+	public void setZ(float z) {
+		this.z = z;
+		this.recreate();
+	}
 	
 }
