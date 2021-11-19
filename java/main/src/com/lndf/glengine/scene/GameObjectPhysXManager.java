@@ -22,9 +22,9 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	private GameObject object;
 	
-	private Vector3f lastPos = null;
-	private Vector3f lastScale = null;
-	private Quaternionf lastRot = null;
+	private boolean posChanged = false;
+	private boolean rotChanged = false;
+	private boolean scaleChanged = false;
 	
 	private HashSet<Collider> shapes = new HashSet<Collider>();
 	private PxRigidActor rigid;
@@ -85,15 +85,18 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	public void unsetRigidBody() {
 		PxRigidActor oldRigid = this.rigid;
+		boolean oldWasParent = this.parentRigidOwner == null;
 		if (this.shapes.size() > 0) {
 			this.setParentRigid();
 			if (this.rigid == null) {
 				this.setDefaultRigidBody();
+			} else {
+				this.parentRigidOwner = null;
 			}
 		} else {
 			this.rigid = null;
 		}
-		if (oldRigid != null) oldRigid.release();
+		if (oldRigid != null && !this.customRigid && oldWasParent) oldRigid.release();
 		this.customRigid = false;
 	}
 	
@@ -179,28 +182,27 @@ public class GameObjectPhysXManager implements EngineResource {
 		PxQuat q = pose.getQ();
 		this.object.getTransform().setWorldPosition(new Vector3f(p.getX(), p.getY(), p.getZ()));
 		this.object.getTransform().setWorldRotation(new Quaternionf(q.getX(), q.getY(), q.getZ(), q.getW()));
-		this.lastPos = this.object.getTransform().getWorldPosition();
-		this.lastRot = this.object.getTransform().getWorldRotation();
+		this.posChanged = false;
+		this.rotChanged = false;
 	}
 	
 	//TODO: reimplement
 	public void pushPoseToRigidBody() {
 		if (this.rigid == null) return;
-		Quaternionf jq = this.object.getTransform().getWorldRotation();
-		Vector3f jp = this.object.getTransform().getWorldPosition();
-		Vector3f js = this.object.getTransform().getWorldScale();
-		if (!jp.equals(this.lastPos) || !jq.equals(this.lastRot)) {
+		if (this.posChanged || this.rotChanged) {
+			this.posChanged = false;
+			this.rotChanged = false;
+			Quaternionf jq = this.object.getTransform().getWorldRotation();
+			Vector3f jp = this.object.getTransform().getWorldPosition();
 			try (MemoryStack mem = MemoryStack.stackPush()) {
 				PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
 				pose.setP(PxVec3.createAt(mem, MemoryStack::nmalloc, jp.x, jp.y, jp.z));
 				pose.setQ(PxQuat.createAt(mem, MemoryStack::nmalloc, jq.x, jq.y, jq.z, jq.w));
-				this.lastPos = jp;
-				this.lastRot = jq;
 				this.rigid.setGlobalPose(pose);
 			}
 		}
-		if (!jp.equals(this.lastScale)) {
-			this.lastScale = js;
+		if (this.scaleChanged) {
+			this.scaleChanged = false;
 			for (Collider shape : this.shapes) {
 				if (shape.getShouldScale()) {
 					this.rigid.detachShape(shape.getPhysXShape());
@@ -209,6 +211,18 @@ public class GameObjectPhysXManager implements EngineResource {
 				}
 			}
 		}
+	}
+	
+	public void posHasChanged() {
+		this.posChanged = true;
+	}
+	
+	public void rotHasChanged() {
+		this.rotChanged = true;
+	}
+	
+	public void scaleHasChanged() {
+		this.scaleChanged = true;
 	}
 	
 	public PxRigidActor getPxRigid() {

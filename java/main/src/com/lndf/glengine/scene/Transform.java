@@ -122,16 +122,19 @@ public class Transform {
 	public void setPosition(Vector3f position) {
 		this.position.set(position);
 		this.clearLocalCache();
+		this.obj.getPhysx().posHasChanged();
 	}
 	
 	public void setScale(Vector3f scale) {
 		this.scale.set(scale);
 		this.clearLocalCache();
+		this.obj.getPhysx().scaleHasChanged();
 	}
 	
 	public void setRotation(Quaternionf rotation) {
 		this.rotation.set(rotation);
 		this.clearLocalCache();
+		this.obj.getPhysx().rotHasChanged();
 	}
 	
 	public Vector3f getWorldPosition() {
