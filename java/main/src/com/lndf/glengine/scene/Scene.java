@@ -24,6 +24,7 @@ public class Scene {
 	
 	private KeySetView<GameObject, Boolean> gameObjects = ConcurrentHashMap.newKeySet();
 	private KeySetView<GameObject, Boolean> gameObjectsToDestroy = ConcurrentHashMap.newKeySet();
+	private KeySetView<GameObject, Boolean> rootGameObjects = ConcurrentHashMap.newKeySet();
 	
 	private float ambientLight;
 	
@@ -59,6 +60,7 @@ public class Scene {
 		if (object.getParent() != null) return;
 		Scene old = object.getScene();
 		if (old != null) old.removeObject(object);
+		this.rootGameObjects.add(object);
 		this._addObject(object);
 	}
 	
@@ -74,6 +76,7 @@ public class Scene {
 	
 	public void removeObject(GameObject object) {
 		if (object.getParent() != null) return;
+		this.rootGameObjects.remove(object);
 		this._removeObject(object);
 	}
 	
@@ -90,6 +93,10 @@ public class Scene {
 	
 	public Set<GameObject> getGameObjects() {
 		return Collections.unmodifiableSet(this.gameObjects);
+	}
+	
+	public Set<GameObject> getRootGameObjects() {
+		return Collections.unmodifiableSet(this.rootGameObjects);
 	}
 	
 	public HashSet<RenderComponent> getRenderComponents() {
@@ -181,17 +188,24 @@ public class Scene {
 				physXScene.simulate((float) simulationTime);
 				physXScene.fetchResults(true);
 			}
-			for (GameObject obj : this.gameObjects) {
-				obj.getPhysx().pullPoseFromRigidBody();
+			for (GameObject obj : this.rootGameObjects) {
+				this.pullPosesFromPhysX(obj);
 			}
+		}
+	}
+	
+	private void pullPosesFromPhysX(GameObject object) {
+		object.getPhysx().pullPoseFromRigidBody();
+		for (GameObject child : object.getChildren()) {
+			this.pullPosesFromPhysX(child);
 		}
 	}
 	
 	public void destroy() {
 		this.unsubscribeFromUpdates();
 		for (GameObject obj : this.gameObjects) {
-			obj.destroy();
 			obj.setScene(null);
+			obj.destroy();
 		}
 		this.gameObjects.clear();
 		this.physXScene.release();
