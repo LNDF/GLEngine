@@ -12,7 +12,6 @@ import physx.physics.PxShape;
 
 public class BoxCollider extends Collider {
 	
-	private PxShape box;
 	private float x;
 	private float y;
 	private float z;
@@ -28,9 +27,12 @@ public class BoxCollider extends Collider {
 		this.z = sizeZ;
 	}
 	
-	private static PxShape create(PhysicalMaterial material, GameObject obj, float x, float y, float z) {
+	@Override
+	protected void createShape() {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
-			float sx = x, sy = y, sz = z;
+			float sx = this.x, sy = this.y, sz = this.z;
+			GameObject obj = this.getGameObject();
+			PhysicalMaterial material = this.material;
 			if (obj != null) {
 				Vector3f scale = obj.getTransform().getWorldScale();
 				sx *= scale.x;
@@ -40,28 +42,7 @@ public class BoxCollider extends Collider {
 			PxBoxGeometry boxGeom = PxBoxGeometry.createAt(mem, MemoryStack::nmalloc, sx, sy, sz);
 			PxShape box = PhysXManager.getPhysics().createShape(boxGeom, material.getPxMaterial(), true);
 			box.setSimulationFilterData(PhysXManager.getDefaultFilterData());
-			return box;
-		}
-	}
-	
-	@Override
-	public boolean isPxCreated() {
-		return this.box != null;
-	}
-	
-	@Override
-	public PxShape getPhysXShape() {
-		if (this.box == null) {
-			this.box = BoxCollider.create(this.getMaterial(), this.getGameObject(), x, y, z);
-		}
-		return this.box;
-	}
-
-	@Override
-	public void pxDestroy() {
-		if (box != null) {
-			this.box.release();
-			this.box = null;
+			this.shape = box;
 		}
 	}
 

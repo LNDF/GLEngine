@@ -12,7 +12,6 @@ import physx.physics.PxShape;
 
 public class CapsuleCollider extends Collider {
 	
-	private PxShape capsule;
 	private float height;
 	private float radius;
 	
@@ -26,9 +25,12 @@ public class CapsuleCollider extends Collider {
 		this(material, 0.5f, 0.5f);
 	}
 	
-	private static PxShape create(PhysicalMaterial material, GameObject obj, float radius, float height) {
+	@Override
+	protected void createShape() {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
-			float r = radius, h = height;
+			float r = this.radius, h = this.height;
+			GameObject obj = this.getGameObject();
+			PhysicalMaterial material = this.material;
 			if (obj != null) {
 				Vector3f scale = obj.getTransform().getWorldScale();
 				r *= scale.x;
@@ -37,28 +39,7 @@ public class CapsuleCollider extends Collider {
 			PxCapsuleGeometry capsuleGeom = PxCapsuleGeometry.createAt(mem, MemoryStack::nmalloc, r, h);
 			PxShape capsule = PhysXManager.getPhysics().createShape(capsuleGeom, material.getPxMaterial(), true);
 			capsule.setSimulationFilterData(PhysXManager.getDefaultFilterData());
-			return capsule;
-		}
-	}
-	
-	@Override
-	public boolean isPxCreated() {
-		return this.capsule != null;
-	}
-	
-	@Override
-	public PxShape getPhysXShape() {
-		if (this.capsule == null) {
-			this.capsule = CapsuleCollider.create(this.getMaterial(), this.getGameObject(), this.radius, this.height);
-		}
-		return this.capsule;
-	}
-
-	@Override
-	public void pxDestroy() {
-		if (this.capsule != null) {
-			this.capsule.release();
-			this.capsule = null;
+			this.shape = capsule;
 		}
 	}
 

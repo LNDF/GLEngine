@@ -224,11 +224,7 @@ public class GameObjectPhysXManager implements EngineResource {
 		if (scaleHasChanged) {
 			this.lastScale = js;
 			for (Collider shape : this.shapes) {
-				if (shape.getShouldScale()) {
-					this.rigid.detachShape(shape.getPhysXShape());
-					shape.pxDestroy();
-					this.rigid.attachShape(shape.getPhysXShape());
-				}
+				shape.recreate();
 			}
 		}
 	}

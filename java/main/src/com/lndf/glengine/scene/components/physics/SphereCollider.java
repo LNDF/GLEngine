@@ -12,7 +12,6 @@ import physx.physics.PxShape;
 
 public class SphereCollider extends Collider {
 	
-	private PxShape sphere;
 	private float radius;
 	
 	public SphereCollider(PhysicalMaterial material, float radius) {
@@ -24,9 +23,12 @@ public class SphereCollider extends Collider {
 		this(material, 0.5f);
 	}
 	
-	private static PxShape create(PhysicalMaterial material, GameObject obj, float radius) {
+	@Override
+	protected void createShape() {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
-			float r = radius;
+			float r = this.radius;
+			GameObject obj = this.getGameObject();
+			PhysicalMaterial material = this.material;
 			if (obj != null) {
 				Vector3f scale = obj.getTransform().getWorldScale();
 				r *= (float) Math.max(scale.x, Math.max(scale.y, scale.z));
@@ -34,28 +36,7 @@ public class SphereCollider extends Collider {
 			PxSphereGeometry sphereGeom = PxSphereGeometry.createAt(mem, MemoryStack::nmalloc, r);
 			PxShape sphere = PhysXManager.getPhysics().createShape(sphereGeom, material.getPxMaterial(), true);
 			sphere.setSimulationFilterData(PhysXManager.getDefaultFilterData());
-			return sphere;
-		}
-	}
-	
-	@Override
-	public boolean isPxCreated() {
-		return this.sphere != null;
-	}
-	
-	@Override
-	public PxShape getPhysXShape() {
-		if (this.sphere == null) {
-			this.sphere = SphereCollider.create(this.getMaterial(), this.getGameObject(), this.radius);
-		}
-		return this.sphere;
-	}
-
-	@Override
-	public void pxDestroy() {
-		if (this.sphere != null) {
-			this.sphere.release();
-			this.sphere = null;
+			this.shape = sphere;
 		}
 	}
 
