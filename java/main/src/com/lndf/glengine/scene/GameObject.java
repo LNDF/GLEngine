@@ -145,8 +145,8 @@ public class GameObject {
 			Scene scene = this.getScene();
 			if (this.physx.hasCustomRigid()) {
 				child.physx.notifyChildrenRigidChange(this);
-			} else if (this.physx.getParentObjectOwner() != null) {
-				child.physx.notifyChildrenRigidChange(this.physx.getParentObjectOwner());
+			} else if (this.physx.getParentRigidOwner() != null) {
+				child.physx.notifyChildrenRigidChange(this.physx.getParentRigidOwner());
 			}
 			if (scene != null) scene.addObject(child, false);
 			this.children.add(child);
@@ -160,7 +160,7 @@ public class GameObject {
 			this.children.remove(child);
 			child.setParent(null);
 			if (scene != null) scene.removeObject(child);
-			if (this.physx.hasCustomRigid() || this.physx.getParentObjectOwner() != null) {
+			if (this.physx.hasCustomRigid() || this.physx.getParentRigidOwner() != null) {
 				child.physx.notifyChildrenRigidChange(null);
 			}
 		}

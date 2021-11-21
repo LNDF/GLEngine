@@ -47,6 +47,8 @@ public class Main {
 					s.y++;
 					s.z++;
 					cube.getTransform().setScale(s);
+//					child.addComponent(childRigid);
+//					child.removeCompopnent(DynamicRigidBody.class);
 				}
 			}
 			
@@ -54,14 +56,14 @@ public class Main {
 		obj.addComponent(dirLight);
 		obj.addComponent(cam);
 		child.addComponent(childBox);
-		//child.addComponent(childRigid);
+//		child.addComponent(childRigid);
 		cube.addChild(child);
 		cube.addComponent(cubeRigid);
 		cube.addComponent(boxColl);
 		cube2.addComponent(boxColl2);
 		child.getTransform().setPosition(new Vector3f(0, 2, 0));
-		cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
-		cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
+//		cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
+//		cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
 		cube2.getTransform().setScale(new Vector3f(100, 1, 100));
 		cube.getTransform().setPosition(new Vector3f(0, 3, -8));
 		cube2.getTransform().setPosition(new Vector3f(0, -1, -8));

@@ -36,16 +36,16 @@ public class GameObjectPhysXManager implements EngineResource {
 	public GameObjectPhysXManager(GameObject object) {
 		Engine.addEngineResource(this);
 		this.object = object;
-		GameObject pOwner = this.getParentRigidOwner();
+		GameObject pOwner = this.getParentCustomRigidObject();
 		if (pOwner != null) {
 			PxRigidActor oldRigid = this.rigid;
 			this.parentRigidOwner = pOwner;
-			this.swapRigidBody(pOwner.getPhysx().getPxRigid());
+			this.swapRigidBody(pOwner.getPhysx().getPxRigid(), false);
 			if (oldRigid != null) oldRigid.release();
 		}
 	}
 	
-	private GameObject getParentRigidOwner() {
+	private GameObject getParentCustomRigidObject() {
 		GameObject parent = this.object.getParent();
 		if (parent != null) {
 			GameObjectPhysXManager pm = parent.getPhysx();
@@ -75,21 +75,41 @@ public class GameObjectPhysXManager implements EngineResource {
 		PxRigidActor oldRigid = this.rigid;
 		boolean oldWasParent = this.parentRigidOwner != null;
 		this.parentRigidOwner = null;
-		if (!this.customRigid && !oldWasParent) {
+		boolean wasCustomRigid = this.customRigid;
+		this.customRigid = true;
+		this.swapRigidBody(newRigid, oldWasParent);
+		if (!wasCustomRigid && !oldWasParent) {
 			if (oldRigid != null) oldRigid.release();
 			this.customRigid = true;
 		}
-		this.swapRigidBody(newRigid);
+		if (oldWasParent) {
+			this.unsetShapeParentPose();
+		}
 	}
 	
 	public void unsetRigidBody() {
-		if (!this.customRigid) return;
+		if (!this.customRigid || this.parentRigidOwner != null) return;
 		this.customRigid = false;
 		if (this.shapes.size() > 0) {
-			this.setDefaultRigidBody();
+			GameObject prOwner = this.getParentCustomRigidObject();
+			if (prOwner != null) {
+				this.parentRigidOwner = prOwner;
+				this.swapRigidBody(prOwner.getPhysx().getPxRigid(), false);
+			} else {
+				this.setDefaultRigidBody(false);
+			}
 		} else {
+			this.updateChildrenRigids();
 			this.rigid = null;
 		}
+	}
+	
+	private void unsetShapeParentPose() {
+		for (Collider shape : this.shapes) {
+			shape.unsetParentPose();
+		}
+		this.lastPos = null;
+		this.lastRot = null;
 	}
 	
 	public void notifyChildrenRigidChange(GameObject parent) {
@@ -98,31 +118,39 @@ public class GameObjectPhysXManager implements EngineResource {
 			PxRigidActor oldRigid = this.rigid;
 			boolean oldWasParent = this.parentRigidOwner != null;
 			this.parentRigidOwner = parent;
-			this.swapRigidBody(parent.getPhysx().getPxRigid());
+			this.swapRigidBody(parent.getPhysx().getPxRigid(), oldWasParent);
 			if (oldRigid != null && !oldWasParent) oldRigid.release();
+			this.lastPos = null;
+			this.lastRot = null;
 		} else {
-			this.customRigid = true;
 			this.parentRigidOwner = null;
-			this.unsetRigidBody();
+			this.customRigid = false;
+			this.unsetShapeParentPose();
+			if (this.shapes.size() > 0) {
+				this.setDefaultRigidBody(true);
+			} else {
+				this.updateChildrenRigids();
+				this.rigid = null;
+			}
 		}
 		for (GameObject child : this.object.getChildren()) {
 			child.getPhysx().notifyChildrenRigidChange(parent);
 		}
 	}
 	
-	private void setDefaultRigidBody() {
+	private void setDefaultRigidBody(boolean oldWasParent) {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
 			PxRigidStatic rigid = PhysXManager.getPhysics().createRigidStatic(pose);
-			this.swapRigidBody(rigid);
+			this.swapRigidBody(rigid, oldWasParent);
 		}
 	}
 	
-	private void swapRigidBody(PxRigidActor newRigid) {
+	private void swapRigidBody(PxRigidActor newRigid, boolean oldWasParent) {
 		if (newRigid == null) return;
 		Scene scene = object.getScene();
 		if (this.rigid != null) {
-			if (scene != null && this.parentRigidOwner == null) {
+			if (scene != null && !oldWasParent) {
 				scene.getPhysXScene().removeActor(this.rigid);
 			}
 			for (Collider shape : this.shapes) {
@@ -152,7 +180,7 @@ public class GameObjectPhysXManager implements EngineResource {
 		this.shapes.add(shape);
 		if (this.rigid == null) {
 			customRigid = false;
-			this.setDefaultRigidBody();
+			this.setDefaultRigidBody(false);
 		}
 		this.rigid.attachShape(shape.getPhysXShape());
 	}
@@ -164,11 +192,11 @@ public class GameObjectPhysXManager implements EngineResource {
 			if (this.shapes.size() == 0 && !this.customRigid && this.parentRigidOwner == null) {
 				this.rigid.release();
 				this.rigid = null;
+				this.updateChildrenRigids();
 			}
 		}
 	}
 	
-	//TODO: reimplement
 	public void pullPoseFromRigidBody() {
 		if (this.rigid == null || this.parentRigidOwner != null) return;
 		PxTransform pose = this.rigid.getGlobalPose();
@@ -184,10 +212,14 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	//TODO: reimplement
 	public void pushPoseToRigidBody() {
-		if (this.rigid == null || this.parentRigidOwner != null) return;
+		if (this.rigid == null) return;
 		Quaternionf jq = this.object.getTransform().getWorldRotation();
 		Vector3f jp = this.object.getTransform().getWorldPosition();
 		Vector3f js = this.object.getTransform().getWorldScale();
+		if (this.parentRigidOwner != null) {
+			jq = this.parentRigidOwner.getTransform().getRelativeRotation(jq);
+			jp = this.parentRigidOwner.getTransform().getRelativePosition(jp).mul(js);
+		}
 		boolean posHasChanged = true;
 		boolean rotHasChanged = true;
 		boolean scaleHasChanged = true;
@@ -208,13 +240,20 @@ public class GameObjectPhysXManager implements EngineResource {
 							  Math.abs(js.z - this.lastScale.z) > this.poseThreshold;
 		}
 		if (posHasChanged || rotHasChanged) {
-			this.lastPos = jp;
-			this.lastRot = jq;
-			try (MemoryStack mem = MemoryStack.stackPush()) {
-				PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
-				pose.setP(PxVec3.createAt(mem, MemoryStack::nmalloc, jp.x, jp.y, jp.z));
-				pose.setQ(PxQuat.createAt(mem, MemoryStack::nmalloc, jq.x, jq.y, jq.z, jq.w));
-				this.rigid.setGlobalPose(pose);
+			if (this.parentRigidOwner != null) {
+				for (Collider shape : this.shapes) {
+					shape.setParentPose(jp, jq);
+
+				}
+			} else {
+				this.lastPos = jp;
+				this.lastRot = jq;
+				try (MemoryStack mem = MemoryStack.stackPush()) {
+					PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
+					pose.setP(PxVec3.createAt(mem, MemoryStack::nmalloc, jp.x, jp.y, jp.z));
+					pose.setQ(PxQuat.createAt(mem, MemoryStack::nmalloc, jq.x, jq.y, jq.z, jq.w));
+					this.rigid.setGlobalPose(pose);
+				}
 			}
 		}
 		if (scaleHasChanged) {
@@ -241,7 +280,7 @@ public class GameObjectPhysXManager implements EngineResource {
 		return this.customRigid;
 	}
 	
-	public GameObject getParentObjectOwner() {
+	public GameObject getParentRigidOwner() {
 		return this.parentRigidOwner;
 	}
 	

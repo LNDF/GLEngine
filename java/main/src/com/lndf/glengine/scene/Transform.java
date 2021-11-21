@@ -15,6 +15,8 @@ public class Transform {
 	private Matrix4f cacheLocalMatrix = null;
 	private Matrix4f cacheParentMatrix = null;
 	private Matrix4f cacheParentMatrixInv = null;
+	private Matrix4f cacheWorldMatrix = null;
+	private Matrix4f cacheWorldMatrixInv = null;
 	private Vector3f cacheWorldPosition = null;
 	private Vector3f cacheWorldScale = null;
 	private Quaternionf cacheWorldRotation = null;
@@ -36,12 +38,16 @@ public class Transform {
 	public void clearParentCache() {
 		if (this.cacheParentMatrix != null ||
 			this.cacheParentMatrixInv != null ||
+			this.cacheWorldMatrix != null ||
+			this.cacheWorldMatrixInv != null ||
 			this.cacheWorldPosition != null ||
 			this.cacheWorldScale != null ||
 			this.cacheWorldRotation != null) {
 			
 			this.cacheParentMatrix = null;
 			this.cacheParentMatrixInv = null;
+			this.cacheWorldMatrix = null;
+			this.cacheWorldMatrixInv = null;
 			this.cacheWorldPosition = null;
 			this.cacheWorldScale = null;
 			this.cacheWorldRotation = null;
@@ -53,11 +59,15 @@ public class Transform {
 	
 	public void clearLocalCache() {
 		if (this.cacheLocalMatrix != null ||
+				this.cacheWorldMatrix != null ||
+				this.cacheWorldMatrixInv != null ||
 			this.cacheWorldPosition != null ||
 			this.cacheWorldScale != null ||
 			this.cacheWorldRotation != null) {
 			
 			this.cacheLocalMatrix = null;
+			this.cacheWorldMatrix = null;
+			this.cacheWorldMatrixInv = null;
 			this.cacheWorldPosition = null;
 			this.cacheWorldScale = null;
 			this.cacheWorldRotation = null;
@@ -102,9 +112,21 @@ public class Transform {
 	}
 	
 	public Matrix4f getWorldMatrix() {
+		if (this.cacheWorldMatrix != null) {
+			return new Matrix4f(this.cacheWorldMatrix);
+		}
 		Matrix4f parent = this.getParentMatrix();
 		Matrix4f local = this.getLocalMatrix();
 		return parent.mul(local);
+	}
+	
+	public Matrix4f getInverseWorldMatrix() {
+		if (this.cacheWorldMatrixInv != null) {
+			return new Matrix4f(this.cacheWorldMatrixInv);
+		}
+		Matrix4f inv = this.getWorldMatrix();
+		this.cacheWorldMatrixInv = inv.invert();
+		return new Matrix4f(inv);
 	}
 	
 	public Vector3f getPosition() {
@@ -170,6 +192,20 @@ public class Transform {
 	
 	public void setWorldRotation(Quaternionf rotation) {
 		this.setRotation(this.getParentMatrix().getUnnormalizedRotation(tmpQ).invert().mul(rotation));
+	}
+	
+	public Vector3f getRelativePosition(Vector3f position) {
+		Vector3f relPos = new Vector3f(position);
+		return this.getInverseWorldMatrix().transformPosition(relPos);
+	}
+	
+	public Vector3f getRelativeScale(Vector3f scale) {
+		Vector3f relScale = new Vector3f(scale);
+		return relScale.div(this.getWorldMatrix().getScale(tmpV));
+	}
+	
+	public Quaternionf getRelativeRotation(Quaternionf rotation) {
+		return new Quaternionf(this.getWorldMatrix().getUnnormalizedRotation(tmpQ).invert().mul(rotation));
 	}
 	
 	public Vector3f getFront() {
