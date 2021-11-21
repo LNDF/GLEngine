@@ -57,10 +57,14 @@ public class Scene {
 	}
 	
 	public void addObject(GameObject object) {
+		this.addObject(object, true);
+	}
+	
+	public void addObject(GameObject object, boolean isRoot) {
 		if (object.getParent() != null) return;
 		Scene old = object.getScene();
 		if (old != null) old.removeObject(object);
-		this.rootGameObjects.add(object);
+		if (isRoot) this.rootGameObjects.add(object);
 		this._addObject(object);
 	}
 	

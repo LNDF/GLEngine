@@ -36,10 +36,6 @@ public class GameObjectPhysXManager implements EngineResource {
 	public GameObjectPhysXManager(GameObject object) {
 		Engine.addEngineResource(this);
 		this.object = object;
-		this.setParentRigid();
-	}
-	
-	private void setParentRigid() {
 		GameObject pOwner = this.getParentRigidOwner();
 		if (pOwner != null) {
 			PxRigidActor oldRigid = this.rigid;
@@ -79,24 +75,24 @@ public class GameObjectPhysXManager implements EngineResource {
 		PxRigidActor oldRigid = this.rigid;
 		boolean oldWasParent = this.parentRigidOwner != null;
 		this.parentRigidOwner = null;
-		this.swapRigidBody(newRigid);
 		if (!this.customRigid && !oldWasParent) {
 			if (oldRigid != null) oldRigid.release();
 			this.customRigid = true;
 		}
+		this.swapRigidBody(newRigid);
 	}
 	
 	public void unsetRigidBody() {
 		if (!this.customRigid) return;
+		this.customRigid = false;
 		if (this.shapes.size() > 0) {
 			this.setDefaultRigidBody();
 		} else {
 			this.rigid = null;
 		}
-		this.customRigid = false;
 	}
 	
-	private void notifyChildrenRigidChange(GameObject parent) {
+	public void notifyChildrenRigidChange(GameObject parent) {
 		if (this.customRigid || this.shapes == null) return;
 		if (parent != null) {
 			PxRigidActor oldRigid = this.rigid;
@@ -174,7 +170,7 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	//TODO: reimplement
 	public void pullPoseFromRigidBody() {
-		if (this.rigid == null) return;
+		if (this.rigid == null || this.parentRigidOwner != null) return;
 		PxTransform pose = this.rigid.getGlobalPose();
 		PxVec3 p = pose.getP();
 		PxQuat q = pose.getQ();
@@ -188,7 +184,7 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	//TODO: reimplement
 	public void pushPoseToRigidBody() {
-		if (this.rigid == null) return;
+		if (this.rigid == null || this.parentRigidOwner != null) return;
 		Quaternionf jq = this.object.getTransform().getWorldRotation();
 		Vector3f jp = this.object.getTransform().getWorldPosition();
 		Vector3f js = this.object.getTransform().getWorldScale();
@@ -239,6 +235,14 @@ public class GameObjectPhysXManager implements EngineResource {
 
 	public PxRigidActor getPxRigid() {
 		return this.rigid;
+	}
+	
+	public boolean hasCustomRigid() {
+		return this.customRigid;
+	}
+	
+	public GameObject getParentObjectOwner() {
+		return this.parentRigidOwner;
 	}
 	
 	@Override

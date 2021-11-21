@@ -143,7 +143,12 @@ public class GameObject {
 	public void addChild(GameObject child) {
 		if (child.getParent() == null) {
 			Scene scene = this.getScene();
-			if (scene != null) scene.addObject(child);
+			if (this.physx.hasCustomRigid()) {
+				child.physx.notifyChildrenRigidChange(this);
+			} else if (this.physx.getParentObjectOwner() != null) {
+				child.physx.notifyChildrenRigidChange(this.physx.getParentObjectOwner());
+			}
+			if (scene != null) scene.addObject(child, false);
 			this.children.add(child);
 			child.setParent(this);
 		}
@@ -155,6 +160,9 @@ public class GameObject {
 			this.children.remove(child);
 			child.setParent(null);
 			if (scene != null) scene.removeObject(child);
+			if (this.physx.hasCustomRigid() || this.physx.getParentObjectOwner() != null) {
+				child.physx.notifyChildrenRigidChange(null);
+			}
 		}
 	}
 

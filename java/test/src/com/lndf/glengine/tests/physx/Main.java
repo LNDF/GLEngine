@@ -54,7 +54,7 @@ public class Main {
 		obj.addComponent(dirLight);
 		obj.addComponent(cam);
 		child.addComponent(childBox);
-		child.addComponent(childRigid);
+		//child.addComponent(childRigid);
 		cube.addChild(child);
 		cube.addComponent(cubeRigid);
 		cube.addComponent(boxColl);
