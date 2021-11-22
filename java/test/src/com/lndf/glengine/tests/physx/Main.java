@@ -47,7 +47,7 @@ public class Main {
 					s.y++;
 					s.z++;
 					cube.getTransform().setScale(s);
-//					child.addComponent(childRigid);
+//					child.addmponent(childRigid);
 //					child.removeCompopnent(DynamicRigidBody.class);
 				}
 			}

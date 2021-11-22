@@ -8,13 +8,13 @@ import org.lwjgl.system.MemoryStack;
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.physics.PhysicalMaterial;
+import com.lndf.glengine.physics.RigidBody;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
 
 import physx.common.PxQuat;
 import physx.common.PxTransform;
 import physx.common.PxVec3;
-import physx.physics.PxRigidActor;
 import physx.physics.PxShape;
 
 public abstract class Collider extends Component implements EngineResource {
@@ -59,15 +59,15 @@ public abstract class Collider extends Component implements EngineResource {
 	public void recreate() {
 		if (this.shape == null) return;
 		GameObject obj = this.getGameObject();
-		PxRigidActor rigid = null;
+		RigidBody rigid = null;
 		if (obj != null) {
-			rigid = obj.getPhysx().getPxRigid();
-			rigid.detachShape(this.shape);
+			rigid = obj.getPhysx().getRigidBody();
+			rigid.removeShape(this);
 		}
 		this.pxDestroy();
 		this.createShape();
 		if (obj != null) {
-			rigid.attachShape(this.shape);
+			rigid.addShape(this);
 		}
 	}
 	

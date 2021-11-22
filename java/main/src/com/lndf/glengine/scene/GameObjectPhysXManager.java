@@ -4,19 +4,11 @@ import java.util.HashSet;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.lwjgl.system.MemoryStack;
-
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.EngineResource;
-import com.lndf.glengine.engine.PhysXManager;
+import com.lndf.glengine.physics.RigidBody;
+import com.lndf.glengine.physics.StaticRigidBody;
 import com.lndf.glengine.scene.components.physics.Collider;
-
-import physx.common.PxIDENTITYEnum;
-import physx.common.PxQuat;
-import physx.common.PxTransform;
-import physx.common.PxVec3;
-import physx.physics.PxRigidActor;
-import physx.physics.PxRigidStatic;
 
 public class GameObjectPhysXManager implements EngineResource {
 	
@@ -29,7 +21,8 @@ public class GameObjectPhysXManager implements EngineResource {
 	private Vector3f lastScale = null;
 	
 	private HashSet<Collider> shapes = new HashSet<Collider>();
-	private PxRigidActor rigid;
+	//private PxRigidActor rigid;
+	private RigidBody rigid;
 	private GameObject parentRigidOwner = null;
 	private boolean customRigid = false;
 	
@@ -38,10 +31,8 @@ public class GameObjectPhysXManager implements EngineResource {
 		this.object = object;
 		GameObject pOwner = this.getParentCustomRigidObject();
 		if (pOwner != null) {
-			PxRigidActor oldRigid = this.rigid;
 			this.parentRigidOwner = pOwner;
-			this.swapRigidBody(pOwner.getPhysx().getPxRigid(), false);
-			if (oldRigid != null) oldRigid.release();
+			this.swapRigidBody(pOwner.getPhysx().getRigidBody(), false);
 		}
 	}
 	
@@ -71,15 +62,15 @@ public class GameObjectPhysXManager implements EngineResource {
 		}
 	}
 	
-	public void setRigidBody(PxRigidActor newRigid) {
-		PxRigidActor oldRigid = this.rigid;
+	public void setRigidBody(RigidBody newRigid) {
+		RigidBody oldRigid = this.rigid;
 		boolean oldWasParent = this.parentRigidOwner != null;
 		this.parentRigidOwner = null;
 		boolean wasCustomRigid = this.customRigid;
 		this.customRigid = true;
 		this.swapRigidBody(newRigid, oldWasParent);
 		if (!wasCustomRigid && !oldWasParent) {
-			if (oldRigid != null) oldRigid.release();
+			if (oldRigid != null) oldRigid.pxRelease();
 			this.customRigid = true;
 		}
 		if (oldWasParent) {
@@ -94,7 +85,7 @@ public class GameObjectPhysXManager implements EngineResource {
 			GameObject prOwner = this.getParentCustomRigidObject();
 			if (prOwner != null) {
 				this.parentRigidOwner = prOwner;
-				this.swapRigidBody(prOwner.getPhysx().getPxRigid(), false);
+				this.swapRigidBody(prOwner.getPhysx().getRigidBody(), false);
 			} else {
 				this.setDefaultRigidBody(false);
 			}
@@ -115,11 +106,11 @@ public class GameObjectPhysXManager implements EngineResource {
 	public void notifyChildrenRigidChange(GameObject parent) {
 		if (this.customRigid || this.shapes == null) return;
 		if (parent != null) {
-			PxRigidActor oldRigid = this.rigid;
+			RigidBody oldRigid = this.rigid;
 			boolean oldWasParent = this.parentRigidOwner != null;
 			this.parentRigidOwner = parent;
-			this.swapRigidBody(parent.getPhysx().getPxRigid(), oldWasParent);
-			if (oldRigid != null && !oldWasParent) oldRigid.release();
+			this.swapRigidBody(parent.getPhysx().getRigidBody(), oldWasParent);
+			if (oldRigid != null && !oldWasParent) oldRigid.pxRelease();
 			this.lastPos = null;
 			this.lastRot = null;
 		} else {
@@ -139,29 +130,22 @@ public class GameObjectPhysXManager implements EngineResource {
 	}
 	
 	private void setDefaultRigidBody(boolean oldWasParent) {
-		try (MemoryStack mem = MemoryStack.stackPush()) {
-			PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
-			PxRigidStatic rigid = PhysXManager.getPhysics().createRigidStatic(pose);
-			this.swapRigidBody(rigid, oldWasParent);
-		}
+		StaticRigidBody staticBody = new StaticRigidBody();
+		this.swapRigidBody(staticBody, oldWasParent);
 	}
 	
-	private void swapRigidBody(PxRigidActor newRigid, boolean oldWasParent) {
+	private void swapRigidBody(RigidBody newRigid, boolean oldWasParent) {
 		if (newRigid == null) return;
 		Scene scene = object.getScene();
 		if (this.rigid != null) {
 			if (scene != null && !oldWasParent) {
-				scene.getPhysXScene().removeActor(this.rigid);
+				scene.getPhysXScene().removeActor(this.rigid.getPxRigidActor());
 			}
-			for (Collider shape : this.shapes) {
-				this.rigid.detachShape(shape.getPhysXShape());
-			}
+			this.rigid.removeShapes(this.shapes);
 		}
-		for (Collider shape : this.shapes) {
-			newRigid.attachShape(shape.getPhysXShape());
-		}
+		newRigid.addShapes(this.shapes);
 		this.rigid = newRigid;
-		if (scene != null && this.parentRigidOwner == null) scene.getPhysXScene().addActor(newRigid);
+		if (scene != null && this.parentRigidOwner == null) scene.getPhysXScene().addActor(newRigid.getPxRigidActor());
 		this.updateChildrenRigids();
 	}
 	
@@ -169,10 +153,10 @@ public class GameObjectPhysXManager implements EngineResource {
 		if (this.rigid == null || this.parentRigidOwner != null) return;
 		Scene scene = this.object.getScene();
 		if (scene != null) {
-			scene.getPhysXScene().removeActor(rigid);
+			scene.getPhysXScene().removeActor(rigid.getPxRigidActor());
 		}
 		if (newScene != null) {
-			newScene.getPhysXScene().addActor(rigid);
+			newScene.getPhysXScene().addActor(rigid.getPxRigidActor());
 		}
 	}
 	
@@ -182,15 +166,15 @@ public class GameObjectPhysXManager implements EngineResource {
 			customRigid = false;
 			this.setDefaultRigidBody(false);
 		}
-		this.rigid.attachShape(shape.getPhysXShape());
+		this.rigid.addShape(shape);
 	}
 	
 	public void removeShape(Collider shape) {
 		if (this.shapes.contains(shape)) {
 			this.shapes.remove(shape);
-			this.rigid.detachShape(shape.getPhysXShape());
+			this.rigid.removeShape(shape);
 			if (this.shapes.size() == 0 && !this.customRigid && this.parentRigidOwner == null) {
-				this.rigid.release();
+				this.rigid.pxRelease();
 				this.rigid = null;
 				this.updateChildrenRigids();
 			}
@@ -199,11 +183,8 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	public void pullPoseFromRigidBody() {
 		if (this.rigid == null || this.parentRigidOwner != null) return;
-		PxTransform pose = this.rigid.getGlobalPose();
-		PxVec3 p = pose.getP();
-		PxQuat q = pose.getQ();
-		Vector3f jp = new Vector3f(p.getX(), p.getY(), p.getZ());
-		Quaternionf jq = new Quaternionf(q.getX(), q.getY(), q.getZ(), q.getW());
+		Vector3f jp = this.rigid.getPxPosition();
+		Quaternionf jq = this.rigid.getPxRotation();
 		this.object.getTransform().setWorldPosition(jp);
 		this.object.getTransform().setWorldRotation(jq);
 		this.lastPos = jp;
@@ -243,17 +224,11 @@ public class GameObjectPhysXManager implements EngineResource {
 			if (this.parentRigidOwner != null) {
 				for (Collider shape : this.shapes) {
 					shape.setParentPose(jp, jq);
-
 				}
 			} else {
 				this.lastPos = jp;
 				this.lastRot = jq;
-				try (MemoryStack mem = MemoryStack.stackPush()) {
-					PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
-					pose.setP(PxVec3.createAt(mem, MemoryStack::nmalloc, jp.x, jp.y, jp.z));
-					pose.setQ(PxQuat.createAt(mem, MemoryStack::nmalloc, jq.x, jq.y, jq.z, jq.w));
-					this.rigid.setGlobalPose(pose);
-				}
+				this.rigid.setPxPose(jp, jq);
 			}
 		}
 		if (scaleHasChanged) {
@@ -272,7 +247,7 @@ public class GameObjectPhysXManager implements EngineResource {
 		this.poseThreshold = poseThreshold;
 	}
 
-	public PxRigidActor getPxRigid() {
+	public RigidBody getRigidBody() {
 		return this.rigid;
 	}
 	
@@ -287,11 +262,9 @@ public class GameObjectPhysXManager implements EngineResource {
 	@Override
 	public void destroy() {
 		if (this.shapes == null) return;
-		for (Collider shape : this.shapes) {
-			this.rigid.detachShape(shape.getPhysXShape());
-		}
+		if (this.rigid != null) this.rigid.removeShapes(this.shapes);
 		if (this.rigid != null && this.parentRigidOwner == null && !this.customRigid) {
-			this.rigid.release();
+			this.rigid.pxRelease();
 		}
 		this.parentRigidOwner = null;
 		this.rigid = null;
