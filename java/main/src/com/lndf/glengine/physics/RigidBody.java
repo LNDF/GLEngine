@@ -18,6 +18,7 @@ public interface RigidBody {
 	
 	public PxRigidActor getPxRigidActor();
 	public void pxRelease();
+	public void shapeUpdated();
 	
 	public default Quaternionf getPxRotation() {
 		PxRigidActor rigid = this.getPxRigidActor();
@@ -36,23 +37,33 @@ public interface RigidBody {
 	public default void addShapes(Collection<Collider> shapes) {
 		PxRigidActor rigid = this.getPxRigidActor();
 		for (Collider shape : shapes) {
+			if (shape.getRigid() != null) {
+				throw new RuntimeException("Collider cannot be attached to more than one rigidbody");
+			}
 			rigid.attachShape(shape.getPhysXShape());
+			shape.setRigid(this);
 		}
 	}
 	public default void removeShapes(Collection<Collider> shapes) {
 		PxRigidActor rigid = this.getPxRigidActor();
 		for (Collider shape : shapes) {
 			rigid.detachShape(shape.getPhysXShape());
+			shape.setRigid(null);
 		}
 	}
 	
 	public default void addShape(Collider collider) {
 		PxRigidActor rigid = this.getPxRigidActor();
+		if (collider.getRigid() != null) {
+			throw new RuntimeException("Collider cannot be attached to more than one rigidbody");
+		}
 		rigid.attachShape(collider.getPhysXShape());
+		collider.setRigid(this);
 	}
 	public default void removeShape(Collider collider) {
 		PxRigidActor rigid = this.getPxRigidActor();
-		rigid.attachShape(collider.getPhysXShape());
+		rigid.detachShape(collider.getPhysXShape());
+		collider.setRigid(null);
 	}
 	
 	public default void setPxPose(Vector3f jp, Quaternionf jq) {

@@ -29,9 +29,9 @@ public class Main {
 		Cube cube2 = new Cube(mat);
 		Cube child = new Cube(mat);
 		PhysicalMaterial pMat = new PhysicalMaterial(0.5f, 0.5f, 0.5f);
-		BoxCollider boxColl= new BoxCollider(pMat);
+		SphereCollider boxColl= new SphereCollider(pMat);
 		BoxCollider boxColl2= new BoxCollider(pMat);
-		BoxCollider childBox = new BoxCollider(pMat);
+		SphereCollider childBox = new SphereCollider(pMat);
 		DynamicRigidBody cubeRigid = new DynamicRigidBody();
 		DynamicRigidBody childRigid = new DynamicRigidBody();
 		FPCamera cam = new FPCamera((float) Math.PI / 4, 100);
@@ -46,13 +46,18 @@ public class Main {
 					s.x++;
 					s.y++;
 					s.z++;
-					cube.getTransform().setScale(s);
-//					child.addmponent(childRigid);
+//					cubeRigid.addForceImpulse(new Vector3f(0, 3, 0));
+//					cube.getTransform().setScale(s);
+//					cubeRigid.clearAllForces();
+					child.addComponent(childRigid);
 //					child.removeCompopnent(DynamicRigidBody.class);
+					//cubeRigid.computeCMassAndInertia();
+					
 				}
 			}
-			
 		});
+//		childRigid.setAutoComputeCMassAndInertia(false);
+//		cubeRigid.setAutoComputeCMassAndInertia(false);
 		obj.addComponent(dirLight);
 		obj.addComponent(cam);
 		child.addComponent(childBox);
@@ -61,9 +66,9 @@ public class Main {
 		cube.addComponent(cubeRigid);
 		cube.addComponent(boxColl);
 		cube2.addComponent(boxColl2);
-		child.getTransform().setPosition(new Vector3f(0, 2, 0));
-//		cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
-//		cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
+		child.getTransform().setPosition(new Vector3f(1, 5, -1));
+		cube2.getTransform().rotateArround(new Vector3f(0, 0, 1), 0.1f);
+		cube2.getTransform().rotateArround(new Vector3f(1, 0, 0), 0.2f);
 		cube2.getTransform().setScale(new Vector3f(100, 1, 100));
 		cube.getTransform().setPosition(new Vector3f(0, 3, -8));
 		cube2.getTransform().setPosition(new Vector3f(0, -1, -8));

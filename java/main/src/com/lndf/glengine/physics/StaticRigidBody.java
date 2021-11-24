@@ -31,6 +31,11 @@ public class StaticRigidBody implements RigidBody {
 			this.rigid = null;
 		}
 	}
+
+	@Override
+	public void shapeUpdated() {
+		
+	}
 	
 	
 	

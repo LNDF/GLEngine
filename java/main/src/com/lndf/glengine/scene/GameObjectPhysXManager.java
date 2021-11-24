@@ -161,11 +161,11 @@ public class GameObjectPhysXManager implements EngineResource {
 	}
 	
 	public void addShape(Collider shape) {
-		this.shapes.add(shape);
 		if (this.rigid == null) {
 			customRigid = false;
 			this.setDefaultRigidBody(false);
 		}
+		this.shapes.add(shape);
 		this.rigid.addShape(shape);
 	}
 	
@@ -221,13 +221,13 @@ public class GameObjectPhysXManager implements EngineResource {
 							  Math.abs(js.z - this.lastScale.z) > this.poseThreshold;
 		}
 		if (posHasChanged || rotHasChanged) {
+			this.lastPos = jp;
+			this.lastRot = jq;
 			if (this.parentRigidOwner != null) {
 				for (Collider shape : this.shapes) {
 					shape.setParentPose(jp, jq);
 				}
 			} else {
-				this.lastPos = jp;
-				this.lastRot = jq;
 				this.rigid.setPxPose(jp, jq);
 			}
 		}

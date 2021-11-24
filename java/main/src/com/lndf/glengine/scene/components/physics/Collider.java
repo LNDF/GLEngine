@@ -25,6 +25,8 @@ public abstract class Collider extends Component implements EngineResource {
 	private Vector3f parentPos;
 	private Quaternionf parentRot;
 	
+	private RigidBody rigid;
+	
 	private Vector3f localPos = new Vector3f(0, 0, 0);
 	private Quaternionf localRot = new Quaternionf(0, 0, 0, 1);
 	
@@ -66,6 +68,7 @@ public abstract class Collider extends Component implements EngineResource {
 		}
 		this.pxDestroy();
 		this.createShape();
+		this.repose();
 		if (obj != null) {
 			rigid.addShape(this);
 		}
@@ -89,6 +92,7 @@ public abstract class Collider extends Component implements EngineResource {
 			PxTransform t = PxTransform.createAt(mem, MemoryStack::nmalloc, v, q);
 			this.shape.setLocalPose(t);
 		}
+		if (this.rigid != null) this.rigid.shapeUpdated();
 	}
 	
 	public void setParentPose(Vector3f pos, Quaternionf rot) {
@@ -102,6 +106,7 @@ public abstract class Collider extends Component implements EngineResource {
 	public void unsetParentPose() {
 		this.parentPos = null;
 		this.parentRot = null;
+		this.repose();
 	}
 	
 	public void setCenterAndRotation(Vector3f center, Quaternionf rotation) {
@@ -120,6 +125,14 @@ public abstract class Collider extends Component implements EngineResource {
 		this.repose();
 	}
 	
+	public RigidBody getRigid() {
+		return rigid;
+	}
+
+	public void setRigid(RigidBody rigid) {
+		this.rigid = rigid;
+	}
+
 	@Override
 	public void addToGameObject() {
 		this.getGameObject().getPhysx().addShape(this);
