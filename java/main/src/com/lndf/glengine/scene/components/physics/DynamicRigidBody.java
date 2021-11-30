@@ -3,7 +3,6 @@ package com.lndf.glengine.scene.components.physics;
 import java.util.Collection;
 
 import org.joml.Quaternionf;
-import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
@@ -23,7 +22,6 @@ import physx.physics.PxRigidActor;
 import physx.physics.PxRigidBodyFlagEnum;
 import physx.physics.PxRigidDynamic;
 import physx.physics.PxRigidDynamicLockFlagEnum;
-import physx.physics.PxRigidDynamicLockFlags;
 
 public class DynamicRigidBody extends Component implements EngineResource, RigidBody {
 	

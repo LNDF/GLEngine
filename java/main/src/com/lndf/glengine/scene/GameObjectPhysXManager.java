@@ -191,7 +191,6 @@ public class GameObjectPhysXManager implements EngineResource {
 		this.lastRot = jq;
 	}
 	
-	//TODO: reimplement
 	public void pushPoseToRigidBody() {
 		if (this.rigid == null) return;
 		Quaternionf jq = this.object.getTransform().getWorldRotation();

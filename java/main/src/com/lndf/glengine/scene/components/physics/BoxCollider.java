@@ -28,7 +28,7 @@ public class BoxCollider extends Collider {
 	}
 	
 	@Override
-	protected void createShape() {
+	protected void pxCreate() {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			float sx = this.x, sy = this.y, sz = this.z;
 			GameObject obj = this.getGameObject();

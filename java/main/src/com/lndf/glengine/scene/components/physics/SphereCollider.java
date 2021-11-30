@@ -24,7 +24,7 @@ public class SphereCollider extends Collider {
 	}
 	
 	@Override
-	protected void createShape() {
+	protected void pxCreate() {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			float r = this.radius;
 			GameObject obj = this.getGameObject();

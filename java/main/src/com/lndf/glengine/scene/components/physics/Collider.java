@@ -16,6 +16,7 @@ import physx.common.PxQuat;
 import physx.common.PxTransform;
 import physx.common.PxVec3;
 import physx.physics.PxShape;
+import physx.physics.PxShapeFlagEnum;
 
 public abstract class Collider extends Component implements EngineResource {
 	
@@ -30,10 +31,21 @@ public abstract class Collider extends Component implements EngineResource {
 	private Vector3f localPos = new Vector3f(0, 0, 0);
 	private Quaternionf localRot = new Quaternionf(0, 0, 0, 1);
 	
+	private float restOffset;
+	private float contactOffset;
+	private boolean trigger;
+	
 	protected PxShape shape;
 	protected PhysicalMaterial material;
 	
-	protected abstract void createShape();
+	protected abstract void pxCreate();
+	
+	protected void createShape() {
+		this.pxCreate();
+		this.setRestOffset(this.restOffset);
+		this.setContactOffset(this.contactOffset);
+		this.setTrigger(this.trigger);
+	}
 	
 	protected Collider(PhysicalMaterial material) {
 		Engine.addEngineResource(this);
@@ -53,6 +65,9 @@ public abstract class Collider extends Component implements EngineResource {
 	
 	protected void pxDestroy() {
 		if (this.shape != null) {
+			this.restOffset = this.getRestOffset();
+			this.contactOffset = this.getContactOffset();
+			this.trigger = this.isTrigger();
 			this.shape.release();
 			this.shape = null;
 		}
@@ -132,7 +147,52 @@ public abstract class Collider extends Component implements EngineResource {
 	public void setRigid(RigidBody rigid) {
 		this.rigid = rigid;
 	}
-
+	
+	public float getContactOffset() {
+		if (this.shape == null) return this.contactOffset;
+		return this.shape.getContactOffset();
+	}
+	
+	public void setContactOffset(float contactOffset) {
+		if (this.shape != null) {
+			this.shape.setContactOffset(contactOffset);
+		} else {
+			this.contactOffset = contactOffset;
+		}
+	}
+	
+	public float getRestOffset() {
+		if (this.shape == null) return this.restOffset;
+		return this.shape.getRestOffset();
+	}
+	
+	public void setRestOffset(float restOffset) {
+		if (this.shape != null) {
+			this.shape.setRestOffset(restOffset);
+		} else {
+			this.restOffset = restOffset;
+		}
+	}
+	
+	public boolean isTrigger() {
+		if (this.shape == null) return this.trigger;
+		return this.shape.getFlags().isSet(PxShapeFlagEnum.eTRIGGER_SHAPE);
+	}
+	
+	public void setTrigger(boolean trigger) {
+		if (this.shape != null) {
+			if (trigger) {
+				this.shape.setFlag(PxShapeFlagEnum.eSIMULATION_SHAPE, false);
+				this.shape.setFlag(PxShapeFlagEnum.eTRIGGER_SHAPE, true);
+			} else {
+				this.shape.setFlag(PxShapeFlagEnum.eTRIGGER_SHAPE, false);
+				this.shape.setFlag(PxShapeFlagEnum.eSIMULATION_SHAPE, true);
+			}
+		} else {
+			this.trigger = trigger;
+		}
+	}
+	
 	@Override
 	public void addToGameObject() {
 		this.getGameObject().getPhysx().addShape(this);

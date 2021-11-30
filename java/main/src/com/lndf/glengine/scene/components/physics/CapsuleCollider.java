@@ -26,7 +26,7 @@ public class CapsuleCollider extends Collider {
 	}
 	
 	@Override
-	protected void createShape() {
+	protected void pxCreate() {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			float r = this.radius, h = this.height;
 			GameObject obj = this.getGameObject();
