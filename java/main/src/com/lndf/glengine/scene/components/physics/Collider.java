@@ -209,7 +209,7 @@ public abstract class Collider extends Component implements EngineResource {
 	}
 	
 	@Override
-	protected void finalize() throws Throwable {
+	protected void finalize() {
 		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	

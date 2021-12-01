@@ -7,6 +7,7 @@ import org.joml.Vector4f;
 
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.Input;
+import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.gl.DefaultMaterial;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.primitives.Cube;
@@ -19,6 +20,9 @@ import com.lndf.glengine.scene.components.physics.BoxCollider;
 import com.lndf.glengine.scene.components.physics.DynamicRigidBody;
 import com.lndf.glengine.scene.components.physics.SphereCollider;
 
+import physx.cooking.PxConvexMeshDesc;
+import physx.geomutils.PxConvexMeshGeometryFlagEnum;
+
 public class Main {
 	
 	public static void main(String[] args) {
@@ -29,9 +33,9 @@ public class Main {
 		Cube cube2 = new Cube(mat);
 		Cube child = new Cube(mat);
 		PhysicalMaterial pMat = new PhysicalMaterial(0.5f, 0.5f, 0.5f);
-		SphereCollider boxColl= new SphereCollider(pMat);
+		BoxCollider boxColl= new BoxCollider(pMat);
 		BoxCollider boxColl2= new BoxCollider(pMat);
-		SphereCollider childBox = new SphereCollider(pMat);
+		BoxCollider childBox = new BoxCollider(pMat);
 		DynamicRigidBody cubeRigid = new DynamicRigidBody();
 		DynamicRigidBody childRigid = new DynamicRigidBody();
 		FPCamera cam = new FPCamera((float) Math.PI / 4, 100);
@@ -46,12 +50,7 @@ public class Main {
 					s.x++;
 					s.y++;
 					s.z++;
-//					cubeRigid.addForceImpulse(new Vector3f(0, 3, 0));
-//					cube.getTransform().setScale(s);
-//					cubeRigid.clearAllForces();
-					child.addComponent(childRigid);
-//					child.removeCompopnent(DynamicRigidBody.class);
-					//cubeRigid.computeCMassAndInertia();
+					cube.getTransform().setScale(s);
 					
 				}
 			}
@@ -61,7 +60,7 @@ public class Main {
 		obj.addComponent(dirLight);
 		obj.addComponent(cam);
 		child.addComponent(childBox);
-//		child.addComponent(childRigid);
+		child.addComponent(childRigid);
 		cube.addChild(child);
 		cube.addComponent(cubeRigid);
 		cube.addComponent(boxColl);
