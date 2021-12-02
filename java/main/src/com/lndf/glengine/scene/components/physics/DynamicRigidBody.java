@@ -115,7 +115,7 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 		this.rigid.setRigidDynamicLockFlag(PxRigidDynamicLockFlagEnum.eLOCK_LINEAR_Z, lock);
 	}
 	
-	public void setkXRotationLock(boolean lock) {
+	public void setXRotationLock(boolean lock) {
 		this.rigid.setRigidDynamicLockFlag(PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_X, lock);
 	}
 	

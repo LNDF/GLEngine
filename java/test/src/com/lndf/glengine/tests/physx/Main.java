@@ -20,6 +20,7 @@ public class Main {
 		Engine.createWindow("PhysX", 800, 600, true);
 		Scene scene = new Scene();
 		DefaultMaterial mat = new DefaultMaterial(new Vector4f(0, 0, 1, 1), new Vector4f(1, 1, 1, 1), 30);
+		DefaultMaterial matCube = new DefaultMaterial(new Vector4f(1, 0, 0, 1), new Vector4f(1, 1, 1, 1), 30);
 		Cube cube2 = new Cube(mat);
 		PhysicalMaterial pMat = new PhysicalMaterial(0.5f, 0.5f, 0.5f);
 		BoxCollider collbox2 = new BoxCollider(pMat);
@@ -27,7 +28,7 @@ public class Main {
 		GameObject obj = new GameObject();
 		DirectionalLight dirLight = new DirectionalLight();
 		for (int i = 0; i < 10; i++) {
-			Cube c = new Cube(mat);
+			Cube c = new Cube(matCube);
 			DynamicRigidBody rb = new DynamicRigidBody();
 			BoxCollider col = new BoxCollider(pMat);
 			c.getTransform().setPosition(new Vector3f(i * 0.1f, 2 * i + 20, -10));
