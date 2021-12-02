@@ -130,7 +130,7 @@ public class GameObjectPhysXManager implements EngineResource {
 	}
 	
 	private void setDefaultRigidBody(boolean oldWasParent) {
-		StaticRigidBody staticBody = new StaticRigidBody();
+		StaticRigidBody staticBody = new StaticRigidBody(this.object);
 		this.swapRigidBody(staticBody, oldWasParent);
 	}
 	

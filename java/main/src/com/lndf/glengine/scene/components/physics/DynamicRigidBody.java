@@ -11,7 +11,6 @@ import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.physics.RigidBody;
 import com.lndf.glengine.scene.Component;
-
 import physx.common.PxIDENTITYEnum;
 import physx.common.PxQuat;
 import physx.common.PxTransform;
@@ -52,10 +51,12 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	@Override
 	public void addToGameObject() {
 		this.getGameObject().getPhysx().setRigidBody(this);
+		PhysXManager.addRigidToGameObjectMapping(this.rigid, this.getGameObject());
 	}
 	
 	@Override
 	public void removeFromGameObject() {
+		PhysXManager.removeRigidToGameobjectMapping(this.rigid, this.getGameObject());
 		this.getGameObject().getPhysx().unsetRigidBody();
 	}
 	

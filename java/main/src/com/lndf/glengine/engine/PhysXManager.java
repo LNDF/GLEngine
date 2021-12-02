@@ -1,7 +1,12 @@
 package com.lndf.glengine.engine;
 
+import java.util.HashMap;
+
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
+
+import com.lndf.glengine.physics.PhysXSimulationCallbacks;
+import com.lndf.glengine.scene.GameObject;
 
 import physx.PxTopLevelFunctions;
 import physx.common.PxDefaultErrorCallback;
@@ -12,11 +17,15 @@ import physx.cooking.PxCooking;
 import physx.cooking.PxCookingParams;
 import physx.extensions.PxDefaultAllocator;
 import physx.physics.PxFilterData;
+import physx.physics.PxPairFlagEnum;
 import physx.physics.PxPhysics;
+import physx.physics.PxRigidActor;
 import physx.physics.PxScene;
 import physx.physics.PxSceneDesc;
 
 public class PhysXManager {
+	
+	private static HashMap<Long, GameObject> rigidToGameObject = new HashMap<Long, GameObject>();
 	
 	public static final int PX_PHYSX_VERSION = PxTopLevelFunctions.getPHYSICS_VERSION();
 	
@@ -43,7 +52,12 @@ public class PhysXManager {
 		filterData = new PxFilterData(0, 0, 0, 0);
 		filterData.setWord0(1);
 		filterData.setWord1(0xffffffff);
-		filterData.setWord2(0);
+		filterData.setWord2(
+				PxPairFlagEnum.eNOTIFY_TOUCH_FOUND      |
+				PxPairFlagEnum.eNOTIFY_TOUCH_LOST       |
+				PxPairFlagEnum.eNOTIFY_TOUCH_PERSISTS   |
+	
+				PxPairFlagEnum.eNOTIFY_CONTACT_POINTS);
 		filterData.setWord3(0);
 		cookingParams = new PxCookingParams(toleranceScale);
 		cooking = PxTopLevelFunctions.CreateCooking(PX_PHYSX_VERSION, foundation, cookingParams);
@@ -64,6 +78,7 @@ public class PhysXManager {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxSceneDesc desc = PxSceneDesc.createAt(mem, MemoryStack::nmalloc, physics.getTolerancesScale());
 			//PxSceneFlags flags = PxSceneFlags.createAt(mem, MemoryStack::nmalloc, (1<<5) | (1<<6));
+			desc.setSimulationEventCallback(new PhysXSimulationCallbacks());
 			desc.setGravity(PxVec3.createAt(mem, MemoryStack::nmalloc, gravity.x, gravity.y, gravity.z));
 			desc.setCpuDispatcher(PxTopLevelFunctions.DefaultCpuDispatcherCreate(cpuThreads));
 			desc.setFilterShader(PxTopLevelFunctions.DefaultFilterShader());
@@ -126,6 +141,18 @@ public class PhysXManager {
 
 	public static void setRecoverTriggerMultiplier(int recoverTriggerMultiplier) {
 		PhysXManager.recoverTriggerMultiplier = recoverTriggerMultiplier;
+	}
+	
+	public static void addRigidToGameObjectMapping(PxRigidActor rigid, GameObject object) {
+		PhysXManager.rigidToGameObject.put(rigid.getAddress(), object);
+	}
+	
+	public static void removeRigidToGameobjectMapping(PxRigidActor rigid, GameObject object) {
+		PhysXManager.rigidToGameObject.remove(rigid.getAddress());
+	}
+	
+	public static GameObject getGameObjectFromRigid(PxRigidActor rigid) {
+		return PhysXManager.rigidToGameObject.get(rigid.getAddress());
 	}
 	
 }
