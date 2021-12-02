@@ -11,15 +11,14 @@ import physx.common.PxBoundedData;
 import physx.common.PxVec3;
 import physx.cooking.PxTriangleMeshDesc;
 import physx.geomutils.PxTriangleMesh;
-import physx.geomutils.PxTriangleMeshFlagEnum;
 import physx.support.Vector_PxU32;
 import physx.support.Vector_PxVec3;
 
-public class PhysicsTriangleMesh implements EngineResource {
+public class PhysicalTriangleMesh implements EngineResource {
 	
 	private PxTriangleMesh mesh;
 	
-	public PhysicsTriangleMesh(Mesh mesh) {
+	public PhysicalTriangleMesh(Mesh mesh) {
 		Engine.addEngineResource(this);
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			Vector_PxVec3 vPoints = new Vector_PxVec3();

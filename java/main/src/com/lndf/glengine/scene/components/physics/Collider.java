@@ -40,16 +40,17 @@ public abstract class Collider extends Component implements EngineResource {
 	
 	protected abstract void pxCreate();
 	
+	protected Collider(PhysicalMaterial material) {
+		this.material = material;
+	}
+	
 	protected void createShape() {
+		if (this.shape != null) return;
+		Engine.addEngineResource(this);
 		this.pxCreate();
 		this.setRestOffset(this.restOffset);
 		this.setContactOffset(this.contactOffset);
 		this.setTrigger(this.trigger);
-	}
-	
-	protected Collider(PhysicalMaterial material) {
-		Engine.addEngineResource(this);
-		this.material = material;
 	}
 	
 	public PhysicalMaterial getMaterial() {

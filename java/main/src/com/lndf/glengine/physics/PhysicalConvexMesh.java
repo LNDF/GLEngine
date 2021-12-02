@@ -13,11 +13,11 @@ import physx.cooking.PxConvexMeshDesc;
 import physx.geomutils.PxConvexMesh;
 import physx.support.Vector_PxVec3;
 
-public class PhysicsConvexMesh implements EngineResource	 {
+public class PhysicalConvexMesh implements EngineResource	 {
 	
 	private PxConvexMesh mesh;
 	
-	public PhysicsConvexMesh(Mesh mesh) {
+	public PhysicalConvexMesh(Mesh mesh) {
 		Engine.addEngineResource(this);
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			Vector_PxVec3 points = new Vector_PxVec3();
