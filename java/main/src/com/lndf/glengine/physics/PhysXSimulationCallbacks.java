@@ -47,12 +47,11 @@ public class PhysXSimulationCallbacks extends JavaSimulationEventCallback {
 					PxVec3 position = contact.getPosition();
 					PxVec3 normal = contact.getNormal();
 					float distance = contact.getSeparation();
-					Vector3f pos10 = new Vector3f(position.getX(), position.getY(), position.getZ());
+					Vector3f pos = new Vector3f(position.getX(), position.getY(), position.getZ());
 					Vector3f normal10 = new Vector3f(normal.getX(), normal.getY(), normal.getZ());
-					Vector3f pos01 = new Vector3f(pos10);
 					Vector3f normal01 = new Vector3f(normal10).mul(-1);
-					c01[j] = new ContactInfo(pos01, normal01, distance);
-					c10[j] = new ContactInfo(pos10, normal10, distance);
+					c01[j] = new ContactInfo(pos, normal01, distance);
+					c10[j] = new ContactInfo(pos, normal10, distance);
 				}
 				PxPairFlags events = pair.getEvents();
 				Collection<Component> comp0 = object0.getComponents();

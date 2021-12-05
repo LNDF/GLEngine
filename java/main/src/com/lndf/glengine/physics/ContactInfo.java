@@ -4,9 +4,9 @@ import org.joml.Vector3f;
 
 public class ContactInfo {
 	
-	public Vector3f position;
-	public Vector3f normal;
-	public float distance;
+	private Vector3f position;
+	private Vector3f normal;
+	private float distance;
 	
 	public ContactInfo(Vector3f position, Vector3f normal, float distance) {
 		this.position = position;
@@ -14,8 +14,16 @@ public class ContactInfo {
 		this.distance = distance;
 	}
 	
-	public ContactInfo(ContactInfo contactInfo) {
-		this(new Vector3f(contactInfo.position), new Vector3f(contactInfo.normal), contactInfo.distance);
+	public Vector3f getPosition() {
+		return new Vector3f(this.position);
+	}
+	
+	public Vector3f getNormal() {
+		return new Vector3f(this.normal);
+	}
+	
+	public float getDistance() {
+		return this.distance;
 	}
 	
 }
