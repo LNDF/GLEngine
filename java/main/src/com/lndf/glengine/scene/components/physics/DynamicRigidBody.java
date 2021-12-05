@@ -51,12 +51,12 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	@Override
 	public void addToGameObject() {
 		this.getGameObject().getPhysx().setRigidBody(this);
-		PhysXManager.addRigidToGameObjectMapping(this.rigid, this.getGameObject());
+		PhysXManager.addActorToGameObjectMapping(this.rigid, this.getGameObject());
 	}
 	
 	@Override
 	public void removeFromGameObject() {
-		PhysXManager.removeRigidToGameobjectMapping(this.rigid, this.getGameObject());
+		PhysXManager.removeActorToGameobjectMapping(this.rigid, this.getGameObject());
 		this.getGameObject().getPhysx().unsetRigidBody();
 	}
 	

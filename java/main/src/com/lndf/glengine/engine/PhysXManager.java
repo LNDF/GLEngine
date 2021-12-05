@@ -16,10 +16,10 @@ import physx.common.PxVec3;
 import physx.cooking.PxCooking;
 import physx.cooking.PxCookingParams;
 import physx.extensions.PxDefaultAllocator;
+import physx.physics.PxActor;
 import physx.physics.PxFilterData;
 import physx.physics.PxPairFlagEnum;
 import physx.physics.PxPhysics;
-import physx.physics.PxRigidActor;
 import physx.physics.PxScene;
 import physx.physics.PxSceneDesc;
 
@@ -143,15 +143,15 @@ public class PhysXManager {
 		PhysXManager.recoverTriggerMultiplier = recoverTriggerMultiplier;
 	}
 	
-	public static void addRigidToGameObjectMapping(PxRigidActor rigid, GameObject object) {
+	public static void addActorToGameObjectMapping(PxActor rigid, GameObject object) {
 		PhysXManager.rigidToGameObject.put(rigid.getAddress(), object);
 	}
 	
-	public static void removeRigidToGameobjectMapping(PxRigidActor rigid, GameObject object) {
+	public static void removeActorToGameobjectMapping(PxActor rigid, GameObject object) {
 		PhysXManager.rigidToGameObject.remove(rigid.getAddress());
 	}
 	
-	public static GameObject getGameObjectFromRigid(PxRigidActor rigid) {
+	public static GameObject getGameObjectFromActor(PxActor rigid) {
 		return PhysXManager.rigidToGameObject.get(rigid.getAddress());
 	}
 	

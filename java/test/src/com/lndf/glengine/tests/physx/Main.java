@@ -5,8 +5,10 @@ import org.joml.Vector4f;
 
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.DefaultMaterial;
+import com.lndf.glengine.physics.ContactInfo;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.primitives.Cube;
+import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Scene;
 import com.lndf.glengine.scene.components.FPCamera;
@@ -27,11 +29,11 @@ public class Main {
 		FPCamera cam = new FPCamera((float) Math.PI / 4, 100);
 		GameObject obj = new GameObject();
 		DirectionalLight dirLight = new DirectionalLight();
-		for (int i = 0; i < 10; i++) {
-			Cube c = new Cube(matCube);
+		for (int i = 0; i < 1000; i++) {
+			Cube c = new Cube("cube" + i, matCube);
 			DynamicRigidBody rb = new DynamicRigidBody();
 			BoxCollider col = new BoxCollider(pMat);
-			c.getTransform().setPosition(new Vector3f(i * 0.1f, 2 * i + 20, -10));
+			c.getTransform().setPosition(new Vector3f(50 - i * 0.1f, 2 * i + 20, -10));
 			c.addComponent(rb);
 			c.addComponent(col);
 			scene.addObject(c);
@@ -39,7 +41,7 @@ public class Main {
 		obj.addComponent(dirLight);
 		obj.addComponent(cam);
 		cube2.addComponent(collbox2);
-		cube2.getTransform().setScale(new Vector3f(100, 1, 100));
+		cube2.getTransform().setScale(new Vector3f(1000, 1, 1000));
 		cube2.getTransform().setPosition(new Vector3f(0, -1, -8));
 		Engine.addDrawable(cam);
 		scene.addObject(obj);

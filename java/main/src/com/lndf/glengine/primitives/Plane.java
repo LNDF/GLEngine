@@ -36,6 +36,12 @@ public class Plane extends GameObject {
 	}
 	
 	public Plane(Material material) {
+		super();
+		this.addComponent(Plane.getMeshRenderer(material));
+	}
+	
+	public Plane(String name, Material material) {
+		super(name);
 		this.addComponent(Plane.getMeshRenderer(material));
 	}
 	

@@ -108,6 +108,12 @@ public class Cube extends GameObject {
 	}
 	
 	public Cube(Material material) {
+		super();
+		this.addComponent(Cube.getMeshRenderer(material));
+	}
+	
+	public Cube(String name, Material material) {
+		super(name);
 		this.addComponent(Cube.getMeshRenderer(material));
 	}
 	

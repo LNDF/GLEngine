@@ -21,7 +21,7 @@ public class StaticRigidBody implements RigidBody {
 			this.rigid = PhysXManager.getPhysics().createRigidStatic(pose);
 		}
 		this.object = object;
-		PhysXManager.addRigidToGameObjectMapping(this.rigid, object);
+		PhysXManager.addActorToGameObjectMapping(this.rigid, object);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class StaticRigidBody implements RigidBody {
 	@Override
 	public void pxRelease() {
 		if (this.rigid != null) {
-			PhysXManager.removeRigidToGameobjectMapping(this.rigid, this.object);
+			PhysXManager.removeActorToGameobjectMapping(this.rigid, this.object);
 			this.rigid.release();
 			this.rigid = null;
 		}
