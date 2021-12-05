@@ -82,7 +82,7 @@ dependencies {
 
 	runtimeOnly "org.lwjgl:lwjgl-opengl::natives-linux"
 	//runtimeOnly "org.lwjgl:lwjgl-opengl::natives-linux-arm64"
-	7/runtimeOnly "org.lwjgl:lwjgl-opengl::natives-linux-arm32"
+	//runtimeOnly "org.lwjgl:lwjgl-opengl::natives-linux-arm32"
 	runtimeOnly "org.lwjgl:lwjgl-opengl::natives-macos"
 	//runtimeOnly "org.lwjgl:lwjgl-opengl::natives-windows-x86"
 	runtimeOnly "org.lwjgl:lwjgl-opengl::natives-windows"
