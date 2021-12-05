@@ -1,19 +1,34 @@
 package com.lndf.glengine.model;
 
-import static org.lwjgl.assimp.Assimp.*;
-
-import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.assimp.Assimp.AI_SCENE_FLAGS_INCOMPLETE;
+import static org.lwjgl.opengl.GL12.GL_BGRA;
+import static org.lwjgl.opengl.GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.*;
+import org.lwjgl.assimp.AIColor4D;
+import org.lwjgl.assimp.AIFace;
+import org.lwjgl.assimp.AIMaterial;
+import org.lwjgl.assimp.AIMatrix4x4;
+import org.lwjgl.assimp.AIMesh;
+import org.lwjgl.assimp.AIMetaData;
+import org.lwjgl.assimp.AIMetaDataEntry;
+import org.lwjgl.assimp.AINode;
+import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.AIString;
+import org.lwjgl.assimp.AITexel;
+import org.lwjgl.assimp.AITexture;
+import org.lwjgl.assimp.AIVector3D;
+import org.lwjgl.assimp.Assimp;
 import org.lwjgl.system.MemoryUtil;
 
 import com.lndf.glengine.asset.Asset;
@@ -33,6 +48,7 @@ public class Model {
 	
 	private HashMap<String, Texture2D> textures = new HashMap<String, Texture2D>();
 	
+	private ArrayList<ModelNode> nodes = new ArrayList<ModelNode>();
 	private ModelNode rootNode;
 	private Asset asset;
 	private float unitScaleFactor = 1f;
@@ -64,7 +80,7 @@ public class Model {
 			AITexture t = AITexture.create(scene.mTextures().get(i));
 			System.out.println(t.mFilename());
 		}
-		this.rootNode = loadNode(scene.mRootNode(), scene, true);
+		this.rootNode = loadNode("", scene.mRootNode(), scene, true);
 	}
 	
 	private AIMetaDataEntry getEntryFromMetaData(AIMetaData metaData, String target) {
@@ -79,10 +95,11 @@ public class Model {
 		return null;
 	}
 	
-	private ModelNode loadNode(AINode node, AIScene scene, boolean isRootNode) {
+	private ModelNode loadNode(String path, AINode node, AIScene scene, boolean isRootNode) {
 		int numMeshes = node.mNumMeshes();
 		int numChildren = node.mNumChildren();
 		String nodeName = node.mName().dataString();
+		String currentPath = path + nodeName;
 		AIMatrix4x4 transform = node.mTransformation();
 		Vector3f position = new Vector3f();
 		Vector3f scale = new Vector3f();
@@ -103,9 +120,11 @@ public class Model {
 		}
 		for (int i = 0; i < numChildren; i++) {
 			AINode child = AINode.create(children.get(i));
-			nodeChildren[i] = loadNode(child, scene, false);
+			nodeChildren[i] = loadNode(currentPath + "/", child, scene, false);
 		}
-		return new ModelNode(nodeName, nodeChildren, meshContainers, position, scale, rotation);
+		ModelNode modelNode = new ModelNode(nodeName, currentPath, nodeChildren, meshContainers, position, scale, rotation);
+		this.nodes.add(modelNode);
+		return modelNode;
 	}
 	
 	private MeshContainer loadMesh(AIMesh aiMesh, AIScene scene) {
@@ -261,6 +280,10 @@ public class Model {
 	
 	private MeshContainer createMeshContainer(String meshName, Mesh mesh, Texture2DRoles textures) {
 		return new MeshContainer(meshName, mesh, textures);
+	}
+	
+	public Collection<ModelNode> getNodes() {
+		return Collections.unmodifiableCollection(this.nodes);
 	}
 	
 	public ModelNode getRootNode() {

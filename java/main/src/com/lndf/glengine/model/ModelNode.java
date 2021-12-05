@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 public class ModelNode {
 	
 	private String name;
+	private String path;
 	
 	private ModelNode[] children;
 	
@@ -15,8 +16,9 @@ public class ModelNode {
 	private Vector3f scale;
 	private Quaternionf rotation;
 	
-	public ModelNode(String name, ModelNode[] children, MeshContainer[] meshContainers, Vector3f position, Vector3f scale, Quaternionf rotation) {
+	public ModelNode(String name, String path, ModelNode[] children, MeshContainer[] meshContainers, Vector3f position, Vector3f scale, Quaternionf rotation) {
 		this.name = name;
+		this.path = path;
 		this.children = children;
 		this.meshContainers = meshContainers;
 		this.position = position;
@@ -28,6 +30,10 @@ public class ModelNode {
 		return name;
 	}
 
+	public String getPath() {
+		return path;
+	}
+	
 	public ModelNode[] getChildren() {
 		return children;
 	}
