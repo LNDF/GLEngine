@@ -76,10 +76,6 @@ public class Model {
 				this.unitScaleFactor = (float) factor;
 			}
 		}
-		for (int i = 0; i < scene.mNumTextures(); i++) {
-			AITexture t = AITexture.create(scene.mTextures().get(i));
-			System.out.println(t.mFilename());
-		}
 		this.rootNode = loadNode("", scene.mRootNode(), scene, true);
 	}
 	
