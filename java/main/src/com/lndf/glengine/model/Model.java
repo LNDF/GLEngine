@@ -303,14 +303,18 @@ public class Model {
 		for (ModelNode childNode : node.getChildren()) {
 			obj.addChild(this.createGameObject(suffix, childNode));
 		}
-		MeshRenderer meshRenderer = new MeshRenderer();
-		for (MeshContainer container : node.getMeshContainers()) {
-			String name = container.getName();
-			Mesh mesh = container.getMesh();
-			Material material = container.createMaterial();
-			meshRenderer.addMesh(name, mesh, material);
+		MeshContainer[] containers = node.getMeshContainers();
+		if (containers.length > 0) {
+			MeshRenderer meshRenderer = new MeshRenderer();
+			for (MeshContainer container : containers) {
+				String name = container.getName();
+				Mesh mesh = container.getMesh();
+				Material material = container.createMaterial();
+				meshRenderer.addMesh(name, mesh, material);
+			}
+			obj.addComponent(meshRenderer);
 		}
-		obj.addComponent(meshRenderer);
+		
 		return obj;
 	}
 	
