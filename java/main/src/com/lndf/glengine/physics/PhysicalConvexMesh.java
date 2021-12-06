@@ -9,6 +9,8 @@ import com.lndf.glengine.gl.Mesh;
 
 import physx.common.PxBoundedData;
 import physx.common.PxVec3;
+import physx.cooking.PxConvexFlagEnum;
+import physx.cooking.PxConvexFlags;
 import physx.cooking.PxConvexMeshDesc;
 import physx.geomutils.PxConvexMesh;
 import physx.support.Vector_PxVec3;
@@ -35,6 +37,8 @@ public class PhysicalConvexMesh implements EngineResource	 {
 			pointsBounded.setData(points.data());
 			PxConvexMeshDesc desc = PxConvexMeshDesc.createAt(mem, MemoryStack::nmalloc);
 			desc.setPoints(pointsBounded);
+			PxConvexFlags flags = PxConvexFlags.createAt(mem, MemoryStack::nmalloc, (short) PxConvexFlagEnum.eCOMPUTE_CONVEX);
+			desc.setFlags(flags);
 			this.mesh = PhysXManager.getCooking().createConvexMesh(desc, PhysXManager.getPhysics().getPhysicsInsertionCallback());
 			points.destroy();
 		}
