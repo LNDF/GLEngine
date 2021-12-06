@@ -19,7 +19,7 @@ public class TriangleMeshCollider extends Collider {
 	
 	private PhysicalTriangleMesh mesh;
 	
-	protected TriangleMeshCollider(PhysicalMaterial material, PhysicalTriangleMesh mesh) {
+	public TriangleMeshCollider(PhysicalMaterial material, PhysicalTriangleMesh mesh) {
 		super(material);
 		this.mesh = mesh;
 	}

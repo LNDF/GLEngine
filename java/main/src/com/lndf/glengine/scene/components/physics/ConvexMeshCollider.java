@@ -19,7 +19,7 @@ public class ConvexMeshCollider extends Collider {
 	
 	private PhysicalConvexMesh mesh;
 	
-	protected ConvexMeshCollider(PhysicalMaterial material, PhysicalConvexMesh mesh) {
+	public ConvexMeshCollider(PhysicalMaterial material, PhysicalConvexMesh mesh) {
 		super(material);
 		this.mesh = mesh;
 	}
