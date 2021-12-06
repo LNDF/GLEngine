@@ -1,18 +1,21 @@
 package com.lndf.glengine.scene;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameObject {
 	
 	private String name;
 	
-	private ConcurrentHashMap<Class<? extends Component>, Component> components = new ConcurrentHashMap<Class<? extends Component>, Component>();
+	private ConcurrentHashMap<Class<? extends Component>, ConcurrentLinkedQueue<Component>> components = new ConcurrentHashMap<Class<? extends Component>, ConcurrentLinkedQueue<Component>>();
 	private KeySetView<Component, Boolean> componentsToDestroy = ConcurrentHashMap.newKeySet();
+	private ArrayList<Component> cachedAllComponents;
 	
 	private Scene scene = null;
 	
@@ -44,15 +47,21 @@ public class GameObject {
 	
 	public void setScene(Scene scene) {
 		if (this.scene != null) {
-			for (Component comp : this.components.values()) {
-				comp.removeFromScene();
+			for (ConcurrentLinkedQueue<Component> tcomp : this.components.values()) {
+				for (Component comp : tcomp) {
+					comp.removeFromScene();
+				}
 			}
+			this.scene.clearComponentCaches();
 		}
 		this.physx.updateScene(scene);
 		this.scene = scene;
 		if (this.scene != null) {
-			for (Component comp : this.components.values()) {
-				comp.addToScene();
+			this.scene.clearComponentCaches();
+			for (ConcurrentLinkedQueue<Component> tcomp : this.components.values()) {
+				for (Component comp : tcomp) {
+					comp.addToScene();
+				}
 			}
 		}
 	}
@@ -60,7 +69,16 @@ public class GameObject {
 	public void addComponent(Component component) {
 		if (component.getGameObject() != null) return;
 		Class<? extends Component> c = component.getClass();
-		this.components.put(c, component);
+		ConcurrentLinkedQueue<Component> tcomp;
+		if (!this.components.containsKey(c)) {
+			tcomp = new ConcurrentLinkedQueue<Component>();;
+			this.components.put(c, tcomp);
+		} else {
+			tcomp = this.components.get(c);
+		}
+		tcomp.add(component);
+		this.cachedAllComponents = null;
+		if (this.scene != null) this.scene.clearComponentCaches();
 		boolean isNew = !this.componentsToDestroy.contains(component);
 		this.componentsToDestroy.remove(component);
 		component.setGameObject(this);
@@ -71,18 +89,35 @@ public class GameObject {
 	}
 	
 	public Component getComponent(Class<? extends Component> c) {
-		return this.components.get(c);
+		ConcurrentLinkedQueue<Component> t = this.components.get(c);
+		if (t != null) return t.peek();
+		return null;
+	}
+	
+	public Collection<Component> getComponents(Class<? extends Component> c) {
+		ConcurrentLinkedQueue<Component> t = this.components.get(c);
+		if (t != null) return Collections.unmodifiableCollection(t);
+		return Collections.unmodifiableCollection(new ConcurrentLinkedQueue<Component>());
 	}
 	
 	public Collection<Component> getComponents() {
-		return Collections.unmodifiableCollection(this.components.values());
+		if (this.cachedAllComponents != null) Collections.unmodifiableCollection(this.cachedAllComponents);
+		ArrayList<Component> comps = new ArrayList<Component>();
+		for (ConcurrentLinkedQueue<Component> t : this.components.values()) {
+			comps.addAll(t);
+		}
+		this.cachedAllComponents = comps;
+		return Collections.unmodifiableCollection(comps);
 	}
 	
-	public void removeCompopnent(Class<? extends Component> c) {
+	public void removeCompopnent(Component component) {
+		Class<? extends Component> c = component.getClass();
 		if (this.components.containsKey(c)) {
-			Component comp = this.components.get(c);
-			this.componentsToDestroy.add(comp);
-			this.components.remove(c);
+			ConcurrentLinkedQueue<Component> tcomp = this.components.get(c);
+			this.componentsToDestroy.add(component);
+			tcomp.remove(component);
+			this.cachedAllComponents = null;
+			if (this.scene != null) this.scene.clearComponentCaches();
 		}
 	}
 	
@@ -101,13 +136,17 @@ public class GameObject {
 			obj.setParent(null);
 		}
 		if (this.getScene() == null) {
-			for (Component comp : this.components.values()) {
-				comp.removeFromScene();
+			for (ConcurrentLinkedQueue<Component> tcomp : this.components.values()) {
+				for (Component comp : tcomp) {
+					comp.removeFromScene();
+				}
 			}
 		}
-		for (Component comp : this.components.values()) {
-			comp.removeFromGameObject();
-			comp.setGameObject(null);
+		for (ConcurrentLinkedQueue<Component> tcomp : this.components.values()) {
+			for (Component comp : tcomp) {
+				comp.removeFromGameObject();
+				comp.setGameObject(null);
+			}
 		}
 		this.destroyComponents();
 		if (this.getScene() != null) {

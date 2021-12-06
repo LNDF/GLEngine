@@ -1,7 +1,5 @@
 package com.lndf.glengine.scene.components;
 
-import java.util.HashMap;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -12,33 +10,42 @@ import com.lndf.glengine.scene.RenderComponent;
 
 public class MeshRenderer extends RenderComponent {
 	
-	private HashMap<Mesh, String> meshes = new HashMap<Mesh, String>();
-	private HashMap<Mesh, Material> materials = new HashMap<Mesh, Material>();
+	private String name;
+	private Mesh mesh;
+	private Material material;
 	
 	public MeshRenderer() {
 		
 	}
 	
-	public MeshRenderer(String meshName, Mesh mesh, Material material) {
-		this.addMesh(meshName, mesh, material);
+	public MeshRenderer(String name, Mesh mesh, Material material) {
+		this.name = name;
+		this.mesh = mesh;
+		this.material = material;
 	}
-	
-	public void addMesh(String meshName, Mesh mesh, Material material) {
-		meshes.put(mesh, meshName);
-		materials.put(mesh, material);
+
+	public String getName() {
+		return name;
 	}
-	
-	public void removeMesh(Mesh mesh) {
-		meshes.remove(mesh);
-		materials.remove(mesh);
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	
-	public HashMap<Mesh, String> getMeshes() {
-		return meshes;
+
+	public Mesh getMesh() {
+		return mesh;
 	}
-	
-	public HashMap<Mesh, Material> getMaterials() {
-		return materials;
+
+	public void setMesh(Mesh mesh) {
+		this.mesh = mesh;
+	}
+
+	public Material getMaterial() {
+		return material;
+	}
+
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 
 	@Override
@@ -46,13 +53,10 @@ public class MeshRenderer extends RenderComponent {
 		if (!this.getVisible()) return;
 		GameObject obj = this.getGameObject();
 		if (obj == null) return;
-		for (Mesh mesh : this.meshes.keySet()) {
-			Material material = materials.get(mesh);
-			if (material == null) continue;
-			material.getShader().bind();
-			material.setUniform(vp, obj, pov);
-			mesh.draw();
-		}
+		if (this.material == null) return;
+		this.material.getShader().bind();
+		this.material.setUniform(vp, obj, pov);
+		this.mesh.draw();
 	}
 	
 	
