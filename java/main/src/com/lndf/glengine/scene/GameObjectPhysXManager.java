@@ -63,6 +63,9 @@ public class GameObjectPhysXManager implements EngineResource {
 	}
 	
 	public void setRigidBody(RigidBody newRigid) {
+		if (this.customRigid) {
+			throw new RuntimeException("Cannot add multiple custom rigid bodies to the same game object");
+		}
 		RigidBody oldRigid = this.rigid;
 		boolean oldWasParent = this.parentRigidOwner != null;
 		this.parentRigidOwner = null;
