@@ -116,6 +116,7 @@ public class GameObject {
 			ConcurrentLinkedQueue<Component> tcomp = this.components.get(c);
 			this.componentsToDestroy.add(component);
 			tcomp.remove(component);
+			if (tcomp.size() == 0) this.components.remove(c);
 			this.cachedAllComponents = null;
 			if (this.scene != null) this.scene.clearComponentCaches();
 		}
