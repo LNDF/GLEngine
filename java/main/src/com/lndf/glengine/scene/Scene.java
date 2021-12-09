@@ -6,10 +6,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
+import javax.swing.table.AbstractTableModel;
+
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.engine.DeltaTime;
+import com.lndf.glengine.engine.Engine;
+import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.engine.RunnableList;
 import com.lndf.glengine.engine.SceneManager;
@@ -17,10 +21,13 @@ import com.lndf.glengine.scene.components.lighting.DirectionalLight;
 import com.lndf.glengine.scene.components.lighting.PointLight;
 import com.lndf.glengine.scene.components.lighting.Spotlight;
 
+import physx.PxTopLevelFunctions;
+import physx.character.PxControllerManager;
 import physx.common.PxVec3;
+import physx.physics.PxPhysics;
 import physx.physics.PxScene;
 
-public class Scene {
+public class Scene implements EngineResource {
 	
 	private KeySetView<GameObject, Boolean> gameObjects = ConcurrentHashMap.newKeySet();
 	private KeySetView<GameObject, Boolean> gameObjectsToDestroy = ConcurrentHashMap.newKeySet();
@@ -32,6 +39,8 @@ public class Scene {
 	private double physXDelta = 0.0;
 	private boolean physXRecovering = false;
 	
+	private PxControllerManager cctControllerManager;
+	
 	private RunnableList updateRunnables = new RunnableList();
 	
 	//caches
@@ -41,11 +50,13 @@ public class Scene {
 	private HashSet<Spotlight> spotlightCache = null;
 	
 	public Scene() {
-		this.physXScene = PhysXManager.createScene(new Vector3f(0, -9.81f, 0));
-		this.ambientLight = 0.01f;
+		this(0.01f);
 	}
 	
 	public Scene(float ambientLight) {
+		Engine.addEngineResource(this);
+		this.physXScene = PhysXManager.createScene(new Vector3f(0, -9.81f, 0));
+		this.cctControllerManager = PxTopLevelFunctions.CreateControllerManager(this.physXScene);
 		this.ambientLight = ambientLight;
 	}
 	
@@ -208,13 +219,20 @@ public class Scene {
 	}
 	
 	public void destroy() {
+		Engine.removeEngineResource(this);
 		this.unsubscribeFromUpdates();
 		for (GameObject obj : this.gameObjects) {
 			obj.setScene(null);
 			obj.destroy();
 		}
 		this.gameObjects.clear();
+		this.cctControllerManager.release();
 		this.physXScene.release();
+	}
+	
+	@Override
+	protected void finalize() {
+		Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public void subscribeToUpdates() {
@@ -235,6 +253,10 @@ public class Scene {
 	
 	public PxScene getPhysXScene() {
 		return physXScene;
+	}
+	
+	public PxControllerManager getPhysXCCTManager() {
+		return cctControllerManager;
 	}
 	
 	public Vector3f getGravity() {
