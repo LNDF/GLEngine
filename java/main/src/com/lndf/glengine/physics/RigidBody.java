@@ -6,6 +6,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
+import com.lndf.glengine.scene.Scene;
 import com.lndf.glengine.scene.components.physics.Collider;
 
 import physx.common.PxIDENTITYEnum;
@@ -19,6 +20,14 @@ public interface RigidBody {
 	public PxRigidActor getPxRigidActor();
 	public void pxRelease();
 	public void shapeUpdated();
+	
+	public default void addToScene(Scene scene) {
+		scene.getPhysXScene().addActor(this.getPxRigidActor());
+	}
+	
+	public default void removeFromScene(Scene scene) {
+		scene.getPhysXScene().removeActor(this.getPxRigidActor());
+	}
 	
 	public default Quaternionf getPxRotation() {
 		PxRigidActor rigid = this.getPxRigidActor();

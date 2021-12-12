@@ -142,13 +142,13 @@ public class GameObjectPhysXManager implements EngineResource {
 		Scene scene = object.getScene();
 		if (this.rigid != null) {
 			if (scene != null && !oldWasParent) {
-				scene.getPhysXScene().removeActor(this.rigid.getPxRigidActor());
+				this.rigid.removeFromScene(scene);
 			}
 			this.rigid.removeShapes(this.shapes);
 		}
 		newRigid.addShapes(this.shapes);
 		this.rigid = newRigid;
-		if (scene != null && this.parentRigidOwner == null) scene.getPhysXScene().addActor(newRigid.getPxRigidActor());
+		if (scene != null && this.parentRigidOwner == null) newRigid.addToScene(scene);
 		this.updateChildrenRigids();
 	}
 	
@@ -156,10 +156,10 @@ public class GameObjectPhysXManager implements EngineResource {
 		if (this.rigid == null || this.parentRigidOwner != null) return;
 		Scene scene = this.object.getScene();
 		if (scene != null) {
-			scene.getPhysXScene().removeActor(rigid.getPxRigidActor());
+			this.rigid.removeFromScene(scene);
 		}
 		if (newScene != null) {
-			newScene.getPhysXScene().addActor(rigid.getPxRigidActor());
+			this.rigid.addToScene(newScene);
 		}
 	}
 	
