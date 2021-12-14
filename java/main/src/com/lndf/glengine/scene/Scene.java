@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
-import javax.swing.table.AbstractTableModel;
-
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
@@ -24,7 +22,6 @@ import com.lndf.glengine.scene.components.lighting.Spotlight;
 import physx.PxTopLevelFunctions;
 import physx.character.PxControllerManager;
 import physx.common.PxVec3;
-import physx.physics.PxPhysics;
 import physx.physics.PxScene;
 
 public class Scene implements EngineResource {

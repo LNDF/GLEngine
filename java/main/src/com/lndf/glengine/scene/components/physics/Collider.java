@@ -66,6 +66,7 @@ public abstract class Collider extends Component implements EngineResource {
 	
 	protected void pxDestroy() {
 		if (this.shape != null) {
+			Engine.removeEngineResource(this);
 			this.restOffset = this.getRestOffset();
 			this.contactOffset = this.getContactOffset();
 			this.trigger = this.isTrigger();
@@ -205,7 +206,6 @@ public abstract class Collider extends Component implements EngineResource {
 	}
 	
 	public void destroy() {
-		Engine.removeEngineResource(this);
 		this.pxDestroy();
 	}
 	
