@@ -1,5 +1,8 @@
 package com.lndf.glengine.scene.components.physics;
 
+import java.util.Collection;
+
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
@@ -7,10 +10,12 @@ import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.physics.RigidBody;
 import com.lndf.glengine.scene.Component;
+import com.lndf.glengine.scene.Scene;
 
 import physx.NativeObject;
 import physx.character.PxController;
 import physx.character.PxControllerDesc;
+import physx.character.PxControllerManager;
 import physx.character.PxControllerNonWalkableModeEnum;
 import physx.character.PxExtendedVec3;
 import physx.character.PxUserControllerHitReport;
@@ -20,6 +25,8 @@ import physx.physics.PxRigidActor;
 public abstract class CharacterController extends Component implements EngineResource, RigidBody {
 	
 	private static final int PXEXTENDEDVEC3_SIZEOF = 24;
+	
+	protected PxControllerManager cttManager;
 	
 	//FIELDS
 	private Vector3f upDirection = new Vector3f(0, 1, 0);
@@ -91,6 +98,7 @@ public abstract class CharacterController extends Component implements EngineRes
 			pos.setX(0);
 			pos.setY(0);
 			pos.setZ(0);
+			desc.setUpDirection(up);
 			desc.setSlopeLimit(this.slopeLimit);
 			desc.setInvisibleWallHeight(this.invisibleWallHeight);
 			desc.setMaxJumpHeight(this.maxJumpHeight);
@@ -170,7 +178,7 @@ public abstract class CharacterController extends Component implements EngineRes
 	}
 
 	public void setStepOffset(float stepOffset) {
-		if (this.getPxCtt()) this.getPxCtt().setStepOffset(stepOffset);
+		if (this.getPxCtt() != null) this.getPxCtt().setStepOffset(stepOffset);
 		this.stepOffset = stepOffset;
 	}
 
@@ -204,6 +212,37 @@ public abstract class CharacterController extends Component implements EngineRes
 		this.shouldSlide = shouldSlide;
 	}
 	
-	m
+	@Override
+	public void addToScene(Scene scene) {
+		this.cttManager = scene.getPhysXCCTManager();
+		this.pxCreate();
+	}
 	
+	@Override
+	public void removeFromScene() {
+		this.pxDestroy();
+	}
+	
+	@Override
+	public Quaternionf getPxRotation() {
+		return null;
+	}
+	
+	@Override
+	public Vector3f getPxPosition() {
+		PxExtendedVec3 pos = this.getPxCtt().getPosition();
+		return new Vector3f((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
+	}
+	
+	@Override
+	public void addShape(Collider collider) {}
+	
+	@Override
+	public void addShapes(Collection<Collider> shapes) {}
+	
+	@Override
+	public void removeShape(Collider collider) {}
+	
+	@Override
+	public void removeShapes(Collection<Collider> shapes) {}
 }
