@@ -21,11 +21,11 @@ public interface RigidBody {
 	public void pxRelease();
 	public void shapeUpdated();
 	
-	public default void addToScene(Scene scene) {
+	public default void setScene(Scene scene) {
 		scene.getPhysXScene().addActor(this.getPxRigidActor());
 	}
 	
-	public default void removeFromScene(Scene scene) {
+	public default void unsetScene(Scene scene) {
 		scene.getPhysXScene().removeActor(this.getPxRigidActor());
 	}
 	
