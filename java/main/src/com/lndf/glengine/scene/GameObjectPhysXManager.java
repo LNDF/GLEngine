@@ -21,7 +21,8 @@ public class GameObjectPhysXManager implements EngineResource {
 	private Vector3f lastScale = null;
 	
 	private HashSet<Collider> shapes = new HashSet<Collider>();
-	//private PxRigidActor rigid;
+	
+	private boolean supportsRotation;
 	private RigidBody rigid;
 	private GameObject parentRigidOwner = null;
 	private boolean customRigid = false;
@@ -148,6 +149,7 @@ public class GameObjectPhysXManager implements EngineResource {
 		}
 		newRigid.addShapes(this.shapes);
 		this.rigid = newRigid;
+		this.supportsRotation = this.rigid.getPxRotation() != null;
 		if (scene != null && this.parentRigidOwner == null) newRigid.addToScene(scene);
 		this.updateChildrenRigids();
 	}
@@ -187,31 +189,34 @@ public class GameObjectPhysXManager implements EngineResource {
 	public void pullPoseFromRigidBody() {
 		if (this.rigid == null || this.parentRigidOwner != null) return;
 		Vector3f jp = this.rigid.getPxPosition();
-		Quaternionf jq = this.rigid.getPxRotation();
 		this.object.getTransform().setWorldPosition(jp);
-		this.object.getTransform().setWorldRotation(jq);
 		this.lastPos = jp;
-		this.lastRot = jq;
+		if (this.supportsRotation) {
+			Quaternionf jq = this.rigid.getPxRotation();
+			this.object.getTransform().setWorldRotation(jq);
+			this.lastRot = jq;
+		}
 	}
 	
 	public void pushPoseToRigidBody() {
 		if (this.rigid == null) return;
-		Quaternionf jq = this.object.getTransform().getWorldRotation();
+		Quaternionf jq = null;
 		Vector3f jp = this.object.getTransform().getWorldPosition();
 		Vector3f js = this.object.getTransform().getWorldScale();
+		if (this.supportsRotation) jq = this.object.getTransform().getWorldRotation();
 		if (this.parentRigidOwner != null) {
-			jq = this.parentRigidOwner.getTransform().getRelativeRotation(jq);
+			if (this.supportsRotation) jq = this.parentRigidOwner.getTransform().getRelativeRotation(jq);
 			jp = this.parentRigidOwner.getTransform().getRelativePosition(jp).mul(js);
 		}
 		boolean posHasChanged = true;
-		boolean rotHasChanged = true;
+		boolean rotHasChanged = this.supportsRotation;
 		boolean scaleHasChanged = true;
 		if (this.lastPos != null) {
 			posHasChanged = Math.abs(jp.x - this.lastPos.x) > this.poseThreshold ||
 							Math.abs(jp.y - this.lastPos.y) > this.poseThreshold ||
 							Math.abs(jp.z - this.lastPos.z) > this.poseThreshold;
 		}
-		if (this.lastRot != null) {
+		if (this.lastRot != null && rotHasChanged) {
 			rotHasChanged = Math.abs(jq.x - this.lastRot.x) > this.poseThreshold ||
 							Math.abs(jq.y - this.lastRot.y) > this.poseThreshold ||
 							Math.abs(jq.z - this.lastRot.z) > this.poseThreshold ||
@@ -224,7 +229,7 @@ public class GameObjectPhysXManager implements EngineResource {
 		}
 		if (posHasChanged || rotHasChanged) {
 			this.lastPos = jp;
-			this.lastRot = jq;
+			if (this.supportsRotation) this.lastRot = jq;
 			if (this.parentRigidOwner != null) {
 				for (Collider shape : this.shapes) {
 					shape.setParentPose(jp, jq);

@@ -1,4 +1,4 @@
-package com.lndf.glengine.scene.components.physics;
+	package com.lndf.glengine.scene.components.physics;
 
 import java.util.Collection;
 
@@ -8,18 +8,21 @@ import org.lwjgl.system.MemoryStack;
 
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.EngineResource;
+import com.lndf.glengine.engine.PhysXManager;
+import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.physics.RigidBody;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.Scene;
 
-import physx.NativeObject;
 import physx.character.PxController;
 import physx.character.PxControllerDesc;
+import physx.character.PxControllerFilters;
 import physx.character.PxControllerManager;
 import physx.character.PxControllerNonWalkableModeEnum;
 import physx.character.PxExtendedVec3;
-import physx.character.PxUserControllerHitReport;
 import physx.common.PxVec3;
+import physx.physics.PxFilterData;
+import physx.physics.PxQueryFlags;
 import physx.physics.PxRigidActor;
 
 public abstract class CharacterController extends Component implements EngineResource, RigidBody {
@@ -27,6 +30,8 @@ public abstract class CharacterController extends Component implements EngineRes
 	private static final int PXEXTENDEDVEC3_SIZEOF = 24;
 	
 	protected PxControllerManager cttManager;
+	
+	private double lastMove;
 	
 	//FIELDS
 	private Vector3f upDirection = new Vector3f(0, 1, 0);
@@ -38,6 +43,7 @@ public abstract class CharacterController extends Component implements EngineRes
 	private float density = 10.0f;
 	private float scaleCoef = 0.8f;
 	private boolean shouldSlide = false;
+	private PhysicalMaterial material;
 	//volumeGrowth = 1.5f
 	//userData = 0
 	//reportCallback = NULL
@@ -47,11 +53,12 @@ public abstract class CharacterController extends Component implements EngineRes
 	
 	public abstract PxController getPxCtt();
 	
-	public void pxCreate() {
-		Engine.addEngineResource(this);
+	public CharacterController(PhysicalMaterial material) {
+		this.lastMove = System.currentTimeMillis();
+		this.material = material;
 	}
 	
-	public CharacterController() {
+	protected void pxCreate() {
 		Engine.addEngineResource(this);
 	}
 	
@@ -67,7 +74,7 @@ public abstract class CharacterController extends Component implements EngineRes
 		return this.getPxCtt().getActor();
 	}
 	
-	public void pxDestroy() {
+	protected void pxDestroy() {
 		Engine.removeEngineResource(this);
 		PxController ctt = this.getPxCtt();
 		PxVec3 up = ctt.getUpDirection();
@@ -93,8 +100,6 @@ public abstract class CharacterController extends Component implements EngineRes
 			PxVec3 up = PxVec3.createAt(mem, MemoryStack::nmalloc, this.upDirection.x, this.upDirection.y, this.upDirection.z);
 			PxExtendedVec3 pos = PxExtendedVec3.wrapPointer(mem.nmalloc(PXEXTENDEDVEC3_SIZEOF));
 			int nonWalkableMode = this.shouldSlide ? PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING : PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING;
-			PxUserControllerHitReport report = PxUserControllerHitReport.wrapPointer(0);
-			NativeObject user = NativeObject.wrapPointer(0);
 			pos.setX(0);
 			pos.setY(0);
 			pos.setZ(0);
@@ -108,9 +113,8 @@ public abstract class CharacterController extends Component implements EngineRes
 			desc.setScaleCoeff(this.scaleCoef);
 			desc.setNonWalkableMode(nonWalkableMode);
 			desc.setVolumeGrowth(1.5f);
-			desc.setUserData(user);
-			desc.setReportCallback(report);
 			desc.setRegisterDeletionListener(true);
+			desc.setMaterial(this.material.getPxMaterial());
 		}
 	}
 
@@ -216,10 +220,12 @@ public abstract class CharacterController extends Component implements EngineRes
 	public void addToScene(Scene scene) {
 		this.cttManager = scene.getPhysXCCTManager();
 		this.pxCreate();
+		PhysXManager.addActorToGameObjectMapping(this.getPxRigidActor(), this.getGameObject());
 	}
 	
 	@Override
 	public void removeFromScene() {
+		PhysXManager.removeActorToGameobjectMapping(this.getPxRigidActor(), this.getGameObject());
 		this.pxDestroy();
 	}
 	
@@ -232,6 +238,41 @@ public abstract class CharacterController extends Component implements EngineRes
 	public Vector3f getPxPosition() {
 		PxExtendedVec3 pos = this.getPxCtt().getPosition();
 		return new Vector3f((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
+	}
+	
+	@Override
+	public void setPxPose(Vector3f jp, Quaternionf jq) {
+		try (MemoryStack mem = MemoryStack.stackPush()) {
+			PxExtendedVec3 p = PxExtendedVec3.wrapPointer(mem.nmalloc(24));
+			p.setX(jp.x);
+			p.setY(jp.y);
+			p.setZ(jp.z);
+			this.getPxCtt().setPosition(p);
+		}
+	}
+	
+	public void move(Vector3f target, float minDist) {
+		try (MemoryStack mem = MemoryStack.stackPush()) {
+			double current = System.currentTimeMillis();
+			float deltaTime = (float) (current - this.lastMove);
+			this.lastMove = current;
+			PxControllerFilters filters = PxControllerFilters.wrapPointer(mem.nmalloc(32));
+			PxFilterData fData = PxFilterData.createAt(mem, MemoryStack::nmalloc);
+			PxQueryFlags qFlags = PxQueryFlags.wrapPointer(mem.nmalloc(4));
+			filters.setMFilterData(fData);
+			filters.setMFilterFlags(qFlags);
+			this.getPxCtt().move(PxVec3.createAt(mem, MemoryStack::nmalloc, target.x, target.y, target.z), minDist, deltaTime, filters);
+		}
+	}
+	
+	@Override
+	public void addToGameObject() {
+		this.getGameObject().getPhysx().setRigidBody(this);
+	}
+	
+	@Override
+	public void removeFromGameObject() {
+		this.getGameObject().getPhysx().unsetRigidBody();
 	}
 	
 	@Override
