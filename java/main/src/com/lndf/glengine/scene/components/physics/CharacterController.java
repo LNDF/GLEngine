@@ -1,4 +1,4 @@
-	package com.lndf.glengine.scene.components.physics;
+package com.lndf.glengine.scene.components.physics;
 
 import java.util.Collection;
 
@@ -21,8 +21,6 @@ import physx.character.PxControllerManager;
 import physx.character.PxControllerNonWalkableModeEnum;
 import physx.character.PxExtendedVec3;
 import physx.common.PxVec3;
-import physx.physics.PxFilterData;
-import physx.physics.PxQueryFlags;
 import physx.physics.PxRigidActor;
 
 public abstract class CharacterController extends Component implements EngineResource, RigidBody {
@@ -32,6 +30,7 @@ public abstract class CharacterController extends Component implements EngineRes
 	protected PxControllerManager cttManager;
 	
 	private double lastMove;
+	private PxControllerFilters filters;
 	
 	//FIELDS
 	private Vector3f upDirection = new Vector3f(0, 1, 0);
@@ -60,6 +59,7 @@ public abstract class CharacterController extends Component implements EngineRes
 	
 	protected void pxCreate() {
 		Engine.addEngineResource(this);
+		this.filters = new PxControllerFilters();
 	}
 	
 	@Override
@@ -85,6 +85,7 @@ public abstract class CharacterController extends Component implements EngineRes
 		this.contactOffset = ctt.getContactOffset();
 		this.stepOffset = ctt.getStepOffset();
 		this.shouldSlide = ctt.getNonWalkableMode() == PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING;
+		this.filters.destroy();
 		ctt.release();
 	}
 
@@ -257,12 +258,7 @@ public abstract class CharacterController extends Component implements EngineRes
 			double current = System.currentTimeMillis();
 			float deltaTime = (float) (current - this.lastMove);
 			this.lastMove = current;
-			PxControllerFilters filters = PxControllerFilters.wrapPointer(mem.nmalloc(32));
-			PxFilterData fData = PxFilterData.createAt(mem, MemoryStack::nmalloc);
-			PxQueryFlags qFlags = PxQueryFlags.wrapPointer(mem.nmalloc(4));
-			filters.setMFilterData(fData);
-			filters.setMFilterFlags(qFlags);
-			this.getPxCtt().move(PxVec3.createAt(mem, MemoryStack::nmalloc, target.x, target.y, target.z), minDist, deltaTime, filters);
+			this.getPxCtt().move(PxVec3.createAt(mem, MemoryStack::nmalloc, target.x, target.y, target.z), minDist, deltaTime, this.filters);
 		}
 	}
 	

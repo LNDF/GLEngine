@@ -54,6 +54,7 @@ public class Scene implements EngineResource {
 		Engine.addEngineResource(this);
 		this.physXScene = PhysXManager.createScene(new Vector3f(0, -9.81f, 0));
 		this.cctControllerManager = PxTopLevelFunctions.CreateControllerManager(this.physXScene);
+		this.cctControllerManager.setOverlapRecoveryModule(true);
 		this.ambientLight = ambientLight;
 	}
 	

@@ -56,7 +56,6 @@ public class PhysXManager {
 				PxPairFlagEnum.eNOTIFY_TOUCH_FOUND      |
 				PxPairFlagEnum.eNOTIFY_TOUCH_LOST       |
 				PxPairFlagEnum.eNOTIFY_TOUCH_PERSISTS   |
-	
 				PxPairFlagEnum.eNOTIFY_CONTACT_POINTS);
 		filterData.setWord3(0);
 		cookingParams = new PxCookingParams(toleranceScale);
