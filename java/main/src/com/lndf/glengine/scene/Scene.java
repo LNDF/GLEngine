@@ -216,15 +216,19 @@ public class Scene implements EngineResource {
 	}
 	
 	public void destroy() {
-		Engine.removeEngineResource(this);
-		this.unsubscribeFromUpdates();
-		for (GameObject obj : this.gameObjects) {
-			obj.setScene(null);
-			obj.destroy();
+		if (this.cctControllerManager != null && this.physXScene != null) {
+			Engine.removeEngineResource(this);
+			this.unsubscribeFromUpdates();
+			for (GameObject obj : this.gameObjects) {
+				obj.setScene(null);
+				obj.destroy();
+			}
+			this.gameObjects.clear();
+			this.cctControllerManager.release();
+			this.physXScene.release();
+			this.cctControllerManager = null;
+			this.physXScene = null;
 		}
-		this.gameObjects.clear();
-		this.cctControllerManager.release();
-		this.physXScene.release();
 	}
 	
 	@Override
