@@ -10,7 +10,7 @@ plugins {
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.10.2"
-project.ext.physxVersion = "0.4.15"
+project.ext.physxVersion = "0.4.16"
 
 group = 'com.lndf.GLEngine'
 version = '0.0.1-SNAPSHOT'
