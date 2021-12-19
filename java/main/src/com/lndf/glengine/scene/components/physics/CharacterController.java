@@ -9,12 +9,15 @@ import org.lwjgl.system.MemoryStack;
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
+import com.lndf.glengine.physics.CharacterCollisionData;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.physics.RigidBody;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.Scene;
 
 import physx.character.PxController;
+import physx.character.PxControllerCollisionFlagEnum;
+import physx.character.PxControllerCollisionFlags;
 import physx.character.PxControllerDesc;
 import physx.character.PxControllerFilters;
 import physx.character.PxControllerManager;
@@ -253,12 +256,13 @@ public abstract class CharacterController extends Component implements EngineRes
 		}
 	}
 	
-	public void move(Vector3f target, float minDist) {
+	public CharacterCollisionData move(Vector3f target, float minDist) {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			double current = System.currentTimeMillis();
 			float deltaTime = (float) (current - this.lastMove);
 			this.lastMove = current;
-			this.getPxCtt().move(PxVec3.createAt(mem, MemoryStack::nmalloc, target.x, target.y, target.z), minDist, deltaTime, this.filters);
+			PxControllerCollisionFlags flags = this.getPxCtt().move(PxVec3.createAt(mem, MemoryStack::nmalloc, target.x, target.y, target.z), minDist, deltaTime, this.filters);
+			return new CharacterCollisionData(flags);
 		}
 	}
 	
