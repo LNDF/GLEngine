@@ -16,7 +16,6 @@ import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.Scene;
 
 import physx.character.PxController;
-import physx.character.PxControllerCollisionFlagEnum;
 import physx.character.PxControllerCollisionFlags;
 import physx.character.PxControllerDesc;
 import physx.character.PxControllerFilters;
