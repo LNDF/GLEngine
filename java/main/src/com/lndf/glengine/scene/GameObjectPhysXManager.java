@@ -281,6 +281,6 @@ public class GameObjectPhysXManager implements EngineResource {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.shapes != null) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 }

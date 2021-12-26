@@ -59,7 +59,7 @@ public class PhysicalConvexMesh implements EngineResource	 {
 	
 	@Override
 	protected void finalize() {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.mesh != null) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 
 }

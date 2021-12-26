@@ -234,7 +234,7 @@ public class Scene implements EngineResource {
 	
 	@Override
 	protected void finalize() {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.cctControllerManager != null && this.physXScene != null) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public void subscribeToUpdates() {

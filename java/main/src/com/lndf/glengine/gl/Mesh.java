@@ -171,7 +171,7 @@ public class Mesh implements EngineResource {
 	
 	@Override
 	protected void finalize() {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.isUploaded()) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

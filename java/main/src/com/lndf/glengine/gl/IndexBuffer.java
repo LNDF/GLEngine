@@ -33,7 +33,7 @@ public class IndexBuffer implements EngineResource {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (!this.closed) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public long getCount() {

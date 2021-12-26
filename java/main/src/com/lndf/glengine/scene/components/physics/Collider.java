@@ -211,7 +211,7 @@ public abstract class Collider extends Component implements EngineResource {
 	
 	@Override
 	protected void finalize() {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.shape != null) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 }

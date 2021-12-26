@@ -210,7 +210,7 @@ public class Texture2D implements EngineResource {
 	
 	@Override
 	protected void finalize() {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (!this.closed) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public void bind(int slot) {

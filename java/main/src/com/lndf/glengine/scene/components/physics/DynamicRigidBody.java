@@ -48,7 +48,7 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	
 	@Override
 	protected void finalize() throws Throwable {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.rigid != null) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	@Override

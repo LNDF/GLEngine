@@ -39,4 +39,10 @@ public class RunnableList {
 		}
 	}
 	
+	public void clear() {
+		this.runnables.clear();
+		this.runnablesToAdd.clear();
+		this.runnablesToRemove.clear();
+	}
+	
 }

@@ -24,7 +24,7 @@ public class PhysicalMaterial implements EngineResource {
 	
 	@Override
 	protected void finalize() {
-		Engine.addEndOfLoopRunnable(() -> this.destroy());
+		if (this.pxMaterial != null) Engine.addEndOfLoopRunnable(() -> this.destroy());
 	}
 	
 	public PxMaterial getPxMaterial() {
