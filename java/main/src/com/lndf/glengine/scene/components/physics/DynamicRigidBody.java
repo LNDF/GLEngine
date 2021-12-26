@@ -11,11 +11,14 @@ import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.physics.RigidBody;
 import com.lndf.glengine.scene.Component;
+
 import physx.common.PxIDENTITYEnum;
 import physx.common.PxQuat;
 import physx.common.PxTransform;
 import physx.common.PxVec3;
 import physx.extensions.PxRigidBodyExt;
+import physx.physics.PxActorFlagEnum;
+import physx.physics.PxActorFlags;
 import physx.physics.PxForceModeEnum;
 import physx.physics.PxRigidActor;
 import physx.physics.PxRigidBodyFlagEnum;
@@ -125,6 +128,20 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	
 	public void setZRotationLock(boolean lock) {
 		this.rigid.setRigidDynamicLockFlag(PxRigidDynamicLockFlagEnum.eLOCK_ANGULAR_Z, lock);
+	}
+	
+	public boolean isGravityEnabled() {
+		return !this.rigid.getActorFlags().isSet(PxActorFlagEnum.eDISABLE_GRAVITY);
+	}
+	
+	public void setGravityEnabled(boolean enable) {
+		PxActorFlags flags = this.rigid.getActorFlags();
+		if (!enable) {
+			flags.set(PxActorFlagEnum.eDISABLE_GRAVITY);
+		} else {
+			flags.clear(PxActorFlagEnum.eDISABLE_GRAVITY);
+		}
+		this.rigid.setActorFlags(flags);
 	}
 	
 	public void setCenterOfMass(Vector3f pos) {
