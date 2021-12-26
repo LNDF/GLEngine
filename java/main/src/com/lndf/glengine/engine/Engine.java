@@ -71,6 +71,7 @@ public class Engine {
 	public static void mainLoop() {
 		//main loop
 		DeltaTime.set();
+		Engine.runnables.clear();
 		while (!glfwWindowShouldClose(Engine.windowId)) {
 			DeltaTime.set();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
