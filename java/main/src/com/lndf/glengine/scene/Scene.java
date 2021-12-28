@@ -282,7 +282,7 @@ public class Scene implements EngineResource {
 	
 	public GameObject searchObject(String searchingName) {
 		for (GameObject obj : this.gameObjects) {
-			if (obj.getName() == searchingName) return obj;
+			if (obj.getName().equals(searchingName)) return obj;
 		}
 		return null;
 	}

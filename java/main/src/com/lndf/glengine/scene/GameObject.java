@@ -168,7 +168,7 @@ public class GameObject {
 	}
 	
 	public GameObject search(String searchingName) {
-		if (this.name == searchingName) return this;
+		if (this.name.equals(searchingName)) return this;
 		for (GameObject child : this.children) {
 			GameObject result = child.search(searchingName);
 			if (result != null) return result;
