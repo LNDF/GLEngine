@@ -21,6 +21,7 @@ public class TriangleMeshCollider extends Collider {
 	
 	public TriangleMeshCollider(PhysicalMaterial material, PhysicalTriangleMesh mesh) {
 		super(material);
+		this.massComputable = false;
 		this.mesh = mesh;
 	}
 

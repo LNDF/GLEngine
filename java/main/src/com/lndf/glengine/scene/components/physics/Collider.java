@@ -37,6 +37,7 @@ public abstract class Collider extends Component implements EngineResource {
 	
 	protected PxShape shape;
 	protected PhysicalMaterial material;
+	protected boolean massComputable = true;
 	
 	protected abstract void pxCreate();
 	
@@ -195,6 +196,10 @@ public abstract class Collider extends Component implements EngineResource {
 		}
 	}
 	
+	public boolean isMassComputable() {
+		return massComputable;
+	}
+
 	@Override
 	public void addToGameObject() {
 		this.getGameObject().getPhysx().addShape(this);

@@ -1,6 +1,7 @@
 package com.lndf.glengine.scene.components.physics;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -30,6 +31,7 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	private PxRigidDynamic rigid;
 	
 	private boolean autoComputeCMassAndInertia = true;
+	private HashSet<Long> illegalMassShapes = new HashSet<Long>();
 	
 	public DynamicRigidBody() {
 		Engine.addEngineResource(this);
@@ -292,6 +294,7 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	}
 	
 	public void computeCMassAndInertia() {
+		if (this.illegalMassShapes.size() > 0) return;
 		PxRigidBodyExt.setMassAndUpdateInertia(this.rigid, this.rigid.getMass());
 	}
 	
@@ -316,24 +319,32 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	@Override
 	public void addShapes(Collection<Collider> shapes) {
 		RigidBody.super.addShapes(shapes);
+		for (Collider shape : shapes) {
+			if (!shape.isMassComputable()) this.illegalMassShapes.add(shape.getPhysXShape().getAddress());
+		}
 		if (this.autoComputeCMassAndInertia) this.computeCMassAndInertia();
 	}
 	
 	@Override
 	public void removeShapes(Collection<Collider> shapes) {
 		RigidBody.super.removeShapes(shapes);
+		for (Collider shape : shapes) {
+			if (!shape.isMassComputable()) this.illegalMassShapes.remove(shape.getPhysXShape().getAddress());
+		}
 		if (this.autoComputeCMassAndInertia) this.computeCMassAndInertia();
 	}
 	
 	@Override
 	public void addShape(Collider collider) {
 		RigidBody.super.addShape(collider);
+		if (!collider.isMassComputable()) this.illegalMassShapes.add(collider.getPhysXShape().getAddress());
 		if (this.autoComputeCMassAndInertia) this.computeCMassAndInertia();
 	}
 	
 	@Override
 	public void removeShape(Collider collider) {
 		RigidBody.super.removeShape(collider);
+		if (!collider.isMassComputable()) this.illegalMassShapes.remove(collider.getPhysXShape().getAddress());
 		if (this.autoComputeCMassAndInertia) this.computeCMassAndInertia();
 	}
 
