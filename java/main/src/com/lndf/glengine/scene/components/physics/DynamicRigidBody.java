@@ -108,6 +108,14 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 		return this.rigid.getMaxAngularVelocity();
 	}
 	
+	public void setMaxLinearVelocity(float maxLinearVelocity) {
+		this.rigid.setMaxLinearVelocity(maxLinearVelocity);
+	}
+	
+	public float getMaxLinearVelocity() {
+		return this.rigid.getMaxLinearVelocity();
+	}
+	
 	public void setXPositionLock(boolean lock) {
 		this.rigid.setRigidDynamicLockFlag(PxRigidDynamicLockFlagEnum.eLOCK_LINEAR_X, lock);
 	}
