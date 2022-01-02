@@ -219,6 +219,10 @@ public abstract class CharacterController extends Component implements EngineRes
 		this.shouldSlide = shouldSlide;
 	}
 	
+	public void resize(float height) {
+		this.getPxCtt().resize(height);
+	}
+	
 	@Override
 	public void setScene(Scene scene) {
 		this.cttManager = scene.getPhysXCCTManager();
