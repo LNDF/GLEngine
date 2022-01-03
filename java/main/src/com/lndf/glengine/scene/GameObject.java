@@ -110,7 +110,7 @@ public class GameObject {
 		return Collections.unmodifiableCollection(comps);
 	}
 	
-	public void removeCompopnent(Component component) {
+	public void removeComponent(Component component) {
 		Class<? extends Component> c = component.getClass();
 		if (this.components.containsKey(c)) {
 			ConcurrentLinkedQueue<Component> tcomp = this.components.get(c);
