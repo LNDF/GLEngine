@@ -6,8 +6,6 @@ import com.lndf.glengine.physics.PhysicalMaterial;
 
 import physx.character.PxBoxController;
 import physx.character.PxBoxControllerDesc;
-import physx.character.PxCapsuleController;
-import physx.character.PxCapsuleControllerDesc;
 import physx.character.PxController;
 
 public class BoxCharacterController extends CharacterController {
