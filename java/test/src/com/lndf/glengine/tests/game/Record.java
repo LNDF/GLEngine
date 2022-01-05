@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.DeltaTime;
-import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.primitives.Plane;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
@@ -14,11 +14,11 @@ public class Record extends GameObject {
 	
 	private static int instances = 0;
 	private static TextureMaterial material;
-	private static Texture2D texture;
+	private static TextureImage2D texture;
 	
 	public Record() {
 		if (Record.instances <= 0) {
-			Record.texture = new Texture2D(new Asset("resource:/testapp/goal.png"));
+			Record.texture = new TextureImage2D(new Asset("resource:/testapp/goal.png"));
 			Record.material = new TextureMaterial(Record.texture, 8, 1, 0, 0);
 		}
 		GameState.record = this;

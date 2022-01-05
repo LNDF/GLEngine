@@ -35,6 +35,7 @@ import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.gl.Material;
 import com.lndf.glengine.gl.Mesh;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
 import com.lndf.glengine.gl.texture.TextureRole;
@@ -46,7 +47,7 @@ public class Model {
 	
 	public static Vector4f DEFAULT_COLOR = new Vector4f(1, 1, 1, 1);
 	
-	private HashMap<String, Texture2D> textures = new HashMap<String, Texture2D>();
+	private HashMap<String, TextureImage2D> textures = new HashMap<String, TextureImage2D>();
 	
 	private ArrayList<ModelNode> nodes = new ArrayList<ModelNode>();
 	private ModelNode rootNode;
@@ -211,14 +212,14 @@ public class Model {
 					if (embTexHeight == 0) {
 						long address = embedded.pcData(0).address0();
 						ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, embTexWidth);
-						Texture2D texture = new Texture2D(textureRaw);
+						TextureImage2D texture = new TextureImage2D(textureRaw);
 						this.textures.put(texPath, texture);
 						textures.add(texture);
 					} else {
 						int capacity = embTexWidth * embTexHeight * AITexel.SIZEOF;
 						long address = embedded.pcData(0).address0();
 						ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, capacity);
-						Texture2D texture = new Texture2D();
+						TextureImage2D texture = new TextureImage2D();
 						texture.setUncompressedTexture(textureRaw, 0, embTexWidth, embTexHeight, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV);
 						texture.setDefaultTextureSettings();
 						this.textures.put(texPath, texture);
@@ -227,7 +228,7 @@ public class Model {
 					}
 				} else {
 					Asset textureAsset = asset.getRelativeAsset(texPath);
-					Texture2D texture = new Texture2D(textureAsset);
+					TextureImage2D texture = new TextureImage2D(textureAsset);
 					this.textures.put(texPath, texture);
 					textures.add(texture);
 				}

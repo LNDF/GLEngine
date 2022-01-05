@@ -6,7 +6,7 @@ import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.DeltaTime;
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.DefaultMaterial;
-import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.primitives.Cube;
 import com.lndf.glengine.scene.Component;
 import com.lndf.glengine.scene.GameObject;
@@ -20,8 +20,8 @@ public class LightsMain {
 	
 	public static void main(String[] args) {
 		Engine.createWindow("Lights test", 800, 600, true);
-		Texture2D boxTexture = new Texture2D(new Asset("resource:/lights/box.png"));
-		Texture2D boxTextureSpecular = new Texture2D(new Asset("resource:/lights/box_specular.png"));
+		TextureImage2D boxTexture = new TextureImage2D(new Asset("resource:/lights/box.png"));
+		TextureImage2D boxTextureSpecular = new TextureImage2D(new Asset("resource:/lights/box_specular.png"));
 		DefaultMaterial material = new DefaultMaterial(boxTexture, boxTextureSpecular, 80);
 		FPCamera cam = new FPCamera((float) (Math.PI / 2), 100.0f);
 		Scene scene = new Scene();

@@ -11,12 +11,16 @@ import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 
 import com.lndf.glengine.gl.Drawable;
+import com.lndf.glengine.gl.Framebuffer;
 
 public class Engine {
 	private static String name;
 	private static int width;
 	private static int height;
 	private static boolean resizable;
+	
+	private static int lastViewportWidth = -1;
+	private static int lastViewportHeight = -1;
 	
 	private static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 	
@@ -63,7 +67,6 @@ public class Engine {
 			public void invoke(long window, int newWidth, int newHeight) {
 				width = newWidth;
 				height = newHeight;
-				glViewport(0, 0, width, height);
 			}
 		});
 	}
@@ -74,12 +77,14 @@ public class Engine {
 		Engine.runnables.clear();
 		while (!glfwWindowShouldClose(Engine.windowId)) {
 			DeltaTime.set();
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			SceneManager.updateScenes();
+			Engine.runnables.executeAll(true);
+			Framebuffer.unbind();
+			Engine.setViewport(width, height);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			for (Drawable drawable : Engine.drawables) {
 				drawable.draw();
 			}
-			SceneManager.updateScenes();
-			Engine.runnables.executeAll(true);
 			glfwSwapBuffers(Engine.windowId);
 			glfwPollEvents();
 		}
@@ -98,6 +103,13 @@ public class Engine {
 		}
 		Engine.init();
 		PhysXManager.start();
+	}
+	
+	public static void setViewport(int width, int height) {
+		if (width == lastViewportWidth && height == lastViewportHeight) return;
+		lastViewportWidth = width;
+		lastViewportHeight = height;
+		glViewport(0, 0, width, height);
 	}
 	
 	public static void createWindow(String title, int width, int height) {

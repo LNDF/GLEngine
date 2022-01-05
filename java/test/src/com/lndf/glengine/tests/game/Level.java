@@ -4,7 +4,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.primitives.Cube;
 import com.lndf.glengine.primitives.Plane;
 import com.lndf.glengine.scene.GameObject;
@@ -17,18 +17,18 @@ public class Level extends Scene {
 	private TextureMaterial grass;
 	private TextureMaterial road;
 	private TextureMaterial roadEdge;
-	private Texture2D grassTex;
-	private Texture2D roadTex;
-	private Texture2D roadEdgeTex;
+	private TextureImage2D grassTex;
+	private TextureImage2D roadTex;
+	private TextureImage2D roadEdgeTex;
 	
 	private FPCamera cam;
 	
 	public Level() {
-		this.grassTex = new Texture2D(new Asset("resource:/testapp/grass.png"));
+		this.grassTex = new TextureImage2D(new Asset("resource:/testapp/grass.png"));
 		this.grass = new TextureMaterial(this.grassTex, 50, 50, 0, 100f);
-		this.roadTex = new Texture2D(new Asset("resource:/testapp/road.png"));
+		this.roadTex = new TextureImage2D(new Asset("resource:/testapp/road.png"));
 		this.road = new TextureMaterial(this.roadTex, 1, 25, 0, 25f);
-		this.roadEdgeTex = new Texture2D(new Asset("resource:/testapp/road_edge.png"));
+		this.roadEdgeTex = new TextureImage2D(new Asset("resource:/testapp/road_edge.png"));
 		this.roadEdge = new TextureMaterial(this.roadEdgeTex, 1, 250, 0, 1300f);
 		GameObject ground = new GameObject();
 		Plane grassObj = new Plane(this.grass);

@@ -1,7 +1,7 @@
 package com.lndf.glengine.tests.game;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.primitives.Cube;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.components.MeshRenderer;
@@ -10,11 +10,11 @@ public class Actor extends GameObject {
 	
 	private static int instances = 0;
 	private static TextureMaterial material;
-	private static Texture2D texture;
+	private static TextureImage2D texture;
 	
 	public Actor(boolean isEnemy) {
 		if (Actor.instances <= 0) {
-			Actor.texture = new Texture2D(new Asset("resource:/testapp/placeholder.png"));
+			Actor.texture = new TextureImage2D(new Asset("resource:/testapp/placeholder.png"));
 			Actor.material = new TextureMaterial(Actor.texture, 1, 1, 0, 0);
 		}
 		Actor.instances++;

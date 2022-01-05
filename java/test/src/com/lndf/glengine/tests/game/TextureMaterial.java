@@ -7,7 +7,7 @@ import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.DeltaTime;
 import com.lndf.glengine.gl.Material;
 import com.lndf.glengine.gl.Shader;
-import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.scene.GameObject;
 
 public class TextureMaterial extends Material {
@@ -15,7 +15,7 @@ public class TextureMaterial extends Material {
 	private static int instances = 0;
 	private static Shader offShader = null;
 	
-	private Texture2D texture;
+	private TextureImage2D texture;
 	private float speedX = 0.0f;
 	private float speedY = 0.0f;
 	private float offsetX = 0.0f;
@@ -34,7 +34,7 @@ public class TextureMaterial extends Material {
 		return new Shader(vertex, fragment, null);
 	}
 	
-	public TextureMaterial(Texture2D tex, float repeatX, float repeatY, float speedX, float speedY) {
+	public TextureMaterial(TextureImage2D tex, float repeatX, float repeatY, float speedX, float speedY) {
 		super(defaultShader());
 		TextureMaterial.offShader = this.getShader();
 		TextureMaterial.instances++;

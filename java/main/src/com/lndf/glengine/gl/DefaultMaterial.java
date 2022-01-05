@@ -8,7 +8,7 @@ import org.joml.Vector4f;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Engine;
-import com.lndf.glengine.gl.texture.Texture2D;
+import com.lndf.glengine.gl.texture.TextureImage2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
 import com.lndf.glengine.gl.texture.TextureRole;
 import com.lndf.glengine.scene.GameObject;
@@ -61,21 +61,21 @@ public class DefaultMaterial extends Material {
 		this.setShininess(shininess);
 	}
 	
-	public DefaultMaterial(Shader shader, Vector4f color, Texture2D specularTexture, float shininess) {
+	public DefaultMaterial(Shader shader, Vector4f color, TextureImage2D specularTexture, float shininess) {
 		super(shader);
 		this.roles.setDefaultColor(TextureRole.DIFFUSE, color);
 		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
 		this.setShininess(shininess);
 	}
 	
-	public DefaultMaterial(Shader shader, Texture2D texture, Vector4f specularColor, float shininess) {
+	public DefaultMaterial(Shader shader, TextureImage2D texture, Vector4f specularColor, float shininess) {
 		super(shader);
 		this.roles.addTexture(TextureRole.DIFFUSE, texture);
 		this.roles.setDefaultColor(TextureRole.SPECULAR, specularColor);
 		this.setShininess(shininess);
 	}
 	
-	public DefaultMaterial(Shader shader, Texture2D texture, Texture2D specularTexture, float shininess) {
+	public DefaultMaterial(Shader shader, TextureImage2D texture, TextureImage2D specularTexture, float shininess) {
 		super(shader);
 		this.roles.addTexture(TextureRole.DIFFUSE, texture);
 		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
@@ -89,21 +89,21 @@ public class DefaultMaterial extends Material {
 		this.setShininess(shininess);
 	}
 	
-	public DefaultMaterial(Vector4f color, Texture2D specularTexture, float shininess) {
+	public DefaultMaterial(Vector4f color, TextureImage2D specularTexture, float shininess) {
 		super(createDefaultShader());
 		this.roles.setDefaultColor(TextureRole.DIFFUSE, color);
 		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
 		this.setShininess(shininess);
 	}
 	
-	public DefaultMaterial(Texture2D texture, Vector4f specularColor, float shininess) {
+	public DefaultMaterial(TextureImage2D texture, Vector4f specularColor, float shininess) {
 		super(createDefaultShader());
 		this.roles.addTexture(TextureRole.DIFFUSE, texture);
 		this.roles.setDefaultColor(TextureRole.SPECULAR, specularColor);
 		this.setShininess(shininess);
 	}
 	
-	public DefaultMaterial(Texture2D texture, Texture2D specularTexture, float shininess) {
+	public DefaultMaterial(TextureImage2D texture, TextureImage2D specularTexture, float shininess) {
 		super(createDefaultShader());
 		this.roles.addTexture(TextureRole.DIFFUSE, texture);
 		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
