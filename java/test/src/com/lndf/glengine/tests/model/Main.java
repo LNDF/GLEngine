@@ -18,7 +18,7 @@ public class Main {
 		Model model = new Model(new Asset("resource:/model/defaultmodel.fbx"));
 		GameObject camObj = new GameObject();
 		FPCamera cam = new FPCamera((float) Math.PI / 2.0f, 1000.0f);
-		DirectionalLight light = new DirectionalLight(new Vector3f(.5f,.5f,.5f));
+		DirectionalLight light = new DirectionalLight(new Vector3f(1f,1f,1f));
 		camObj.addComponent(cam);
 		camObj.addComponent(light);
 		camObj.addComponent(light);
