@@ -22,7 +22,10 @@ public class LightsMain {
 		Engine.createWindow("Lights test", 800, 600, true);
 		TextureImage2D boxTexture = new TextureImage2D(new Asset("resource:/lights/box.png"));
 		TextureImage2D boxTextureSpecular = new TextureImage2D(new Asset("resource:/lights/box_specular.png"));
-		DefaultMaterial material = new DefaultMaterial(boxTexture, boxTextureSpecular, 80);
+		DefaultMaterial material = new DefaultMaterial();
+		material.setAlbedoTexture(boxTexture);
+		material.setRoughnessTexture(boxTextureSpecular);
+		material.setMetalness(1f);
 		FPCamera cam = new FPCamera((float) (Math.PI / 2), 100.0f);
 		Scene scene = new Scene();
 		Spotlight pl = new Spotlight(new Vector3f(1,1,1), 1.0f, 0.35f, 0.44f, (float) Math.toRadians(25), (float) Math.toRadians(35));

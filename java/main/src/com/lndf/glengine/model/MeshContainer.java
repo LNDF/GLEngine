@@ -30,8 +30,8 @@ public class MeshContainer {
 	}
 	
 	public Material createMaterial() {
-		DefaultMaterial mat = new DefaultMaterial(this.textures);
-		mat.setShininess(Float.MAX_VALUE);
+		DefaultMaterial mat = new DefaultMaterial();
+		mat.setRoles(textures);
 		return mat;
 	}
 	

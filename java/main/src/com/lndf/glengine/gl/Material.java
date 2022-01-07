@@ -8,7 +8,7 @@ import com.lndf.glengine.scene.Scene;
 
 public abstract class Material {
 	
-	private Shader shader;
+	protected Shader shader;
 
 	protected Material(Shader shader) {
 		this.shader = shader;

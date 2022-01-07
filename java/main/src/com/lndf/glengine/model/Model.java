@@ -1,8 +1,7 @@
 package com.lndf.glengine.model;
 
-import static org.lwjgl.assimp.Assimp.AI_SCENE_FLAGS_INCOMPLETE;
-import static org.lwjgl.opengl.GL12.GL_BGRA;
-import static org.lwjgl.opengl.GL12.GL_UNSIGNED_INT_8_8_8_8_REV;
+import static org.lwjgl.assimp.Assimp.*;
+import static org.lwjgl.opengl.GL12.*;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -13,7 +12,6 @@ import java.util.HashMap;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
@@ -36,16 +34,14 @@ import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.gl.Material;
 import com.lndf.glengine.gl.Mesh;
 import com.lndf.glengine.gl.texture.TextureImage2D;
-import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
-import com.lndf.glengine.gl.texture.TextureRole;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Transform;
 import com.lndf.glengine.scene.components.MeshRenderer;
 
 public class Model {
 	
-	public static Vector4f DEFAULT_COLOR = new Vector4f(1, 1, 1, 1);
+	private static HashMap<String, Vector3f> DEFAULT_COLORS = new HashMap<>();
 	
 	private HashMap<String, TextureImage2D> textures = new HashMap<String, TextureImage2D>();
 	
@@ -53,6 +49,14 @@ public class Model {
 	private ModelNode rootNode;
 	private Asset asset;
 	private float unitScaleFactor = 1f;
+	
+	static {
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_DIFFUSE, new Vector3f(0.6f));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_AMBIENT, new Vector3f(1));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_EMISSIVE, new Vector3f(0));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_SPECULAR, new Vector3f(0));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_REFLECTIVE, new Vector3f(0));
+	}
 	
 	public Model(Asset asset, ModelImporterSettings settings) {
 		this.asset = asset;
@@ -134,10 +138,12 @@ public class Model {
 		AIVector3D.Buffer modelNormals = aiMesh.mNormals();
 		AIFace.Buffer faces = aiMesh.mFaces();
 		AIVector3D.Buffer modelTexCoords = aiMesh.mTextureCoords(0);
+		AIVector3D.Buffer modelTangents = aiMesh.mTangents();
 		Texture2DRoles textures = new Texture2DRoles();
 		float[] positions = new float[numVertices * 3];
 		float[] normals = new float[numVertices * 3];
 		float[] texCoords = new float[numVertices * 2];
+		float[] tangents = new float[numVertices * 3];
 		int[] indexBuffer = new int[numFaces * 3];
 		//Vertex buffer
 		if (vertices != null) { //positions
@@ -163,6 +169,14 @@ public class Model {
 				normals[(3 * i) + 2] = normal.z();
 			}
 		}
+		if (modelTangents != null) {
+			for (int i = 0; i < numVertices; i++) {
+				AIVector3D tangent = modelTangents.get(i);
+				tangents[(3 * i) + 0] = tangent.x();
+				tangents[(3 * i) + 1] = tangent.y();
+				tangents[(3 * i) + 2] = tangent.z();
+			}
+		}
 		//Index buffer
 		for (int i = 0, pos = 0; i < numFaces; i++) {
 			AIFace face = faces.get(i);
@@ -176,16 +190,18 @@ public class Model {
 		if (materialIndex >= 0) {
 			AIMaterial material = AIMaterial.create(scene.mMaterials().get(materialIndex));
 			//textures
-			textures.put(TextureRole.AMBIENT, this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT));
-			textures.put(TextureRole.DIFFUSE, this.loadTextures(scene, material, Assimp.aiTextureType_DIFFUSE));
-			textures.put(TextureRole.LIGHTMAP, this.loadTextures(scene, material, Assimp.aiTextureType_LIGHTMAP));
-			textures.put(TextureRole.NORMAL, this.loadTextures(scene, material, Assimp.aiTextureType_NORMALS));
-			textures.put(TextureRole.SPECULAR, this.loadTextures(scene, material, Assimp.aiTextureType_SPECULAR));
-			textures.put(TextureRole.SHININESS, this.loadTextures(scene, material, Assimp.aiTextureType_SHININESS));
-			//colors
-			textures.setDefaultColor(TextureRole.AMBIENT, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT));
-			textures.setDefaultColor(TextureRole.DIFFUSE, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
-			textures.setDefaultColor(TextureRole.SPECULAR, this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR));
+			textures.setAlbedoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_DIFFUSE));
+			textures.setAoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT));
+			textures.setNormalMap(this.loadTextures(scene, material, Assimp.aiTextureType_NORMALS));
+			textures.setMetalnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_SHININESS));
+			textures.setRoughnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_SPECULAR));
+			textures.setEmissiveTexture(this.loadTextures(scene, material, Assimp.aiTextureType_EMISSIVE));
+			//colorss
+			textures.setAlbedoColor(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
+			textures.setAo(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT).x);
+			textures.setEmissiveColor(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_EMISSIVE));
+			textures.setRoughness(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR).x);
+			textures.setMetalness(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_REFLECTIVE).x);
 		}
 		mesh.setPositions(positions);
 		mesh.setTexCoords(texCoords);
@@ -194,47 +210,42 @@ public class Model {
 		return this.createMeshContainer(meshName, mesh, textures);
 	}
 	
-	private ArrayList<Texture2D> loadTextures(AIScene scene, AIMaterial material, int type) {
+	private TextureImage2D loadTextures(AIScene scene, AIMaterial material, int type) {
 		int textureCount = Assimp.aiGetMaterialTextureCount(material, type);
 		if (textureCount <= 0) return null;
-		ArrayList<Texture2D> textures = new ArrayList<Texture2D>();
+		TextureImage2D texture = null;
 		AIString path = AIString.calloc();
-		for (int i = 0; i < textureCount; i++) {
-			Assimp.aiGetMaterialTexture(material, type, i, path, (IntBuffer) null, null, null, null, null, null);
-			String texPath = path.dataString();
-			if (this.textures.containsKey(texPath)) {
-				textures.add(this.textures.get(texPath));
-			} else {
-				AITexture embedded = getEmbeddedTexture(scene, texPath);
-				if (embedded != null) {
-					int embTexWidth = embedded.mWidth();
-					int embTexHeight = embedded.mHeight();
-					if (embTexHeight == 0) {
-						long address = embedded.pcData(0).address0();
-						ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, embTexWidth);
-						TextureImage2D texture = new TextureImage2D(textureRaw);
-						this.textures.put(texPath, texture);
-						textures.add(texture);
-					} else {
-						int capacity = embTexWidth * embTexHeight * AITexel.SIZEOF;
-						long address = embedded.pcData(0).address0();
-						ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, capacity);
-						TextureImage2D texture = new TextureImage2D();
-						texture.setUncompressedTexture(textureRaw, 0, embTexWidth, embTexHeight, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV);
-						texture.setDefaultTextureSettings();
-						this.textures.put(texPath, texture);
-						textures.add(texture);
-						
-					}
-				} else {
-					Asset textureAsset = asset.getRelativeAsset(texPath);
-					TextureImage2D texture = new TextureImage2D(textureAsset);
+		Assimp.aiGetMaterialTexture(material, type, 1, path, (IntBuffer) null, null, null, null, null, null);
+		String texPath = path.dataString();
+		if (this.textures.containsKey(texPath)) {
+			texture = this.textures.get(texPath);
+		} else {
+			AITexture embedded = getEmbeddedTexture(scene, texPath);
+			if (embedded != null) {
+				int embTexWidth = embedded.mWidth();
+				int embTexHeight = embedded.mHeight();
+				if (embTexHeight == 0) {
+					long address = embedded.pcData(0).address0();
+					ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, embTexWidth);
+					texture = new TextureImage2D(textureRaw);
 					this.textures.put(texPath, texture);
-					textures.add(texture);
+				} else {
+					int capacity = embTexWidth * embTexHeight * AITexel.SIZEOF;
+					long address = embedded.pcData(0).address0();
+					ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, capacity);
+					texture = new TextureImage2D();
+					texture.setUncompressedTexture(textureRaw, 0, embTexWidth, embTexHeight, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV);
+					texture.setDefaultTextureSettings();
+					this.textures.put(texPath, texture);
+					
 				}
+			} else {
+				Asset textureAsset = asset.getRelativeAsset(texPath);
+				texture = new TextureImage2D(textureAsset);
+				this.textures.put(texPath, texture);
 			}
 		}
-		return textures;
+		return texture;
 	}
 	
 	private String getShortFilename(String filename) {
@@ -265,13 +276,13 @@ public class Model {
 		return null;
 	}
 	
-	private Vector4f getMaterialColor(AIMaterial material, String type) {
+	private Vector3f getMaterialColor(AIMaterial material, String type) {
 		AIColor4D aiColor = AIColor4D.create();
 		int res = Assimp.aiGetMaterialColor(material, type, Assimp.aiTextureType_NONE, 0, aiColor);
 		if (res == 0) {
-			return new Vector4f(aiColor.r(), aiColor.g(), aiColor.b(), aiColor.a());
+			return new Vector3f(aiColor.r(), aiColor.g(), aiColor.b());
 		} else {
-			return new Vector4f(Model.DEFAULT_COLOR);
+			return new Vector3f(Model.DEFAULT_COLORS.get(type));
 		}
 	}
 	

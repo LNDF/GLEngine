@@ -22,6 +22,12 @@ public class Plane extends GameObject {
 				0.0f, 0.0f, 1.0f,
 				0.0f, 0.0f, 1.0f
 		};
+		float[] tangents = {
+				1.0f, 0.0f, 0.0f,
+				1.0f, 0.0f, 0.0f,
+				1.0f, 0.0f, 0.0f,
+				1.0f, 0.0f, 0.0f
+		};
 		float[] texCoords = {
 				1.0f, 1.0f,
 				1.0f, 0.0f,
@@ -32,7 +38,7 @@ public class Plane extends GameObject {
 				2, 1, 0,
 				2, 3, 1
 		};
-		Plane.planeObject = new Mesh(positions, normals, texCoords, indices);
+		Plane.planeObject = new Mesh(positions, normals, texCoords, tangents, indices);
 	}
 	
 	public Plane(Material material) {

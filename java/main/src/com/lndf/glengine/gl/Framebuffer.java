@@ -3,7 +3,6 @@ package com.lndf.glengine.gl;
 import static org.lwjgl.opengl.GL33.*;
 
 import java.util.ArrayList;
-
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.gl.texture.TextureFramebuffer2D;
@@ -26,10 +25,14 @@ public class Framebuffer implements EngineResource {
 	
 	private static int boundFramebuffer = 0;
 	
+	private ArrayList<Integer> drawBuffers = new ArrayList<>();
+	private boolean drawBuffersChanged = true;
+	
 	public Framebuffer(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.id = glGenFramebuffers();
+		
 	}
 	
 	@Override
@@ -72,6 +75,28 @@ public class Framebuffer implements EngineResource {
 		if (this.depthTexture != null) this.depthTexture.allocateTexture(width, height);
 		if (this.stencilTexture != null) this.stencilTexture.allocateTexture(width, height);
 		if (this.depthStencilTexture != null) this.depthStencilTexture.allocateTexture(width, height);
+	}
+	
+	private void setGLDrawBuffers() {
+		if (this.drawBuffers.size() < 0) {
+			glDrawBuffers(GL_NONE);
+		} else {
+			int[] array = new int[this.drawBuffers.size()];
+			for (int i = 0; i < this.drawBuffers.size(); i++) {
+				array[i] = this.drawBuffers.get(i);
+			}
+			glDrawBuffers(array);
+		}
+	}
+	
+	public void setTextureToDrawBuffer(int bufferIndex, int textureIndex) {
+		this.drawBuffersChanged = true;
+		this.drawBuffers.add(bufferIndex, textureIndex);
+	}
+	
+	public void unsetTextureFromDrawBuffer(int bufferIndex) {
+		this.drawBuffersChanged = true;
+		this.drawBuffers.remove(bufferIndex);
 	}
 	
 	public void attachTexture(TextureFramebuffer2D texture) {
@@ -145,6 +170,10 @@ public class Framebuffer implements EngineResource {
 	
 	public void render() {
 		this.bind();
+		if (this.drawBuffersChanged) {
+			this.drawBuffersChanged = false;
+			this.setGLDrawBuffers();
+		}
 		Engine.setViewport(width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		for (Drawable drawable : this.drawables) {

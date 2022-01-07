@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import com.lndf.glengine.asset.Asset;
-import com.lndf.glengine.engine.Utils;
 import com.lndf.glengine.engine.Engine;
+import com.lndf.glengine.engine.Utils;
 
 public class Shader {
 	
@@ -125,6 +127,14 @@ public class Shader {
 	
 	public void setUniform(String name, float f1, float f2, float f3, float f4) {
 		glUniform4f(this.getUniformLocation(name), f1, f2, f3, f4);
+	}
+	
+	public void setUniform(String name, Vector3f v1) {
+		this.setUniform(name, v1.x, v1.y, v1.z);
+	}
+	
+	public void setUniform(String name, Vector4f v1) {
+		this.setUniform(name, v1.x, v1.y, v1.z, v1.w);
 	}
 	
 	public void setUniform(String name, Matrix4f v1) {

@@ -1,8 +1,6 @@
 package com.lndf.glengine.tests.physx;
 
 import org.joml.Vector3f;
-import org.joml.Vector4f;
-
 import com.lndf.glengine.engine.Engine;
 import com.lndf.glengine.gl.DefaultMaterial;
 import com.lndf.glengine.physics.PhysicalMaterial;
@@ -19,8 +17,14 @@ public class Main {
 	public static void main(String[] args) {
 		Engine.createWindow("PhysX", 800, 600, true);
 		Scene scene = new Scene();
-		DefaultMaterial mat = new DefaultMaterial(new Vector4f(0, 0, 1, 1), new Vector4f(1, 1, 1, 1), 30);
-		DefaultMaterial matCube = new DefaultMaterial(new Vector4f(1, 0, 0, 1), new Vector4f(1, 1, 1, 1), 30);
+		DefaultMaterial mat = new DefaultMaterial();
+		DefaultMaterial matCube = new DefaultMaterial();
+		mat.setAlbedoColor(new Vector3f(0, 0, 1));
+		mat.setRoughness(.3f);
+		mat.setMetalness(.2f);
+		matCube.setAlbedoColor(new Vector3f(1, 0, 0));
+		matCube.setRoughness(.3f);
+		matCube.setMetalness(.2f);
 		Cube cube2 = new Cube(mat);
 		PhysicalMaterial pMat = new PhysicalMaterial(0.5f, 0.5f, 0.5f);
 		BoxCollider collbox2 = new BoxCollider(pMat);

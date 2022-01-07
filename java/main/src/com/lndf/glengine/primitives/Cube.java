@@ -62,6 +62,32 @@ public class Cube extends GameObject {
 				 1.0f,  0.0f,  0.0f,
 				 1.0f,  0.0f,  0.0f
 		};
+		float[] tangents = {
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				 1.0f,  0.0f,  0.0f,
+				-1.0f,  0.0f,  0.0f,
+				-1.0f,  0.0f,  0.0f,
+				-1.0f,  0.0f,  0.0f,
+				-1.0f,  0.0f,  0.0f,
+				 0.0f,  0.0f, -1.0f,
+				 0.0f,  0.0f, -1.0f,
+				 0.0f,  0.0f, -1.0f,
+				 0.0f,  0.0f, -1.0f,
+				 0.0f,  0.0f,  1.0f,
+				 0.0f,  0.0f,  1.0f,
+				 0.0f,  0.0f,  1.0f,
+				 0.0f,  0.0f,  1.0f
+		};
 		float[] texCoords = {
 				0.0f, 1.0f,
 				1.0f, 1.0f,
@@ -104,7 +130,7 @@ public class Cube extends GameObject {
 				24, 25, 26,
 				26, 27, 24
 		};
-		Cube.cubeObject = new Mesh(positions, normals, texCoords, indices);
+		Cube.cubeObject = new Mesh(positions, normals, texCoords, tangents, indices);
 	}
 	
 	public Cube(Material material) {

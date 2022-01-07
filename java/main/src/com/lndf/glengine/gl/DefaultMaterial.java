@@ -4,13 +4,10 @@ import java.util.HashSet;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
-
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Engine;
-import com.lndf.glengine.gl.texture.TextureImage2D;
+import com.lndf.glengine.gl.texture.Texture2D;
 import com.lndf.glengine.gl.texture.Texture2DRoles;
-import com.lndf.glengine.gl.texture.TextureRole;
 import com.lndf.glengine.scene.GameObject;
 import com.lndf.glengine.scene.Scene;
 import com.lndf.glengine.scene.components.lighting.DirectionalLight;
@@ -18,7 +15,7 @@ import com.lndf.glengine.scene.components.lighting.PointLight;
 import com.lndf.glengine.scene.components.lighting.Spotlight;
 
 public class DefaultMaterial extends Material {
-
+	
 	private Texture2DRoles roles = new Texture2DRoles();
 	
 	public static Shader defaultShader = null;
@@ -31,100 +28,131 @@ public class DefaultMaterial extends Material {
 		if (defaultShader != null) return defaultShader;
 		String[] vertex = new String[] {
 				Shader.SHADER_VERSION,
-				Shader.readShader(new Asset("resource:/assets/glengine/shader/vertex_default.glsl")),
+				Shader.readShader(new Asset("resource:/assets/glengine/shader/vertex.glsl")),
 		};
 		String[] fragment = new String[] {
 				Shader.SHADER_VERSION,
-				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_default_sampler.glsl")),
-				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_default_light_declarations.glsl")),
-				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_default_light.glsl")),
-				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_default.glsl"))
+				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_sampler.glsl")),
+				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_light_declarations.glsl")),
+				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_light.glsl")),
+				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_cooktorrance.glsl")),
+				Shader.readShader(new Asset("resource:/assets/glengine/shader/frag_pbr.glsl"))
 		};
 		defaultShader = new Shader(vertex, fragment, null);
 		return defaultShader;
 	}
 	
-	public DefaultMaterial(Shader shader, Texture2DRoles textures) {
+	public DefaultMaterial(Shader shader) {
 		super(shader);
-		this.roles = textures;
 	}
 	
-	public DefaultMaterial(Texture2DRoles textures) {
+	public DefaultMaterial() {
 		super(createDefaultShader());
-		this.roles = textures;
 	}
-	
-	public DefaultMaterial(Shader shader, Vector4f color, Vector4f specularColor, float shininess) {
-		super(shader);
-		this.roles.setDefaultColor(TextureRole.DIFFUSE, color);
-		this.roles.setDefaultColor(TextureRole.SPECULAR, specularColor);
-		this.setShininess(shininess);
+
+	public Texture2DRoles getRoles() {
+		return roles;
 	}
-	
-	public DefaultMaterial(Shader shader, Vector4f color, TextureImage2D specularTexture, float shininess) {
-		super(shader);
-		this.roles.setDefaultColor(TextureRole.DIFFUSE, color);
-		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
-		this.setShininess(shininess);
+
+	public void setRoles(Texture2DRoles roles) {
+		this.roles = roles;
 	}
-	
-	public DefaultMaterial(Shader shader, TextureImage2D texture, Vector4f specularColor, float shininess) {
-		super(shader);
-		this.roles.addTexture(TextureRole.DIFFUSE, texture);
-		this.roles.setDefaultColor(TextureRole.SPECULAR, specularColor);
-		this.setShininess(shininess);
+
+	public Texture2D getAlbedoTexture() {
+		return this.roles.getAlbedoTexture();
 	}
-	
-	public DefaultMaterial(Shader shader, TextureImage2D texture, TextureImage2D specularTexture, float shininess) {
-		super(shader);
-		this.roles.addTexture(TextureRole.DIFFUSE, texture);
-		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
-		this.setShininess(shininess);
+
+	public void setAlbedoTexture(Texture2D albedoTexture) {
+		this.roles.setAlbedoTexture(albedoTexture);
 	}
-	
-	public DefaultMaterial(Vector4f color, Vector4f specularColor, float shininess) {
-		super(createDefaultShader());
-		this.roles.setDefaultColor(TextureRole.DIFFUSE, color);
-		this.roles.setDefaultColor(TextureRole.SPECULAR, specularColor);
-		this.setShininess(shininess);
+
+	public Texture2D getNormalMap() {
+		return this.roles.getNormalMap();
 	}
-	
-	public DefaultMaterial(Vector4f color, TextureImage2D specularTexture, float shininess) {
-		super(createDefaultShader());
-		this.roles.setDefaultColor(TextureRole.DIFFUSE, color);
-		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
-		this.setShininess(shininess);
+
+	public void setNormalMap(Texture2D normalMap) {
+		this.roles.setNormalMap(normalMap);
 	}
-	
-	public DefaultMaterial(TextureImage2D texture, Vector4f specularColor, float shininess) {
-		super(createDefaultShader());
-		this.roles.addTexture(TextureRole.DIFFUSE, texture);
-		this.roles.setDefaultColor(TextureRole.SPECULAR, specularColor);
-		this.setShininess(shininess);
+
+	public Texture2D getRoughnessTexture() {
+		return this.roles.getRoughnessTexture();
 	}
-	
-	public DefaultMaterial(TextureImage2D texture, TextureImage2D specularTexture, float shininess) {
-		super(createDefaultShader());
-		this.roles.addTexture(TextureRole.DIFFUSE, texture);
-		this.roles.addTexture(TextureRole.SPECULAR, specularTexture);
-		this.setShininess(shininess);
+
+	public void setRoughnessTexture(Texture2D roughnessTexture) {
+		this.roles.setRoughnessTexture(roughnessTexture);
 	}
-	
-	public void setShininess(float shininess) {
-		this.roles.setDefaultColor(TextureRole.SHININESS, new Vector4f(shininess, 0, 0, 0));
+
+	public Texture2D getMetalnessTexture() {
+		return this.roles.getMetalnessTexture();
 	}
-	
-	public Texture2DRoles getTextureRole() {
-		return this.roles;
+
+	public void setMetalnessTexture(Texture2D metalnessTexture) {
+		this.roles.setMetalnessTexture(metalnessTexture);
+	}
+
+	public Texture2D getAoTexture() {
+		return this.roles.getAoTexture();
+	}
+
+	public void setAoTexture(Texture2D aoTexture) {
+		this.setAoTexture(aoTexture);
+	}
+
+	public Texture2D getEmissiveTexture() {
+		return this.roles.getEmissiveTexture();
+	}
+
+	public void setEmissiveTexture(Texture2D emissiveTexture) {
+		this.roles.setEmissiveTexture(emissiveTexture);
+	}
+
+	public Vector3f getAlbedoColor() {
+		return this.roles.getAlbedoColor();
+	}
+
+	public void setAlbedoColor(Vector3f albedoColor) {
+		this.roles.setAlbedoColor(albedoColor);
+	}
+
+	public float getAo() {
+		return this.roles.getAo();
+	}
+
+	public void setAo(float ao) {
+		this.roles.setAo(ao);
+	}
+
+	public Vector3f getEmissiveColor() {
+		return this.roles.getEmissiveColor();
+	}
+
+	public void setEmissiveColor(Vector3f emissiveColor) {
+		this.roles.setEmissiveColor(emissiveColor);
+	}
+
+	public float getRoughness() {
+		return this.roles.getRoughness();
+	}
+
+	public void setRoughness(float roughness) {
+		this.roles.setRoughness(roughness);
+	}
+
+	public float getMetalness() {
+		return this.getMetalness();
+	}
+
+	public void setMetalness(float metalness) {
+		this.roles.setMetalness(metalness);
 	}
 
 	@Override
 	public void setUniform(Matrix4f vp, GameObject obj, Vector3f pov) {
-		Shader shader = this.getShader();
+		Shader shader = this.shader;
 		Scene scene = obj.getScene();
 		if (scene == null) return;
 		this.setVMP(vp, scene, obj, pov);
-		this.roles.setUniforms(shader);
+		this.roles.setUniforms(this.shader);
 		//lighting
 		HashSet<DirectionalLight> dLights = scene.getDirectionalLights();
 		HashSet<PointLight> pLights = scene.getPointLights();
