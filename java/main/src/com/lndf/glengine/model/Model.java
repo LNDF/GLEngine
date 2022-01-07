@@ -206,6 +206,7 @@ public class Model {
 		mesh.setPositions(positions);
 		mesh.setTexCoords(texCoords);
 		mesh.setNormals(normals);
+		mesh.setTangents(tangents);
 		mesh.setIndices(indexBuffer);
 		return this.createMeshContainer(meshName, mesh, textures);
 	}
@@ -215,7 +216,7 @@ public class Model {
 		if (textureCount <= 0) return null;
 		TextureImage2D texture = null;
 		AIString path = AIString.calloc();
-		Assimp.aiGetMaterialTexture(material, type, 1, path, (IntBuffer) null, null, null, null, null, null);
+		Assimp.aiGetMaterialTexture(material, type, 0, path, (IntBuffer) null, null, null, null, null, null);
 		String texPath = path.dataString();
 		if (this.textures.containsKey(texPath)) {
 			texture = this.textures.get(texPath);

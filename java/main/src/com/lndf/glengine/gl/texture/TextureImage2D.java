@@ -17,6 +17,8 @@ public class TextureImage2D extends Texture2D {
 	private HashMap<Integer, Integer> width = new HashMap<Integer, Integer>();
 	private HashMap<Integer, Integer> height = new HashMap<Integer, Integer>();
 	
+	private String path;
+	
 	private TextureFilter minMipmapFilter = TextureFilter.LINEAR;
 	
 	protected static boolean STBImageVerticalFlipMode = false;
@@ -44,6 +46,7 @@ public class TextureImage2D extends Texture2D {
 	
 	public void setTexture(Asset asset, int mipmapLevel) {
 		try {
+			this.path = asset.toString();
 			this.setTexture(asset.getByteBuffer(), mipmapLevel);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -65,7 +68,7 @@ public class TextureImage2D extends Texture2D {
 			IntBuffer c = stack.mallocInt(1); //Not used
 			ByteBuffer img = stbi_load_from_memory(input, w, h, c, 4);
 			if (img == null) {
-				throw new RuntimeException("Couldn't load texture. Reason: " + stbi_failure_reason());
+				throw new RuntimeException("Couldn't load texture" + (this.path != null ? " " + path : "") + ". Reason: " + stbi_failure_reason());
 			}
 			int width = w.get(0);
 			int height = h.get(0);
