@@ -7,27 +7,24 @@ import com.lndf.glengine.scene.Component;
 public class Spotlight extends Component {
 	
 	private Vector3f color;
-	private float atConstant;
-	private float atLinear;
-	private float atQuadratic;
+	private float radius;
+	private float strength;
 	private float innerCone;
 	private float outerCone;
 	
 	
 	public Spotlight() {
 		this.color = new Vector3f(1, 1, 1);
-		this.atConstant = 1.0f;
-		this.atLinear = 0.22f;
-		this.atQuadratic = 0.20f;
+		this.radius = 1;
+		this.strength = 1.3f;
 		this.innerCone = (float) Math.toRadians(10);
 		this.outerCone = (float) Math.toRadians(15);
 	}
 	
-	public Spotlight(Vector3f color, float atConstant, float atLinear, float atQuadratic, float innerCone, float outerCone) {
+	public Spotlight(Vector3f color, float radius, float strength, float innerCone, float outerCone) {
 		this.color = color;
-		this.atConstant = atConstant;
-		this.atLinear = atLinear;
-		this.atQuadratic = atQuadratic;
+		this.radius = radius;
+		this.strength = strength;
 		this.innerCone = innerCone;
 		this.outerCone = outerCone;
 	}
@@ -48,30 +45,22 @@ public class Spotlight extends Component {
 		this.outerCone = outerCone;
 	}
 	
-	public float getAtConstant() {
-		return atConstant;
+	public float getRadius() {
+		return radius;
 	}
 
-	public void setAtConstant(float atConstant) {
-		this.atConstant = atConstant;
+	public void setRadius(float radius) {
+		this.radius = radius;
 	}
 
-	public float getAtLinear() {
-		return atLinear;
+	public float getStrength() {
+		return strength;
 	}
 
-	public void setAtLinear(float atLinear) {
-		this.atLinear = atLinear;
+	public void setStrength(float strength) {
+		this.strength = strength;
 	}
 
-	public float getAtQuadratic() {
-		return atQuadratic;
-	}
-
-	public void setAtQuadratic(float atQuadratic) {
-		this.atQuadratic = atQuadratic;
-	}
-	
 	public Vector3f getColor() {
 		return color;
 	}

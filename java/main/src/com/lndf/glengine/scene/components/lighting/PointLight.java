@@ -7,48 +7,37 @@ import com.lndf.glengine.scene.Component;
 public class PointLight extends Component {
 	
 	private Vector3f color;
-	private float atConstant;
-	private float atLinear;
-	private float atQuadratic;
+	private float radius;
+	private float strength;
 	
 	public PointLight() {
-		this.color = new Vector3f(1, 1, 1);
-		this.atConstant = 1.0f;
-		this.atLinear = 0.22f;
-		this.atQuadratic = 0.20f;
+		this.color = new Vector3f(1);
+		this.radius = 1;
+		this.strength = 1.3f;
 	}
 	
-	public PointLight(Vector3f color, float atConstant, float atLinear, float atQuadratic) {
+	public PointLight(Vector3f color, float radius, float strength) {
 		this.color = color;
-		this.atConstant = atConstant;
-		this.atLinear = atLinear;
-		this.atQuadratic = atQuadratic;
-	}
-
-	public float getAtConstant() {
-		return atConstant;
-	}
-
-	public void setAtConstant(float atConstant) {
-		this.atConstant = atConstant;
-	}
-
-	public float getAtLinear() {
-		return atLinear;
-	}
-
-	public void setAtLinear(float atLinear) {
-		this.atLinear = atLinear;
-	}
-
-	public float getAtQuadratic() {
-		return atQuadratic;
-	}
-
-	public void setAtQuadratic(float atQuadratic) {
-		this.atQuadratic = atQuadratic;
+		this.radius = radius;
+		this.strength = strength;
 	}
 	
+	public float getRadius() {
+		return radius;
+	}
+
+	public void setRadius(float radius) {
+		this.radius = radius;
+	}
+
+	public float getStrength() {
+		return strength;
+	}
+
+	public void setStrength(float strength) {
+		this.strength = strength;
+	}
+
 	public Vector3f getColor() {
 		return color;
 	}

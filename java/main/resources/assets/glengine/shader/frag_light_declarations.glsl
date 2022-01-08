@@ -6,18 +6,17 @@ struct DirLight {
 struct PointLight {
 	vec3 position;
 	vec3 color;
-	float atConstant;
-	float atLinear;
-	float atQuadratic;
+	float radius;
+	float strength;
 };
 
 struct Spotlight {
 	vec3 position;
 	vec3 direction;
 	vec3 color;
+	vec3 minColor;
 	float cosInnerCone;
 	float cosOuterCone;
-	float atConstant;
-	float atLinear;
-	float atQuadratic;
+	float radius;
+	float strength;
 };

@@ -20,6 +20,8 @@ public class DefaultMaterial extends Material {
 	
 	public static Shader defaultShader = null;
 	
+	public static boolean disableAO = false; //DISABLE AO HACK
+	
 	static {
 		Engine.addTerminateRunnable(() -> defaultShader = null);
 	}
@@ -153,6 +155,10 @@ public class DefaultMaterial extends Material {
 		if (scene == null) return;
 		this.setVMP(vp, scene, obj, pov);
 		this.roles.setUniforms(this.shader);
+		if (DefaultMaterial.disableAO) { //DISABLE AO HACK
+			this.shader.setUniform("ao", 1f);
+			this.shader.setUniform("useAoTexture", false);
+		}
 		//lighting
 		HashSet<DirectionalLight> dLights = scene.getDirectionalLights();
 		HashSet<PointLight> pLights = scene.getPointLights();
@@ -175,9 +181,8 @@ public class DefaultMaterial extends Material {
 			Vector3f position = light.getGameObject().getTransform().getWorldPosition();
 			shader.setUniform("pointLights[" + counter + "].color", color.x, color.y, color.z);
 			shader.setUniform("pointLights[" + counter + "].position", position.x, position.y, position.z);
-			shader.setUniform("pointLights[" + counter + "].atConstant", light.getAtConstant());
-			shader.setUniform("pointLights[" + counter + "].atLinear", light.getAtLinear());
-			shader.setUniform("pointLights[" + counter + "].atQuadratic", light.getAtQuadratic());
+			shader.setUniform("pointLights[" + counter + "].radius", light.getRadius());
+			shader.setUniform("pointLights[" + counter + "].strength", light.getStrength());
 			counter++;
 		}
 		shader.setUniform("pointLightCount", counter);
@@ -189,10 +194,9 @@ public class DefaultMaterial extends Material {
 			Vector3f position = light.getGameObject().getTransform().getWorldPosition();
 			shader.setUniform("spotlights[" + counter + "].color", color.x, color.y, color.z);
 			shader.setUniform("spotlights[" + counter + "].position", position.x, position.y, position.z);
+			shader.setUniform("spotlights[" + counter + "].radius", light.getRadius());
+			shader.setUniform("spotlights[" + counter + "].strength", light.getStrength());
 			shader.setUniform("spotlights[" + counter + "].direction", direction.x, direction.y, direction.z);
-			shader.setUniform("spotlights[" + counter + "].atConstant", light.getAtConstant());
-			shader.setUniform("spotlights[" + counter + "].atLinear", light.getAtLinear());
-			shader.setUniform("spotlights[" + counter + "].atQuadratic", light.getAtQuadratic());
 			shader.setUniform("spotlights[" + counter + "].cosInnerCone", (float) Math.cos(light.getInnerCone()));
 			shader.setUniform("spotlights[" + counter + "].cosOuterCone", (float) Math.cos(light.getOuterCone()));
 			counter++;

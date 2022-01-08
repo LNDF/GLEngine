@@ -25,11 +25,11 @@ public class LightsMain {
 		DefaultMaterial material = new DefaultMaterial();
 		material.setAlbedoTexture(boxTexture);
 		material.setRoughnessTexture(boxTextureSpecular);
-		material.setMetalness(1f);
+		material.setMetalness(0f);
 		FPCamera cam = new FPCamera((float) (Math.PI / 2), 100.0f);
 		Scene scene = new Scene();
-		Spotlight pl = new Spotlight(new Vector3f(1,1,1), 1.0f, 0.35f, 0.44f, (float) Math.toRadians(25), (float) Math.toRadians(35));
-		PointLight pl1 = new PointLight(new Vector3f(1, 0, 0), 1.0f, 0.07f, 0.017f);
+		Spotlight pl = new Spotlight(new Vector3f(1,1,1), 3, 2, (float) Math.toRadians(25), (float) Math.toRadians(35));
+		PointLight pl1 = new PointLight(new Vector3f(1, 0, 0), 10.0f, 1.3f);
 		DirectionalLight pl2 = new DirectionalLight(new Vector3f(0, 0.3f, 0)) {
 			@Override
 			public void update() {
