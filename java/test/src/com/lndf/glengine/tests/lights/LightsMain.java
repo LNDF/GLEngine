@@ -21,11 +21,12 @@ public class LightsMain {
 	public static void main(String[] args) {
 		Engine.createWindow("Lights test", 800, 600, true);
 		TextureImage2D boxTexture = new TextureImage2D(new Asset("resource:/lights/box.png"));
-		TextureImage2D boxTextureSpecular = new TextureImage2D(new Asset("resource:/lights/box_specular.png"));
+		TextureImage2D boxTextureRough = new TextureImage2D(new Asset("resource:/lights/box_rough.png"));
+		TextureImage2D boxTextureMetal = new TextureImage2D(new Asset("resource:/lights/box_metal.png"));
 		DefaultMaterial material = new DefaultMaterial();
 		material.setAlbedoTexture(boxTexture);
-		material.setRoughnessTexture(boxTextureSpecular);
-		material.setMetalness(0f);
+		material.setRoughnessTexture(boxTextureRough);
+		material.setMetalnessTexture(boxTextureMetal);
 		FPCamera cam = new FPCamera((float) (Math.PI / 2), 100.0f);
 		Scene scene = new Scene();
 		Spotlight pl = new Spotlight(new Vector3f(1,1,1), 3, 2, (float) Math.toRadians(25), (float) Math.toRadians(35));
@@ -78,7 +79,8 @@ public class LightsMain {
 		Engine.mainLoop();
 		material.destroy();
 		boxTexture.destroy();
-		boxTextureSpecular.destroy();
+		boxTextureRough.destroy();
+		boxTextureMetal.destroy();
 		scene.destroy();
 		Engine.terminate();
 	}
