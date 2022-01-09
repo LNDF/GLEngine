@@ -35,7 +35,7 @@ out vec4 fragColor;
 void main() {
 	vec3 albedoColor = albedo;
 	if (useAlbedoTexture) {
-		albedoColor = sampleTexture(albedoTexture, inTexCoords).rgb;
+		albedoColor = sampleTextureGC(albedoTexture, inTexCoords).rgb;
 	}
 	vec3 normal = normalize(inNormal);
 	if (useNormalMap) {
@@ -57,7 +57,7 @@ void main() {
 	}
 	vec3 emissiveColor = emissive;
 	if (useEmissiveTexture) {
-		emissiveColor = sampleTexture(emissiveTexture, inTexCoords).rgb;
+		emissiveColor = sampleTextureGC(emissiveTexture, inTexCoords).rgb;
 	}
 	vec3 view = normalize(inPOV - inPos);
 	vec3 F0 = vec3(0.04);
