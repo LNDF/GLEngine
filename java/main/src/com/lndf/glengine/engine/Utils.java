@@ -35,6 +35,7 @@ public class Utils {
 		return BufferUtils.createByteBuffer(bytes.length).put(bytes).flip();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static void decomposeAssimpMatrix4x4(AIMatrix4x4 matrix, Vector3f position, Vector3f scale, Quaternionf rotation) {
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			AIVector3D assimpPos = AIVector3D.callocStack(stack);

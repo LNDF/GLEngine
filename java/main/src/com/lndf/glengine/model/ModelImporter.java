@@ -72,6 +72,7 @@ public class ModelImporter {
 	
 	private static final AIFileFlushProc AI_FILE_FLUSH_PROC = AIFileFlushProc.create(pFile -> { throw new UnsupportedOperationException(); });
 	 
+	@SuppressWarnings("deprecation")
 	private static final AIFileOpenProc  AI_FILE_OPEN_PROC  = AIFileOpenProc.create((pFileIO, fileName, openMode) -> {
 		ByteBuffer data = null;
 		String strFileName = memUTF8(fileName);
@@ -101,6 +102,7 @@ public class ModelImporter {
 	
 	private static final AIFileCloseProc AI_FILE_CLOSE_PROC = AIFileCloseProc.create((pFileIO, pFile) -> {});
 	
+	@SuppressWarnings("deprecation")
 	public static AIScene importScene(Asset asset, ModelImporterSettings settings) {
 		try (MemoryStack stack = stackPush()) {
 			AIPropertyStore store = Assimp.aiCreatePropertyStore();
