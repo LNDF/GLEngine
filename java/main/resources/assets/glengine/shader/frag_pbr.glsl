@@ -73,20 +73,16 @@ void main() {
 	for (int i = 0; i < pointLightCount; i++) {
 		PointLight light = pointLights[i];
 		vec3 radiance = calculatePointLight(light, inPos);
-		if (radiance.x > 0 || radiance.y > 0 || radiance.z > 0) {
-			vec3 L = normalize(light.position - inPos);
-			vec3 H = normalize(view + L);
-			Lo += cookTorrance(normal, view, H, L, F0, albedoColor, radiance, roughnessLevel, metalnessLevel);
-		}
+		vec3 L = normalize(light.position - inPos);
+		vec3 H = normalize(view + L);
+		Lo += cookTorrance(normal, view, H, L, F0, albedoColor, radiance, roughnessLevel, metalnessLevel);
 	}
 	for (int i = 0; i < spotlightCount; i++) {
 		Spotlight light = spotlights[i];
 		vec3 radiance = calculateSpotlight(light, inPos);
-		if (radiance.x > 0 || radiance.y > 0 || radiance.z > 0) {
-			vec3 L = normalize(light.position - inPos);
-			vec3 H = normalize(view + L);
-			Lo += cookTorrance(normal, view, H, L, F0, albedoColor, radiance, roughnessLevel, metalnessLevel);
-		}
+		vec3 L = normalize(light.position - inPos);
+		vec3 H = normalize(view + L);
+		Lo += cookTorrance(normal, view, H, L, F0, albedoColor, radiance, roughnessLevel, metalnessLevel);
 	}
 	vec3 ambient = ambientLightLevel * albedoColor * aoLevel;
 	vec3 color = ambient + Lo;
