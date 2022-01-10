@@ -168,7 +168,7 @@ public class Model {
 			//textures
 			textures.setAlbedoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_BASE_COLOR));
 			textures.setAoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT_OCCLUSION));
-			textures.setNormalMap(this.loadTextures(scene, material, Assimp.aiTextureType_));
+			textures.setNormalMap(this.loadTextures(scene, material, Assimp.aiTextureType_NORMALS));
 			textures.setMetalnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_METALNESS));
 			textures.setRoughnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_DIFFUSE_ROUGHNESS));
 			textures.setEmissiveTexture(this.loadTextures(scene, material, Assimp.aiTextureType_EMISSION_COLOR));
