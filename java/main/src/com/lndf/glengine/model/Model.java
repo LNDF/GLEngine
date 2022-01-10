@@ -18,16 +18,12 @@ import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMatrix4x4;
 import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AIMetaData;
-import org.lwjgl.assimp.AIMetaDataEntry;
 import org.lwjgl.assimp.AINode;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
-import org.lwjgl.assimp.AITexel;
 import org.lwjgl.assimp.AITexture;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
-import org.lwjgl.system.MemoryUtil;
 
 import com.lndf.glengine.asset.Asset;
 import com.lndf.glengine.engine.Utils;
@@ -174,7 +170,6 @@ public class Model {
 			textures.setEmissiveTexture(this.loadTextures(scene, material, Assimp.aiTextureType_EMISSION_COLOR));
 			//colorss
 			textures.setAlbedoColor(this.getMaterialColor(material, Assimp.AI_MATKEY_BASE_COLOR));
-			textures.setAo(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT).x);
 			textures.setEmissiveColor(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_EMISSIVE));
 			textures.setRoughness(this.getMaterialColor(material, Assimp.AI_MATKEY_ROUGHNESS_FACTOR).x);
 			textures.setMetalness(this.getMaterialColor(material, Assimp.AI_MATKEY_METALLIC_FACTOR).x);
