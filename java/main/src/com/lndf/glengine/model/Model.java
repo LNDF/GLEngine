@@ -48,14 +48,13 @@ public class Model {
 	private ArrayList<ModelNode> nodes = new ArrayList<ModelNode>();
 	private ModelNode rootNode;
 	private Asset asset;
-	private float unitScaleFactor = 1f;
 	
 	static {
-		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_DIFFUSE, new Vector3f(0.6f));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_BASE_COLOR, new Vector3f(0.6f));
 		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_AMBIENT, new Vector3f(1));
 		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_EMISSIVE, new Vector3f(0));
-		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_SPECULAR, new Vector3f(0));
-		DEFAULT_COLORS.put(Assimp.AI_MATKEY_COLOR_REFLECTIVE, new Vector3f(0));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_ROUGHNESS_FACTOR, new Vector3f(0));
+		DEFAULT_COLORS.put(Assimp.AI_MATKEY_METALLIC_FACTOR, new Vector3f(0));
 	}
 	
 	public Model(Asset asset, ModelImporterSettings settings) {
@@ -74,26 +73,7 @@ public class Model {
 				scene.mRootNode() == null) {
 			throw new RuntimeException("Assimp Error: " + Assimp.aiGetErrorString());
 		}
-		if (scene.mMetaData() != null) {
-			AIMetaDataEntry unitScaleFactor = this.getEntryFromMetaData(scene.mMetaData(), "UnitScaleFactor");
-			if (unitScaleFactor != null) {
-				double factor = unitScaleFactor.mData(8).getDouble();
-				this.unitScaleFactor = (float) factor;
-			}
-		}
 		this.rootNode = loadNode("", scene.mRootNode(), scene, true);
-	}
-	
-	private AIMetaDataEntry getEntryFromMetaData(AIMetaData metaData, String target) {
-		int numProperties = metaData.mNumProperties();
-		AIString.Buffer keys = metaData.mKeys();
-		AIMetaDataEntry.Buffer values = metaData.mValues();
-		for (int i = 0; i < numProperties; i++) {
-			if (keys.get(i).dataString().equals(target)) {
-				return values.get(i);
-			}
-		}
-		return null;
 	}
 	
 	private ModelNode loadNode(String path, AINode node, AIScene scene, boolean isRootNode) {
@@ -106,10 +86,6 @@ public class Model {
 		Vector3f scale = new Vector3f();
 		Quaternionf rotation = new Quaternionf();
 		Utils.decomposeAssimpMatrix4x4(transform, position, scale, rotation);
-		if (!isRootNode) {
-			position.mul(unitScaleFactor);
-			scale.mul(unitScaleFactor);
-		}
 		MeshContainer[] meshContainers = new MeshContainer[numMeshes];
 		ModelNode[] nodeChildren = new ModelNode[numChildren];
 		IntBuffer meshes = node.mMeshes();
@@ -190,18 +166,18 @@ public class Model {
 		if (materialIndex >= 0) {
 			AIMaterial material = AIMaterial.create(scene.mMaterials().get(materialIndex));
 			//textures
-			textures.setAlbedoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_DIFFUSE));
-			textures.setAoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT));
-			textures.setNormalMap(this.loadTextures(scene, material, Assimp.aiTextureType_NORMALS));
-			textures.setMetalnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_SHININESS));
-			textures.setRoughnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_SPECULAR));
-			textures.setEmissiveTexture(this.loadTextures(scene, material, Assimp.aiTextureType_EMISSIVE));
+			textures.setAlbedoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_BASE_COLOR));
+			textures.setAoTexture(this.loadTextures(scene, material, Assimp.aiTextureType_AMBIENT_OCCLUSION));
+			textures.setNormalMap(this.loadTextures(scene, material, Assimp.aiTextureType_));
+			textures.setMetalnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_METALNESS));
+			textures.setRoughnessTexture(this.loadTextures(scene, material, Assimp.aiTextureType_DIFFUSE_ROUGHNESS));
+			textures.setEmissiveTexture(this.loadTextures(scene, material, Assimp.aiTextureType_EMISSION_COLOR));
 			//colorss
-			textures.setAlbedoColor(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE));
+			textures.setAlbedoColor(this.getMaterialColor(material, Assimp.AI_MATKEY_BASE_COLOR));
 			textures.setAo(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT).x);
 			textures.setEmissiveColor(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_EMISSIVE));
-			textures.setRoughness(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR).x);
-			textures.setMetalness(this.getMaterialColor(material, Assimp.AI_MATKEY_COLOR_REFLECTIVE).x);
+			textures.setRoughness(this.getMaterialColor(material, Assimp.AI_MATKEY_ROUGHNESS_FACTOR).x);
+			textures.setMetalness(this.getMaterialColor(material, Assimp.AI_MATKEY_METALLIC_FACTOR).x);
 		}
 		mesh.setPositions(positions);
 		mesh.setTexCoords(texCoords);
@@ -226,14 +202,11 @@ public class Model {
 				int embTexWidth = embedded.mWidth();
 				int embTexHeight = embedded.mHeight();
 				if (embTexHeight == 0) {
-					long address = embedded.pcData(0).address0();
-					ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, embTexWidth);
+					ByteBuffer textureRaw = embedded.pcDataCompressed();
 					texture = new TextureImage2D(textureRaw);
 					this.textures.put(texPath, texture);
 				} else {
-					int capacity = embTexWidth * embTexHeight * AITexel.SIZEOF;
-					long address = embedded.pcData(0).address0();
-					ByteBuffer textureRaw = MemoryUtil.memByteBuffer(address, capacity);
+					ByteBuffer textureRaw = embedded.pcDataCompressed();
 					texture = new TextureImage2D();
 					texture.setUncompressedTexture(textureRaw, 0, embTexWidth, embTexHeight, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV);
 					texture.setDefaultTextureSettings();
