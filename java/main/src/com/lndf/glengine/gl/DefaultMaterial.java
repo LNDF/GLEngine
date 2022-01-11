@@ -75,6 +75,14 @@ public class DefaultMaterial extends Material {
 	public void setNormalMap(Texture2D normalMap) {
 		this.roles.setNormalMap(normalMap);
 	}
+	
+	public Texture2D getDisplacementMap() {
+		return this.roles.getDisplacementMap();
+	}
+	
+	public void setDisplacementMap(Texture2D displacementMap) {
+		this.roles.setDisplacementMap(displacementMap);
+	}
 
 	public Texture2D getRoughnessTexture() {
 		return this.roles.getRoughnessTexture();
