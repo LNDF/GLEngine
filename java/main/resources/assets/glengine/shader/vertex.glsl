@@ -12,8 +12,6 @@ out vec3 inNormal;
 out vec3 inPOV;
 out vec3 inPos;
 out vec2 inTexCoords;
-out vec3 inTangentPOV;
-out vec3 inTangentPos;
 
 void main() {
 	vec3 T = normalize(vec3(model * vec4(tangent, 0.0)));
@@ -25,7 +23,5 @@ void main() {
 	inPos = (model * position).xyz;
 	inTexCoords = texCoords;
 	inTBN = mat3(T, B, N);
-	inTangentPOV = inTBN * inPOV;
-	inTangentPos = inTBN * inPos;
 	gl_Position = vp * model * position;
 }

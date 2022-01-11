@@ -7,7 +7,6 @@ public class Texture2DRoles {
 
 	private Texture2D albedoTexture;
 	private Texture2D normalMap;
-	private Texture2D displacementMap;
 	private Texture2D roughnessTexture;
 	private Texture2D metalnessTexture;
 	private Texture2D aoTexture;
@@ -33,14 +32,6 @@ public class Texture2DRoles {
 
 	public void setNormalMap(Texture2D normalMap) {
 		this.normalMap = normalMap;
-	}
-
-	public Texture2D getDisplacementMap() {
-		return displacementMap;
-	}
-
-	public void setDisplacementMap(Texture2D displacementMap) {
-		this.displacementMap = displacementMap;
 	}
 
 	public Texture2D getRoughnessTexture() {
@@ -118,7 +109,6 @@ public class Texture2DRoles {
 	public void setUniforms(Shader shader) {
 		shader.setUniform("useAlbedoTexture", this.albedoTexture != null);
 		shader.setUniform("useNormalMap", this.normalMap != null);
-		shader.setUniform("useDisplacementMap", this.displacementMap != null);
 		shader.setUniform("useRoughnessTexture", this.roughnessTexture != null);
 		shader.setUniform("useMetalnessTexture", this.metalnessTexture != null);
 		shader.setUniform("useAoTexture", this.aoTexture != null);
@@ -133,31 +123,27 @@ public class Texture2DRoles {
 			this.normalMap.bind(1);
 			shader.setUniform("normalMap", 1);
 		}
-		if (this.displacementMap != null) {
-			this.displacementMap.bind(2);
-			shader.setUniform("displacementMap", 2);
-		}
 		if (this.roughnessTexture != null) {
-			this.roughnessTexture.bind(3);
-			shader.setUniform("roughnessTexture", 3);
+			this.roughnessTexture.bind(2);
+			shader.setUniform("roughnessTexture", 2);
 		} else {
 			shader.setUniform("roughness", this.roughness);
 		}
 		if (this.metalnessTexture != null) {
-			this.metalnessTexture.bind(4);
-			shader.setUniform("metalnessTexture", 4);
+			this.metalnessTexture.bind(3);
+			shader.setUniform("metalnessTexture", 3);
 		} else {
 			shader.setUniform("metalness", this.metalness);
 		}
 		if (this.aoTexture != null) {
-			this.aoTexture.bind(5);
-			shader.setUniform("aoTexture", 5);
+			this.aoTexture.bind(4);
+			shader.setUniform("aoTexture", 4);
 		} else {
 			shader.setUniform("ao", this.ao);
 		}
 		if (this.emissiveTexture != null) {
-			this.emissiveTexture.bind(6);
-			shader.setUniform("emissiveTexture", 6);
+			this.emissiveTexture.bind(5);
+			shader.setUniform("emissiveTexture", 5);
 		} else {
 			shader.setUniform("emissive", this.emissiveColor);
 		}
