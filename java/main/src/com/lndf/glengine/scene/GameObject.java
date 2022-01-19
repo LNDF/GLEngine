@@ -143,6 +143,7 @@ public class GameObject {
 				}
 			}
 		}
+		this.setScene(null);
 		for (ConcurrentLinkedQueue<Component> tcomp : this.components.values()) {
 			for (Component comp : tcomp) {
 				comp.removeFromGameObject();

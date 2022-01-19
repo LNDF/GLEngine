@@ -221,7 +221,6 @@ public class Scene implements EngineResource {
 			Engine.removeEngineResource(this);
 			this.unsubscribeFromUpdates();
 			for (GameObject obj : this.gameObjects) {
-				obj.setScene(null);
 				obj.destroy();
 			}
 			this.gameObjects.clear();
