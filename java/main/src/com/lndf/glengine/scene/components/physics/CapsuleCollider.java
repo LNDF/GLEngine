@@ -7,7 +7,7 @@ import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.scene.GameObject;
 
-import physx.geomutils.PxCapsuleGeometry;
+import physx.geometry.PxCapsuleGeometry;
 import physx.physics.PxShape;
 
 public class CapsuleCollider extends Collider {

@@ -4,19 +4,18 @@
 
 plugins {
     id 'java'
-    id 'eclipse'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 project.ext.lwjglVersion = "3.3.0"
-project.ext.jomlVersion = "1.10.3"
-project.ext.physxVersion = "0.4.16"
+project.ext.jomlVersion = "1.10.8"
+project.ext.physxVersion = "2.4.2"
 
 group = 'com.lndf.GLEngine'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0'
 description = 'GLEngine'
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_11
 
 sourceSets {
     main {
@@ -99,9 +98,9 @@ dependencies {
 	//PhysX
 	implementation "de.fabmax:physx-jni:$physxVersion"
 	
-    runtimeOnly "de.fabmax:physx-jni:$physxVersion:native-win64"
-    runtimeOnly "de.fabmax:physx-jni:$physxVersion:native-linux64"
-    runtimeOnly "de.fabmax:physx-jni:$physxVersion:native-mac64"
+    runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-windows"
+    runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-linux"
+    runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-macos"
 	
 }
 

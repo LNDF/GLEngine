@@ -11,8 +11,8 @@ import com.lndf.glengine.scene.GameObject;
 import physx.common.PxIDENTITYEnum;
 import physx.common.PxQuat;
 import physx.common.PxVec3;
-import physx.geomutils.PxMeshScale;
-import physx.geomutils.PxTriangleMeshGeometry;
+import physx.geometry.PxMeshScale;
+import physx.geometry.PxTriangleMeshGeometry;
 import physx.physics.PxShape;
 
 public class TriangleMeshCollider extends Collider {

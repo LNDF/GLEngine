@@ -8,4 +8,7 @@ bin/
 .gradle/
 build/
 
+# vscode
+.vscode/
+
 puntos.bin

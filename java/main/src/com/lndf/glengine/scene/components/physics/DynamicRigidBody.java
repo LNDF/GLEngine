@@ -147,7 +147,7 @@ public class DynamicRigidBody extends Component implements EngineResource, Rigid
 	public void setGravityEnabled(boolean enable) {
 		PxActorFlags flags = this.rigid.getActorFlags();
 		if (!enable) {
-			flags.set(PxActorFlagEnum.eDISABLE_GRAVITY);
+			flags.raise(PxActorFlagEnum.eDISABLE_GRAVITY);
 		} else {
 			flags.clear(PxActorFlagEnum.eDISABLE_GRAVITY);
 		}

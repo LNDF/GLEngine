@@ -7,13 +7,14 @@ import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.gl.Mesh;
 
+import physx.PxTopLevelFunctions;
 import physx.common.PxBoundedData;
 import physx.common.PxVec3;
 import physx.cooking.PxConvexFlagEnum;
 import physx.cooking.PxConvexFlags;
 import physx.cooking.PxConvexMeshDesc;
-import physx.geomutils.PxConvexMesh;
-import physx.support.Vector_PxVec3;
+import physx.geometry.PxConvexMesh;
+import physx.support.PxArray_PxVec3;
 
 public class PhysicalConvexMesh implements EngineResource	 {
 	
@@ -22,25 +23,23 @@ public class PhysicalConvexMesh implements EngineResource	 {
 	public PhysicalConvexMesh(Mesh mesh) {
 		Engine.addEngineResource(this);
 		try (MemoryStack mem = MemoryStack.stackPush()) {
-			Vector_PxVec3 points = new Vector_PxVec3();
-			PxVec3 tmpVec = PxVec3.createAt(mem, MemoryStack::nmalloc);
 			float[] positions = mesh.getPositions();
+			PxArray_PxVec3 points = PxArray_PxVec3.createAt(mem, MemoryStack::nmalloc, positions.length / 3);
 			for (int i = 0; i < positions.length; i += 3) {
-				tmpVec.setX(positions[i]);
-				tmpVec.setY(positions[i + 1]);
-				tmpVec.setZ(positions[i + 2]);
-				points.push_back(tmpVec);
+				PxVec3 point = points.get(i / 3);
+				point.setX(positions[i]);
+				point.setY(positions[i + 1]);
+				point.setZ(positions[i + 2]);
 			}
 			PxBoundedData pointsBounded = PxBoundedData.createAt(mem, MemoryStack::nmalloc);
 			pointsBounded.setCount(points.size());
 			pointsBounded.setStride(PxVec3.SIZEOF);
-			pointsBounded.setData(points.data());
+			pointsBounded.setData(points.begin());
 			PxConvexMeshDesc desc = PxConvexMeshDesc.createAt(mem, MemoryStack::nmalloc);
 			desc.setPoints(pointsBounded);
-			PxConvexFlags flags = PxConvexFlags.createAt(mem, MemoryStack::nmalloc, (short) PxConvexFlagEnum.eCOMPUTE_CONVEX);
+			PxConvexFlags flags = PxConvexFlags.createAt(mem, MemoryStack::nmalloc, (short) PxConvexFlagEnum.eCOMPUTE_CONVEX.value);
 			desc.setFlags(flags);
-			this.mesh = PhysXManager.getCooking().createConvexMesh(desc, PhysXManager.getPhysics().getPhysicsInsertionCallback());
-			points.destroy();
+			this.mesh = PxTopLevelFunctions.CreateConvexMesh(PhysXManager.getCookingParams(), desc);
 		}
 	}
 	

@@ -7,7 +7,7 @@ import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.physics.PhysicalMaterial;
 import com.lndf.glengine.scene.GameObject;
 
-import physx.geomutils.PxBoxGeometry;
+import physx.geometry.PxBoxGeometry;
 import physx.physics.PxShape;
 
 public class BoxCollider extends Collider {

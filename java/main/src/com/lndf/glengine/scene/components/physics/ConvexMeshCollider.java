@@ -11,8 +11,8 @@ import com.lndf.glengine.scene.GameObject;
 import physx.common.PxIDENTITYEnum;
 import physx.common.PxQuat;
 import physx.common.PxVec3;
-import physx.geomutils.PxConvexMeshGeometry;
-import physx.geomutils.PxMeshScale;
+import physx.geometry.PxConvexMeshGeometry;
+import physx.geometry.PxMeshScale;
 import physx.physics.PxShape;
 
 public class ConvexMeshCollider extends Collider {

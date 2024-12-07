@@ -7,12 +7,13 @@ import com.lndf.glengine.engine.EngineResource;
 import com.lndf.glengine.engine.PhysXManager;
 import com.lndf.glengine.gl.Mesh;
 
+import physx.PxTopLevelFunctions;
 import physx.common.PxBoundedData;
 import physx.common.PxVec3;
 import physx.cooking.PxTriangleMeshDesc;
-import physx.geomutils.PxTriangleMesh;
-import physx.support.Vector_PxU32;
-import physx.support.Vector_PxVec3;
+import physx.geometry.PxTriangleMesh;
+import physx.support.PxArray_PxU32;
+import physx.support.PxArray_PxVec3;
 
 public class PhysicalTriangleMesh implements EngineResource {
 	
@@ -21,34 +22,31 @@ public class PhysicalTriangleMesh implements EngineResource {
 	public PhysicalTriangleMesh(Mesh mesh) {
 		Engine.addEngineResource(this);
 		try (MemoryStack mem = MemoryStack.stackPush()) {
-			Vector_PxVec3 vPoints = new Vector_PxVec3();
-			Vector_PxU32 vIndices = new Vector_PxU32();
-			PxVec3 tmpVec = PxVec3.createAt(mem, MemoryStack::nmalloc);
 			float[] positions = mesh.getPositions();
 			int[] indices = mesh.getIndices();
+			PxArray_PxVec3 vPoints = PxArray_PxVec3.createAt(mem, MemoryStack::nmalloc, positions.length / 3);
+			PxArray_PxU32 vIndices = PxArray_PxU32.createAt(mem, MemoryStack::nmalloc, indices.length);
 			for (int i = 0; i < positions.length; i += 3) {
-				tmpVec.setX(positions[i]);
-				tmpVec.setY(positions[i + 1]);
-				tmpVec.setZ(positions[i + 2]);
-				vPoints.push_back(tmpVec);
+				PxVec3 point = vPoints.get(i / 3);
+				point.setX(positions[i]);
+				point.setY(positions[i + 1]);
+				point.setZ(positions[i + 2]);
 			}
 			for (int i = 0; i < indices.length; i++) {
-				vIndices.push_back(indices[i]);
+				vIndices.pushBack(indices[i]);
 			}
 			PxBoundedData boundedPoints = PxBoundedData.createAt(mem, MemoryStack::nmalloc);
 			boundedPoints.setCount(vPoints.size());
 			boundedPoints.setStride(PxVec3.SIZEOF);
-			boundedPoints.setData(vPoints.data());
+			boundedPoints.setData(vPoints.begin());
 			PxBoundedData boundedIndices = PxBoundedData.createAt(mem, MemoryStack::nmalloc);
 			boundedIndices.setCount(vIndices.size() / 3);
 			boundedIndices.setStride(4 * 3);
-			boundedIndices.setData(vIndices.data());
+			boundedIndices.setData(vIndices.begin());
 			PxTriangleMeshDesc meshDesc = PxTriangleMeshDesc.createAt(mem, MemoryStack::nmalloc);
 			meshDesc.setPoints(boundedPoints);
 			meshDesc.setTriangles(boundedIndices);
-			this.mesh = PhysXManager.getCooking().createTriangleMesh(meshDesc, PhysXManager.getPhysics().getPhysicsInsertionCallback());
-			vPoints.destroy();
-			vIndices.destroy();
+			this.mesh = PxTopLevelFunctions.CreateTriangleMesh(PhysXManager.getCookingParams(), meshDesc);
 		}
 	}
 	

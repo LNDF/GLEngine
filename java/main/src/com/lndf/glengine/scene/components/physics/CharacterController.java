@@ -102,7 +102,7 @@ public abstract class CharacterController extends Component implements EngineRes
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxVec3 up = PxVec3.createAt(mem, MemoryStack::nmalloc, this.upDirection.x, this.upDirection.y, this.upDirection.z);
 			PxExtendedVec3 pos = PxExtendedVec3.wrapPointer(mem.nmalloc(PXEXTENDEDVEC3_SIZEOF));
-			int nonWalkableMode = this.shouldSlide ? PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING : PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING;
+			PxControllerNonWalkableModeEnum nonWalkableMode = this.shouldSlide ? PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING : PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING;
 			pos.setX(0);
 			pos.setY(0);
 			pos.setZ(0);
