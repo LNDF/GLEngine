@@ -16,7 +16,7 @@ public abstract class RenderComponent extends Component {
 	}
 	
 	public void setGLSettings() {
-		throw new UnsupportedOperationException("Function not implemented.");
+		// To be implemented
 	}
 	
 	public abstract void render(Matrix4f vp, Vector3f pov);
