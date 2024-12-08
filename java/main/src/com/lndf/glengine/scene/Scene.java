@@ -1,5 +1,6 @@
 package com.lndf.glengine.scene;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,8 @@ import com.lndf.glengine.scene.components.lighting.Spotlight;
 import physx.PxTopLevelFunctions;
 import physx.character.PxControllerManager;
 import physx.common.PxVec3;
+import physx.physics.PxRaycastBuffer10;
+import physx.physics.PxRaycastHit;
 import physx.physics.PxScene;
 
 public class Scene implements EngineResource {
@@ -268,6 +271,45 @@ public class Scene implements EngineResource {
 	public void setGravity(Vector3f gravity) {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			physXScene.setGravity(PxVec3.createAt(mem, MemoryStack::nmalloc, gravity.x, gravity.y, gravity.z));
+		}
+	}
+
+	public RayHit raycast(Vector3f origin, Vector3f direction, float distance) {
+		try (MemoryStack mem = MemoryStack.stackPush()) {
+			PxVec3 originVec = PxVec3.createAt(mem, MemoryStack::nmalloc, origin.x, origin.y, origin.z);
+			PxVec3 directionVec = PxVec3.createAt(mem, MemoryStack::nmalloc, direction.x, direction.y, direction.z);
+			PxRaycastBuffer10 buffer = new PxRaycastBuffer10();
+			directionVec.normalize();
+			boolean gotHit = physXScene.raycast(originVec, directionVec, distance, buffer);
+			if (!gotHit || !buffer.hasAnyHits()) {
+				buffer.destroy();
+				return null;
+			}
+			PxRaycastHit block = buffer.getBlock();
+			RayHit rayHit = new RayHit(block);
+			buffer.destroy();
+			return rayHit;
+		}
+	}
+
+	public ArrayList<RayHit> raycastAll(Vector3f origin, Vector3f direction, float distance) {
+		try (MemoryStack mem = MemoryStack.stackPush()) {
+			PxVec3 originVec = PxVec3.createAt(mem, MemoryStack::nmalloc, origin.x, origin.y, origin.z);
+			PxVec3 directionVec = PxVec3.createAt(mem, MemoryStack::nmalloc, direction.x, direction.y, direction.z);
+			PxRaycastBuffer10 buffer = new PxRaycastBuffer10();
+			directionVec.normalize();
+			boolean gotHit = physXScene.raycast(originVec, directionVec, distance, buffer);
+			if (!gotHit || !buffer.hasAnyHits()) {
+				buffer.destroy();
+				return null;
+			}
+			ArrayList<RayHit> hits = new ArrayList<>();
+			for (int i = 0; i < buffer.getNbAnyHits(); i++) {
+				PxRaycastHit hit = buffer.getAnyHit(i);
+				hits.add(new RayHit(hit));
+			}
+			buffer.destroy();
+			return hits;
 		}
 	}
 	
