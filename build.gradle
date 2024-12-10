@@ -4,6 +4,7 @@
 
 plugins {
     id 'java'
+	id 'maven-publish'
     id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
@@ -102,6 +103,29 @@ dependencies {
     runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-linux"
     runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-macos"
 	
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+pubhlishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+
+	repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/LNDF/GLEngine")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") // GitHub Actions actor
+                password = System.getenv("GITHUB_TOKEN") // GitHub Actions token
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile) {
