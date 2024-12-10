@@ -12,7 +12,7 @@ project.ext.lwjglVersion = "3.3.0"
 project.ext.jomlVersion = "1.10.8"
 project.ext.physxVersion = "2.4.2"
 
-group = 'com.lndf.GLEngine'
+group = 'com.lndf'
 version = '0.1.0'
 description = 'GLEngine'
 
@@ -114,6 +114,7 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
+			artifactId = "glengine"
 		}
 	}
 
