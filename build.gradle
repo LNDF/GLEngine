@@ -110,7 +110,7 @@ java {
 	withJavadocJar()
 }
 
-pubhlishing {
+publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
