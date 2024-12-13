@@ -160,6 +160,11 @@ jreleaser {
 		secretKey = System.getenv("GPG_SECRET_KEY")
 		passphrase = System.getenv("GPG_PASSPHRASE")
 	}
+	release {
+        github {
+            enabled = false
+        }
+    }
 	deploy {
 		maven {
 			mavenCentral {
