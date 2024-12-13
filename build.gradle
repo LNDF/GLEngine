@@ -5,6 +5,7 @@
 plugins {
     id 'java'
 	id 'maven-publish'
+	id 'org.jreleaser' version '1.15.0'
     id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
@@ -111,22 +112,67 @@ java {
 }
 
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-			artifactId = "glengine"
-		}
-	}
+    publications {
+        maven(MavenPublication) {
+            groupId = 'io.github.lndf'
+            artifactId = 'glengine'
 
-	repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/LNDF/GLEngine")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR") // GitHub Actions actor
-                password = System.getenv("GITHUB_TOKEN") // GitHub Actions token
+            from components.java
+
+            pom {
+                name = 'glengine'
+                description = 'OpenGL Engine'
+                url = 'https://github.com/LNDF/GLEngine'
+                inceptionYear = '2020'
+                licenses {
+                    license {
+                        name = 'Apache-2.0'
+                        url = 'https://spdx.org/licenses/Apache-2.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'LNDF'
+                        name = 'Lander Gallastegi'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/LNDF/GLEngine.git'
+                    developerConnection = 'scm:git:ssh://github.com/LNDF/GLEngine.git'
+                    url = 'https://github.com/LNDF/GLEngine'
+                }
             }
         }
     }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('maven-deploy')
+        }
+    }
+}
+
+jreleaser {
+	signing {
+		active = 'ALWAYS'
+		armored = true
+		publicKey = System.getenv("GPG_PUBLIC_KEY")
+		secretKey = System.getenv("GPG_SECRET_KEY")
+		passphrase = System.getenv("GPG_PASSPHRASE")
+	}
+	deploy {
+		maven {
+			mavenCentral {
+				sonatype {
+					active = 'ALWAYS'
+					url = 'https://central.sonatype.com/api/v1/publisher'
+					username = System.getenv("SONATYPE_USERNAME")
+					password = System.getenv("SONATYPE_PASSWORD")
+					stagingRepository('target/maven-deploy')
+				}
+			}
+		}
+	}
 }
 
 tasks.withType(JavaCompile) {
