@@ -174,7 +174,7 @@ jreleaser {
 					url = 'https://central.sonatype.com/api/v1/publisher'
 					username = System.getenv("SONATYPE_USERNAME")
 					password = System.getenv("SONATYPE_PASSWORD")
-					stagingRepository('target/maven-deploy')
+					stagingRepository('build/maven-deploy')
 				}
 			}
 		}
