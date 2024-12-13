@@ -161,7 +161,10 @@ jreleaser {
 		passphrase = System.getenv("GPG_PASSPHRASE")
 	}
 	release {
-        enabled = false
+        github {
+            skipRelease = true
+			token = "dummy"
+        }
     }
 	deploy {
 		maven {
