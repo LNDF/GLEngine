@@ -4,6 +4,7 @@
 
 plugins {
     id 'java'
+	id 'java-library'
 	id 'maven-publish'
 	id 'org.jreleaser' version '1.15.0'
     id "com.github.johnrengelman.shadow" version "8.1.1"
