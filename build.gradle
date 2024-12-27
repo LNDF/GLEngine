@@ -44,14 +44,14 @@ repositories {
 }
 
 dependencies {
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    api platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
-	implementation "org.lwjgl:lwjgl"
-	implementation "org.lwjgl:lwjgl-assimp"
-	implementation "org.lwjgl:lwjgl-glfw"
-	implementation "org.lwjgl:lwjgl-openal"
-	implementation "org.lwjgl:lwjgl-opengl"
-	implementation "org.lwjgl:lwjgl-stb"
+	api "org.lwjgl:lwjgl"
+	api "org.lwjgl:lwjgl-assimp"
+	api "org.lwjgl:lwjgl-glfw"
+	api "org.lwjgl:lwjgl-openal"
+	api "org.lwjgl:lwjgl-opengl"
+	api "org.lwjgl:lwjgl-stb"
 
 	runtimeOnly "org.lwjgl:lwjgl::natives-linux"
 	//runtimeOnly "org.lwjgl:lwjgl::natives-linux-arm64"
@@ -95,10 +95,10 @@ dependencies {
 	//runtimeOnly "org.lwjgl:lwjgl-stb::natives-windows-x86"
 	runtimeOnly "org.lwjgl:lwjgl-stb::natives-windows"
 
-	implementation "org.joml:joml:${jomlVersion}"
+	api "org.joml:joml:${jomlVersion}"
 	
 	//PhysX
-	implementation "de.fabmax:physx-jni:$physxVersion"
+	api "de.fabmax:physx-jni:$physxVersion"
 	
     runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-windows"
     runtimeOnly "de.fabmax:physx-jni:$physxVersion:natives-linux"
