@@ -75,6 +75,7 @@ public class CapsuleCharacterController extends CharacterController {
 		this.height = this.ctt.getHeight();
 		this.radius = this.ctt.getRadius();
 		super.pxDestroy();
+		this.ctt = null;
 	}
 	
 }

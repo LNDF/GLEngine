@@ -77,5 +77,6 @@ public class BoxCharacterController extends CharacterController {
 		this.halfSide = this.ctt.getHalfSideExtent();
 		this.halfForward = this.ctt.getHalfForwardExtent();
 		super.pxDestroy();
+		this.ctt = null;
 	}
 }
