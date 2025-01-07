@@ -18,6 +18,7 @@ public class Engine {
 	private static int width;
 	private static int height;
 	private static boolean resizable;
+	private static boolean vsync = true;
 	private static double frameTimeLimit = 0.0;
 	
 	private static int lastViewportWidth = -1;
@@ -129,6 +130,15 @@ public class Engine {
 
 	public static void setFPSLimit(int fpsLimit) {
 		Engine.frameTimeLimit = fpsLimit == 0 ? 0.0 : 1.0 / fpsLimit;
+	}
+
+	public static boolean isVsyncEnabled() {
+		return Engine.vsync;
+	}
+
+	public static void setVsync(boolean vsync) {
+		Engine.vsync = vsync;
+		glfwSwapInterval(vsync ? 1 : 0);
 	}
 	
 	public static void createWindow(String title, int width, int height) {
