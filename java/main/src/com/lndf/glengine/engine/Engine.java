@@ -18,6 +18,7 @@ public class Engine {
 	private static int width;
 	private static int height;
 	private static boolean resizable;
+	private static double frameTimeLimit = 0.0;
 	
 	private static int lastViewportWidth = -1;
 	private static int lastViewportHeight = -1;
@@ -87,6 +88,16 @@ public class Engine {
 			}
 			glfwSwapBuffers(Engine.windowId);
 			glfwPollEvents();
+			if (Engine.frameTimeLimit > 0.0) {
+				double frameTime = DeltaTime.get();
+				if (frameTime < Engine.frameTimeLimit) {
+					try {
+						Thread.sleep((long) ((Engine.frameTimeLimit - frameTime) * 1000.0));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	
@@ -110,6 +121,14 @@ public class Engine {
 		lastViewportWidth = width;
 		lastViewportHeight = height;
 		glViewport(0, 0, width, height);
+	}
+
+	public static int getFPSLimit() {
+		return (int) (1.0 / Engine.frameTimeLimit);
+	}
+
+	public static void setFPSLimit(int fpsLimit) {
+		Engine.frameTimeLimit = fpsLimit == 0 ? 0.0 : 1.0 / fpsLimit;
 	}
 	
 	public static void createWindow(String title, int width, int height) {
