@@ -281,7 +281,7 @@ public class Scene implements EngineResource {
 			PxRaycastBuffer10 buffer = new PxRaycastBuffer10();
 			directionVec.normalize();
 			boolean gotHit = physXScene.raycast(originVec, directionVec, distance, buffer);
-			if (!gotHit || !buffer.hasAnyHits()) {
+			if (!gotHit) {
 				buffer.destroy();
 				return null;
 			}
@@ -299,7 +299,7 @@ public class Scene implements EngineResource {
 			PxRaycastBuffer10 buffer = new PxRaycastBuffer10();
 			directionVec.normalize();
 			boolean gotHit = physXScene.raycast(originVec, directionVec, distance, buffer);
-			if (!gotHit || !buffer.hasAnyHits()) {
+			if (!gotHit) {
 				buffer.destroy();
 				return null;
 			}
