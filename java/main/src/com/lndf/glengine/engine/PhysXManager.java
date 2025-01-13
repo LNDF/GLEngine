@@ -137,14 +137,23 @@ public class PhysXManager {
 	}
 
 	public static void addActorToGameObjectMapping(PxActor rigid, GameObject object) {
+		if (rigid == null || object == null) {
+			return;
+		}
 		PhysXManager.rigidToGameObject.put(rigid.getAddress(), object);
 	}
 
-	public static void removeActorToGameobjectMapping(PxActor rigid, GameObject object) {
+	public static void removeActorToGameobjectMapping(PxActor rigid) {
+		if (rigid == null) {
+			return;
+		}
 		PhysXManager.rigidToGameObject.remove(rigid.getAddress());
 	}
 
 	public static GameObject getGameObjectFromActor(PxActor rigid) {
+		if (rigid == null) {
+			return null;
+		}
 		return PhysXManager.rigidToGameObject.get(rigid.getAddress());
 	}
 

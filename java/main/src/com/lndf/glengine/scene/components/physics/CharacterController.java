@@ -233,7 +233,7 @@ public abstract class CharacterController extends Component implements EngineRes
 	@Override
 	public void unsetScene(Scene scene) {
 		this.cttManager = scene.getPhysXCCTManager();
-		PhysXManager.removeActorToGameobjectMapping(this.getPxRigidActor(), this.getGameObject());
+		PhysXManager.removeActorToGameobjectMapping(this.getPxRigidActor());
 		this.pxDestroy();
 	}
 	

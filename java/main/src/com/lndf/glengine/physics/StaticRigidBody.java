@@ -13,14 +13,12 @@ import physx.physics.PxRigidStatic;
 public class StaticRigidBody implements RigidBody {
 	
 	private PxRigidStatic rigid;
-	private GameObject object;
 
 	public StaticRigidBody(GameObject object) {
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxTransform pose = PxTransform.createAt(mem, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
 			this.rigid = PhysXManager.getPhysics().createRigidStatic(pose);
 		}
-		this.object = object;
 		PhysXManager.addActorToGameObjectMapping(this.rigid, object);
 	}
 
@@ -32,7 +30,7 @@ public class StaticRigidBody implements RigidBody {
 	@Override
 	public void pxRelease() {
 		if (this.rigid != null) {
-			PhysXManager.removeActorToGameobjectMapping(this.rigid, this.object);
+			PhysXManager.removeActorToGameobjectMapping(this.rigid);
 			this.rigid.release();
 			this.rigid = null;
 		}
