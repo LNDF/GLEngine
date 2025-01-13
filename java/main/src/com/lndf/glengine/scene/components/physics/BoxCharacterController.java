@@ -60,7 +60,6 @@ public class BoxCharacterController extends CharacterController {
 	
 	@Override
 	protected void pxCreate() {
-		super.pxCreate();
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxBoxControllerDesc desc = PxBoxControllerDesc.createAt(mem, MemoryStack::nmalloc);
 			this.configureBaseControllerDesc(desc);
@@ -69,6 +68,7 @@ public class BoxCharacterController extends CharacterController {
 			desc.setHalfSideExtent(this.halfSide);
 			this.ctt = PxBoxController.wrapPointer(this.cttManager.createController(desc).getAddress());
 		}
+		super.pxCreate();
 	}
 	
 	@Override

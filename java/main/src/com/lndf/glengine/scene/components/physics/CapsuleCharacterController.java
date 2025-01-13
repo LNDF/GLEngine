@@ -60,7 +60,6 @@ public class CapsuleCharacterController extends CharacterController {
 	
 	@Override
 	protected void pxCreate() {
-		super.pxCreate();
 		try (MemoryStack mem = MemoryStack.stackPush()) {
 			PxCapsuleControllerDesc desc = PxCapsuleControllerDesc.createAt(mem, MemoryStack::nmalloc);
 			this.configureBaseControllerDesc(desc);
@@ -68,6 +67,7 @@ public class CapsuleCharacterController extends CharacterController {
 			desc.setHeight(this.height);
 			this.ctt = PxCapsuleController.wrapPointer(this.cttManager.createController(desc).getAddress());
 		}
+		super.pxCreate();
 	}
 	
 	@Override

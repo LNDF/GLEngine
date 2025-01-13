@@ -23,7 +23,11 @@ import physx.character.PxControllerManager;
 import physx.character.PxControllerNonWalkableModeEnum;
 import physx.character.PxExtendedVec3;
 import physx.common.PxVec3;
+import physx.physics.PxActor;
 import physx.physics.PxRigidActor;
+import physx.physics.PxShapeFlagEnum;
+import physx.support.PxArray_PxShapePtr;
+import physx.support.PxShapePtr;
 
 public abstract class CharacterController extends Component implements EngineResource, RigidBody {
 	
@@ -51,6 +55,9 @@ public abstract class CharacterController extends Component implements EngineRes
 	//behaviourCallback = NULL
 	//position = 0, 0, 0
 	//registerDeclarationListener = true
+
+	private boolean trigger;
+	private boolean queriable;
 	
 	public abstract PxController getPxCtt();
 	
@@ -62,6 +69,8 @@ public abstract class CharacterController extends Component implements EngineRes
 	protected void pxCreate() {
 		Engine.addEngineResource(this);
 		this.filters = new PxControllerFilters();
+		this.setTrigger(this.trigger);
+		this.setQueriable(this.queriable);
 	}
 	
 	@Override
@@ -87,6 +96,8 @@ public abstract class CharacterController extends Component implements EngineRes
 		this.contactOffset = ctt.getContactOffset();
 		this.stepOffset = ctt.getStepOffset();
 		this.shouldSlide = ctt.getNonWalkableMode() == PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING;
+		this.trigger = this.isTrigger();
+		this.queriable = this.isQueriable();
 		this.filters.destroy();
 		ctt.release();
 	}
@@ -217,6 +228,57 @@ public abstract class CharacterController extends Component implements EngineRes
 	public void setShouldSlide(boolean shouldSlide) {
 		if (this.getPxCtt() != null) this.getPxCtt().setNonWalkableMode(this.shouldSlide ? PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING : PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING);
 		this.shouldSlide = shouldSlide;
+	}
+
+	private boolean getShapeFlag(PxShapeFlagEnum flag) {
+		PxRigidActor actor = this.getPxRigidActor();
+		if (actor == null) return false;
+		PxArray_PxShapePtr shapes = new PxArray_PxShapePtr(1);
+		actor.getShapes(shapes.begin(), 1, 0);
+		return shapes.get(0).getFlags().isSet(flag);
+	}
+
+	private void setShapeFlag(PxShapeFlagEnum flag, boolean value) {
+		PxRigidActor actor = this.getPxRigidActor();
+		if (actor == null) return;
+		int shapeCount = actor.getNbShapes();
+		PxArray_PxShapePtr shapes = new PxArray_PxShapePtr(shapeCount);
+		actor.getShapes(shapes.begin(), shapeCount, 0);
+		for (int i = 0; i < shapeCount; i++) {
+			shapes.get(i).setFlag(flag, value);
+		}
+	}
+
+	public boolean isTrigger() {
+		if (this.getPxRigidActor() == null) return this.trigger;
+		return this.getShapeFlag(PxShapeFlagEnum.eSIMULATION_SHAPE);
+	}
+
+	public void setTrigger(boolean trigger) {
+		if (this.getPxRigidActor() != null) {
+			if (trigger) {
+				this.setShapeFlag(PxShapeFlagEnum.eSIMULATION_SHAPE, true);
+				this.setShapeFlag(PxShapeFlagEnum.eTRIGGER_SHAPE, true);
+			} else {
+				this.setShapeFlag(PxShapeFlagEnum.eSIMULATION_SHAPE, false);
+				this.setShapeFlag(PxShapeFlagEnum.eTRIGGER_SHAPE, false);
+			}
+		} else {
+			this.trigger = trigger;
+		}
+	}
+
+	public boolean isQueriable() {
+		if (this.getPxRigidActor() == null) return this.queriable;
+		return this.getShapeFlag(PxShapeFlagEnum.eSCENE_QUERY_SHAPE);
+	}
+
+	public void setQueriable(boolean queriable) {
+		if (this.getPxRigidActor() != null) {
+			this.setShapeFlag(PxShapeFlagEnum.eSCENE_QUERY_SHAPE, queriable);
+		} else {
+			this.queriable = queriable;
+		}
 	}
 	
 	public void resize(float height) {
