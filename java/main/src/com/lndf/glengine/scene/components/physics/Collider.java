@@ -34,6 +34,7 @@ public abstract class Collider extends Component implements EngineResource {
 	private float restOffset;
 	private float contactOffset;
 	private boolean trigger;
+	private boolean queriable;
 	
 	protected PxShape shape;
 	protected PhysicalMaterial material;
@@ -52,6 +53,7 @@ public abstract class Collider extends Component implements EngineResource {
 		this.setRestOffset(this.restOffset);
 		this.setContactOffset(this.contactOffset);
 		this.setTrigger(this.trigger);
+		this.setQueriable(this.queriable);
 	}
 	
 	public PhysicalMaterial getMaterial() {
@@ -71,6 +73,7 @@ public abstract class Collider extends Component implements EngineResource {
 			this.restOffset = this.getRestOffset();
 			this.contactOffset = this.getContactOffset();
 			this.trigger = this.isTrigger();
+			this.queriable = this.isQueriable();
 			this.shape.release();
 			this.shape = null;
 		}
@@ -193,6 +196,19 @@ public abstract class Collider extends Component implements EngineResource {
 			}
 		} else {
 			this.trigger = trigger;
+		}
+	}
+
+	public boolean isQueriable() {
+		if (this.shape == null) return this.queriable;
+		return this.shape.getFlags().isSet(PxShapeFlagEnum.eSCENE_QUERY_SHAPE);
+	}
+
+	public void setQueriable(boolean queriable) {
+		if (this.shape != null) {
+			this.shape.setFlag(PxShapeFlagEnum.eSCENE_QUERY_SHAPE, queriable);
+		} else {
+			this.queriable = queriable;
 		}
 	}
 	
