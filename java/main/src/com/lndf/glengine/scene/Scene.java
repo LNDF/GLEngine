@@ -281,12 +281,25 @@ public class Scene implements EngineResource {
 			PxRaycastBuffer10 buffer = new PxRaycastBuffer10();
 			directionVec.normalize();
 			boolean gotHit = physXScene.raycast(originVec, directionVec, distance, buffer);
-			if (!gotHit) {
+			if (!gotHit || buffer.getNbTouches() == 0) {
 				buffer.destroy();
 				return null;
 			}
-			PxRaycastHit block = buffer.getBlock();
-			RayHit rayHit = new RayHit(block);
+			int hitIndex = -1;
+			float minDistance = Float.MAX_VALUE;
+			for (int i = 0; i < buffer.getNbTouches(); i++) {
+				PxRaycastHit hit = buffer.getTouch(i);
+				if (hit.getDistance() <= minDistance) {
+					minDistance = hit.getDistance();
+					hitIndex = i;
+				}
+			}
+			if (hitIndex == -1) {
+				buffer.destroy();
+				return null;
+			}
+			PxRaycastHit hit = buffer.getTouch(hitIndex);
+			RayHit rayHit = new RayHit(hit);
 			buffer.destroy();
 			return rayHit;
 		}
@@ -304,8 +317,8 @@ public class Scene implements EngineResource {
 				return null;
 			}
 			ArrayList<RayHit> hits = new ArrayList<>();
-			for (int i = 0; i < buffer.getNbAnyHits(); i++) {
-				PxRaycastHit hit = buffer.getAnyHit(i);
+			for (int i = 0; i < buffer.getNbTouches(); i++) {
+				PxRaycastHit hit = buffer.getTouch(i);
 				hits.add(new RayHit(hit));
 			}
 			buffer.destroy();
